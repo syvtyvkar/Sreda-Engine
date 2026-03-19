@@ -1,0 +1,10 @@
+{
+  "name": "engine",
+  "version": "1.0.0",
+  "dependencies": [
+    "glfw3",
+    "glm",
+    "spdlog"
+  ],
+  "builtin-baseline": "57987637aac17d62bac535bc839baca3754490e6"
+}
