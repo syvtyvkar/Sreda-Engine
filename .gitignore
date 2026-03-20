@@ -1,6 +1,9 @@
 # Build files
 build/*
 
+# vcpkg installed
+vcpkg_installed/*
+
 # Prerequisites
 *.d
 
