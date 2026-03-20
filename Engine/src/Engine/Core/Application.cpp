@@ -45,7 +45,7 @@ namespace Engine
         WindowConfig.wight = 800;
         WindowConfig.height = 600;
         WindowConfig.title = InNameApp;
-        WindowConfig.vsync = true;
+        WindowConfig.vsync = false;
 
         if (!AppWindow->Init(WindowConfig))                                                         // Попытка инициализировать окно с заданными параметрами
         {                                                       
@@ -64,7 +64,7 @@ namespace Engine
         m_render->setViewport(0,0,WindowConfig.wight,WindowConfig.height);                          // Установка области вывода (viewport) на весь размер окна
         m_render->setClearColor(Color(0.1f,0.1f,0.1f,1.f));                                         // Установка цвета очистки экрана (тёмно-серый)
 
-        Input::InputSystem::Init(AppWindow.get());                                                  // Инициализация системы ввода с передачей указателя на окно
+        Engine::InputSystem::Init(AppWindow.get());                                                  // Инициализация системы ввода с передачей указателя на окно
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))                                    // Загрузка OpenGL функций через GLAD (требуется после создания контекста окна)
         {                                  
@@ -80,10 +80,10 @@ namespace Engine
         camConfig.screenWidth = WindowConfig.wight;                                                 // Ширина экрана для соотношения сторон
         camConfig.screenHeight = WindowConfig.height;                                               // Высота экрана
 
-        // Подписка на событие нажатия клавиши
-        Input::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](int key, int mods, int repeat) 
+        // Подписка на событие нажатия клавиши (Выход из демонстрации)
+        Engine::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](InputKey key, int mods, int repeat) 
         {
-            if (Input::InputSystem::InputKeyFromInt(key) != InputKey::X) return;                            // Если нажата не клавиша X, игнорируем
+            if (key != InputKey::Escape) return;                                                                 // Если нажата не клавиша X, игнорируем
             ENGINE_LOG_INFO("Press exit application...");                                                   // Логируем нажатие
             ExitApp();                                                                                      // Выход из приложения
         });
@@ -112,7 +112,7 @@ namespace Engine
             m_render->endFrame();                                                                           // Завершение кадра (переключение буферов и т.д.)
             AppWindow->Update();                                                                            // Обработка событий окна (GLFW poll events)
         }
-        Input::InputSystem::Shutdown();                                                                     // Выключение системы ввода
+        Engine::InputSystem::Shutdown();                                                                     // Выключение системы ввода
         Time::TimeSystem::Shutdown();                                                                       // Выключение системы времени
     }
 

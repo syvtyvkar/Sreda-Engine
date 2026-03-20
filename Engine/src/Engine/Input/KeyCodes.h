@@ -5,7 +5,7 @@
 #include <cstdint>
 #include "Engine/Core/Event.h"
 
-namespace Input
+namespace Engine
 {
 
     /**

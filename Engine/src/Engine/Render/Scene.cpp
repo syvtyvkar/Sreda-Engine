@@ -62,27 +62,27 @@ namespace Engine
             obj->update(deltaTime);
         }
 
-        if (Input::InputSystem::IsKeyPressed(InputKey::W))
+        if (Engine::InputSystem::IsKeyPressed(InputKey::W))
         {
             r_camera.get()->processKeyboard(Engine::CameraMovement::Forward, deltaTime);
         }
-        if (Input::InputSystem::IsKeyPressed(InputKey::S))
+        if (Engine::InputSystem::IsKeyPressed(InputKey::S))
         {
             r_camera.get()->processKeyboard(Engine::CameraMovement::Backward, deltaTime);
         }
-        if (Input::InputSystem::IsKeyPressed(InputKey::A))
+        if (Engine::InputSystem::IsKeyPressed(InputKey::A))
         {
             r_camera.get()->processKeyboard(Engine::CameraMovement::Left, deltaTime);
         }
-        if (Input::InputSystem::IsKeyPressed(InputKey::D))
+        if (Engine::InputSystem::IsKeyPressed(InputKey::D))
         {
             r_camera.get()->processKeyboard(Engine::CameraMovement::Right, deltaTime);
         }
-        if (Input::InputSystem::IsKeyPressed(InputKey::Q))
+        if (Engine::InputSystem::IsKeyPressed(InputKey::Q))
         {
             r_camera.get()->processKeyboard(Engine::CameraMovement::Down, deltaTime);
         }
-        if (Input::InputSystem::IsKeyPressed(InputKey::E))
+        if (Engine::InputSystem::IsKeyPressed(InputKey::E))
         {
             r_camera.get()->processKeyboard(Engine::CameraMovement::Up, deltaTime);
         }

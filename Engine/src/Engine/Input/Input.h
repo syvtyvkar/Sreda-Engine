@@ -10,18 +10,18 @@
 #include <glm/glm.hpp>                          // Математическая библиотека для векторов
 
 
-ADD_DELEGATE_THREE_PARAMS(DOnKeyPressed, int, int, int)         // Событие нажатия клавиши (key, scancode, mods)
-ADD_DELEGATE_TWO_PARAMS(DOnKeyReleased,int,int)                 // Событие отпускания клавиши (key, mods)
-ADD_DELEGATE_TWO_PARAMS(DOnMouseMoved,float,float)              // Событие перемещения мыши (x, y)
-ADD_DELEGATE_TWO_PARAMS(DOnMouseScrolled,float,float)           // Событие прокрутки колесика (xOffset, yOffset)
-ADD_DELEGATE_TWO_PARAMS(DOnMouseButtonPressed,int,int)          // Событие нажатия кнопки мыши (button, mods)
-ADD_DELEGATE_TWO_PARAMS(DOnMouseButtonReleased,int,int)         // Событие отпускания кнопки мыши (button, mods)
-
 struct GLFWwindow;          //TODO: Убрать!!!!
-using namespace Input;
+//using namespace Input;
 
-namespace Engine::Input 
+namespace Engine
 {
+    ADD_DELEGATE_THREE_PARAMS(DOnKeyPressed, InputKey, int, int)         // Событие нажатия клавиши (key, scancode, mods)
+    ADD_DELEGATE_TWO_PARAMS(DOnKeyReleased,InputKey,int)                 // Событие отпускания клавиши (key, mods)
+    ADD_DELEGATE_TWO_PARAMS(DOnMouseMoved,float,float)              // Событие перемещения мыши (x, y)
+    ADD_DELEGATE_TWO_PARAMS(DOnMouseScrolled,float,float)           // Событие прокрутки колесика (xOffset, yOffset)
+    ADD_DELEGATE_TWO_PARAMS(DOnMouseButtonPressed,InputKey,int)          // Событие нажатия кнопки мыши (button, mods)
+    ADD_DELEGATE_TWO_PARAMS(DOnMouseButtonReleased,InputKey,int)         // Событие отпускания кнопки мыши (button, mods)
+    
     class Window;
 
     /**
@@ -62,7 +62,7 @@ namespace Engine::Input
 
         static void* GetWindowHandle();                                     // Возвращает указатель на нативный дескриптор окна (например, GLFWwindow*).
 
-        InputListen* GetInputListen() {return m_InputListen;};              // Возвращает указатель на объект InputListen (используется для расширенной обработки).
+        InputListen* GetInputListen() {return m_InputListen.get();};        // Возвращает указатель на объект InputListen (используется для расширенной обработки).
 
         // Доступ к делегатам для подписки
         DOnKeyPressed& OnKeyPressed() {return s_OnKeyPressed;}
@@ -72,8 +72,8 @@ namespace Engine::Input
         DOnMouseButtonPressed& OnMouseButtonPressed() {return s_OnMouseButtonPressed;}
         DOnMouseButtonReleased& OnMouseButtonReleased() {return s_OnMouseButtonReleased;}
 
-        static InputKey InputKeyFromInt(int IntKey);                        // Преобразует целочисленный код клавиши (например, из GLFW) в перечисление InputKey.
-
+    protected:
+        std::unique_ptr<InputListen> m_InputListen=nullptr;                 // Слушатель ввода
     private:
         InputSystem() = default;
         ~InputSystem() =default;
@@ -82,7 +82,6 @@ namespace Engine::Input
         InputState GetKeyStateInternal(InputKey Key) const;                 // Внутренний метод получения состояния клавиши.
 
         static InputSystem* s_InputInstance;                                // Указатель на единственный экземпляр (синглтон).
-        InputListen* m_InputListen=nullptr;                                 // Слушатель ввода
 
         // Состояния клавиш: текущее и предыдущее (для определения just pressed/released).
         uint8_t m_keyStates[static_cast<uint32_t>(InputKey::KeyCount)];
@@ -93,19 +92,6 @@ namespace Engine::Input
         glm::vec2 m_mouseDelta = {0,0};                                     // Изменение позиции за кадр.
         double m_scrollDelta = 0.0;                                         // Накопленная прокрутка колесика.
 
-        void* m_windowHandle = nullptr;                                     // Нативный дескриптор окна (платформозависимый).
-
-#ifdef ENGINE_GLFW
-        //TODO: УБРАТЬ!!!!! Преобразования между InputKey и GLFW-кодами
-        static int ToGLFWKey(InputKey key);
-        static InputKey FromGLFWKey(int glfwKey);
-        static int ToGLFWMouseButton(InputKey button);
-        // Статические функции-обработчики, которые будут переданы в GLFW как колбэки.
-        static void OnGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-        static void OnGLFWMouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-        static void OnGLFWCursorPosCallback(GLFWwindow* window, double xpos, double ypos);
-        static void OnGLFWScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-#endif
         // Дружественный класс Window имеет доступ к приватным методам (например, для обработки).
         friend class Window;
 
@@ -117,5 +103,10 @@ namespace Engine::Input
         DOnMouseButtonPressed s_OnMouseButtonPressed;       // button, mods
         DOnMouseButtonReleased s_OnMouseButtonReleased;     // button, mods
 
+    protected:
+        void CallOnKeyPressed(InputKey key, int scancode, int mods, InputState State);
+        void CallOnMouseMoved(float x, float y);
+        void CallOnMouseScrolled(float x, float mods);
+        void CallOnMouseButtonPressed(InputKey button, int mods, InputState State);
     };
 }

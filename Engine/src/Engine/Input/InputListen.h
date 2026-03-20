@@ -4,22 +4,19 @@
 
 #include "Engine/Core/Types.h"          // Основные типы движка (Vector2, Vector3 и т.д.)
 #include "Engine/Input/KeyCodes.h"      // Коды клавиш (InputKey)
-//#include "Engine/Input/Input.h"
 #include "Engine/Core/Log.h"            // Логирование
 #include "Engine/Core/Event.h"          // Базовые события (вероятно, используется в делегатах)
 #include <memory>                       // Для std::unique_ptr
 #include <string>                       // Для std::string
 
-// Определение типов делегатов для событий ввода, специфичных для InputListen.
-ADD_DELEGATE_THREE_PARAMS(DOnKeyPressedListen, int, int, int)       // key, scancode, mods
-ADD_DELEGATE_TWO_PARAMS(DOnKeyReleasedListen,int,int)               // key, mods
-ADD_DELEGATE_TWO_PARAMS(DOnMouseMovedListen,float,float)            // x, y
-ADD_DELEGATE_TWO_PARAMS(DOnMouseScrolledListen,float,float)         // xOffset, yOffset
-ADD_DELEGATE_TWO_PARAMS(DOnMouseButtonPressedListen,int,int)        // button, mods
-ADD_DELEGATE_TWO_PARAMS(DOnMouseButtonReleasedListen,int,int)       // button, mods
-
-namespace Engine::Input 
+namespace Engine 
 {
+    // Определение типов делегатов для событий ввода, специфичных для InputListen.
+    ADD_DELEGATE_FOUR_PARAMS(DOnKeyPressedListen, InputKey, int, int,InputState)       // key, scancode, mods
+    ADD_DELEGATE_TWO_PARAMS(DOnMouseMovedListen,float,float)            // x, y
+    ADD_DELEGATE_TWO_PARAMS(DOnMouseScrolledListen,float,float)         // xOffset, yOffset
+    ADD_DELEGATE_THREE_PARAMS(DOnMouseButtonPressedListen,InputKey,int,InputState)        // button, mods
+
     /**
      * @class InputListen
      * @brief Абстрактный базовый класс для обработчиков ввода.
@@ -38,27 +35,25 @@ namespace Engine::Input
         //virtual InputListen() = default;
         virtual ~InputListen() = default;                                                               // Виртуальный деструктор для корректного удаления наследников
 
-        virtual void Init(class InputSystem* InInput) = 0;                                              // Инициализация слушателя.
+        virtual void Init(class Window* InWindow) = 0;                                              // Инициализация слушателя.
         virtual void DeInit() = 0;                                                                      // Деинициализация слушателя, освобождение ресурсов.
 
         // Методы доступа к делегатам для подписки.
         DOnKeyPressedListen& OnKeyPressed() {return s_OnKeyPressedListen;}
-        DOnKeyReleasedListen& OnKeyReleased() {return s_OnKeyReleasedListen;}
         DOnMouseMovedListen& OnMouseMoved() {return s_OnMouseMovedListen;}
         DOnMouseScrolledListen& OnMouseScrolled() {return s_OnMouseScrolledListen;}
         DOnMouseButtonPressedListen& OnMouseButtonPressed() {return s_OnMouseButtonPressedListen;}
-        DOnMouseButtonReleasedListen& OnMouseButtonReleased() {return s_OnMouseButtonReleasedListen;}
+
+        virtual void SetCursorVisible(bool Visible) = 0;                    
+        virtual void SetCursorMode(int Mode) = 0; // 0=Normal, 1=Hidden, 2=Disable
 
     protected:
 
         // Защищённые экземпляры делегатов, доступные наследникам.
         DOnKeyPressedListen s_OnKeyPressedListen;
-        DOnKeyReleasedListen s_OnKeyReleasedListen;
         DOnMouseMovedListen s_OnMouseMovedListen;
         DOnMouseScrolledListen s_OnMouseScrolledListen;
         DOnMouseButtonPressedListen s_OnMouseButtonPressedListen;
-        DOnMouseButtonReleasedListen s_OnMouseButtonReleasedListen;
-
     };
 
     /**

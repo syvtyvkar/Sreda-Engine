@@ -2,98 +2,11 @@
 
 #include "Engine/Input/Input.h"                                 // Основной заголовок системы ввода
 #include "Engine/Core/Log.h"                                    // Логирование
+#include "Input.h"
 
-#ifdef ENGINE_GLFW
-#include <GLFW/glfw3.h>                                         // Заголовок GLFW (платформозависимый)
-#include "Engine/Input/InputCodes.h"                            // Таблицы соответствия клавиш (GLFW <-> Engine)
-#include "Engine/Platform/WindowAPI/WindowGLF3/WindowGLF3.h"    // Класс окна GLFW
-#endif
-
-#include "Engine/Input/InputAPI/InputGLF3/InputGLF3.h"          // Специфичная для GLFW часть ввода
-
-#include <unordered_map>                                        // Пока не используется
-
-namespace Engine::Input 
+namespace Engine
 {
     InputSystem* InputSystem::s_InputInstance = nullptr;        // Инициализация статического указателя на единственный экземпляр InputSystem.
-
-    /*************** API */
-
-#ifdef ENGINE_GLFW
-
-    int InputSystem::ToGLFWKey(InputKey key)  // Преобразует внутренний код клавиши (InputKey) в соответствующий код GLFW.          
-    {
-        auto idx = static_cast<uint32_t>(key);
-        if (idx >= sizeof(GLFW::KeyToGLFW) / sizeof(GLFW::KeyToGLFW[0])) 
-        {
-            return GLFW_KEY_UNKNOWN;  // Если индекс выходит за пределы таблицы
-        }
-        return GLFW::KeyToGLFW[idx];
-    }
-
-    InputKey InputSystem::FromGLFWKey(int glfwKey) {return GLFW::GLFWKeyToEngineKey(glfwKey);};             // Преобразует код клавиши GLFW во внутренний InputKey.
-
-    int InputSystem::ToGLFWMouseButton(InputKey button) {return ToGLFWKey(button);};                        // Преобразует кнопку мыши (InputKey) в код GLFW (используется та же таблица, что и для клавиш, но с учётом сдвига).
-
-    void InputSystem::OnGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)    // Колбэк, вызываемый GLFW при событии клавиатуры.
-    {
-        if (!s_InputInstance) return;
-        
-        InputKey engineKey = InputSystem::FromGLFWKey(key);                                 // Преобразуем GLFW-код клавиши во внутренний.
-        if (engineKey == InputKey::Unknown) return;                                         // Игнорируем неизвестные клавиши
-
-        InputState state = InputState::Unknown;                                             // Определяем тип действия (нажатие, повтор, отпускание).
-        switch (action) {
-            case GLFW_PRESS:    state = InputState::Pressed; break;
-            case GLFW_REPEAT:   state = InputState::Repeated; break;
-            case GLFW_RELEASE:  state = InputState::Released; break;
-        }
-
-        s_InputInstance->OnKeyPressed().Broadcast(key,mods,scancode);                       // Вызов делегата (события) нажатия клавиши.
-
-        if (state != InputState::Unknown) s_InputInstance->SetKeyState(engineKey, state);   // Если состояние определено, обновляем внутреннее состояние клавиши.
-    }
-
-    void InputSystem::OnGLFWMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)   // Колбэк для событий кнопок мыши.
-    {
-        if (!s_InputInstance) return;
-        
-        // Кнопки мыши в GLFW имеют коды, начиная с 0, но мы сдвигаем их на 1000, чтобы отличать от клавиш клавиатуры
-        InputKey engineButton = FromGLFWKey(button + 1000);  // Сдвиг для мыши
-        if (engineButton == InputKey::Unknown) return;
-
-        InputState state = (action == GLFW_PRESS) ? InputState::Pressed : (action == GLFW_RELEASE) ? InputState::Released : InputState::Unknown;    // Определяем действие (нажатие/отпускание).
-
-        // Вызов соответствующих делегатов.
-        if (state == InputState::Pressed)
-        {
-            s_InputInstance->OnMouseButtonPressed().Broadcast(button,mods);
-        }else if (state == InputState::Released)
-        {
-            s_InputInstance->OnMouseButtonReleased().Broadcast(button,mods);
-        }
-        
-
-        if (state != InputState::Unknown) s_InputInstance->SetKeyState(engineButton, state);    // Обновляем состояние кнопки, если оно определено.
-
-    }
-
-    void InputSystem::OnGLFWCursorPosCallback(GLFWwindow* window, double xpos, double ypos)     // Колбэк перемещения курсора мыши.
-    {
-        if (!s_InputInstance) return;
-        
-        glm::vec2 newPos = {static_cast<float>(xpos), static_cast<float>(ypos)};
-        s_InputInstance->m_mouseDelta = newPos - s_InputInstance->m_mousePosition;              // Вычисляем смещение
-        s_InputInstance->m_mousePosition = newPos;                                              // Обновляем текущую позицию
-    }
-
-    void InputSystem::OnGLFWScrollCallback(GLFWwindow* window, double xoffset, double yoffset)  // Колбэк прокрутки колесика мыши.
-    {
-        if (!s_InputInstance) return;
-        s_InputInstance->m_scrollDelta = yoffset;  // Обычно используем только вертикальный скролл
-    }
-
-#endif
 
     /*************** BASE (базовые методы инициализации/завершения) */
 
@@ -104,23 +17,23 @@ namespace Engine::Input
             return;
         }
         s_InputInstance = new InputSystem();
-        s_InputInstance->m_windowHandle=windowHandle;                       // Сохраняем указатель на окно
 
         // Обнуляем массивы состояний клавиш (текущее и предыдущее).
         for (auto& LState : s_InputInstance->m_keyStates) LState = 0;
         for (auto& LState : s_InputInstance->m_prevKeyStates) LState = 0;
 
-        #ifdef ENGINE_GLFW
-        // Приведение указателя к конкретному типу окна GLFW.
-        Engine::WindowGLF3* WindowGL = static_cast<Engine::WindowGLF3*>(windowHandle);
-        auto* glfwWindow = static_cast<GLFWwindow*>(WindowGL->GetHandle());
+        s_InputInstance->m_InputListen = InputListenAPIFactory::create();
+        if (!s_InputInstance->m_InputListen.get())
+        {
+            ENGINE_LOG_ERROR("ERROR SERACH INPUT LISTEN!");
+            return;
+        }
+        s_InputInstance->m_InputListen.get()->Init(windowHandle);
+        s_InputInstance->m_InputListen.get()->OnKeyPressed().Subscribe([&](InputKey key, int mods, int repeat,InputState state) { s_InputInstance->CallOnKeyPressed(key,mods,repeat,state);});
+        s_InputInstance->m_InputListen.get()->OnMouseButtonPressed().Subscribe([&](InputKey button, int mods,InputState state) {s_InputInstance->CallOnMouseButtonPressed(button,mods,state);});
+        s_InputInstance->m_InputListen.get()->OnMouseMoved().Subscribe([&](float x, float y) {s_InputInstance->CallOnMouseMoved(x,y);});
+        s_InputInstance->m_InputListen.get()->OnMouseScrolled().Subscribe([&](float x, float y) {s_InputInstance->CallOnMouseScrolled(x,y);});
 
-         // Устанавливаем колбэки GLFW.
-        glfwSetKeyCallback(glfwWindow, OnGLFWKeyCallback);
-        glfwSetMouseButtonCallback(glfwWindow, OnGLFWMouseButtonCallback);
-        glfwSetCursorPosCallback(glfwWindow, OnGLFWCursorPosCallback);
-        glfwSetScrollCallback(glfwWindow, OnGLFWScrollCallback);
-        #endif
         ENGINE_LOG_TRACE("Input system start!");
     }
 
@@ -128,17 +41,9 @@ namespace Engine::Input
     {
         if (!s_InputInstance) return;
 
-        #ifdef ENGINE_GLFW
-        // Сбрасываем колбэки GLFW, чтобы они не вызывались после удаления InputSystem.
-        auto* glfwWindow = static_cast<GLFWwindow*>(s_InputInstance->m_windowHandle);
-        if (glfwWindow)
-        {
-            glfwSetKeyCallback(glfwWindow, nullptr);
-            glfwSetMouseButtonCallback(glfwWindow, nullptr);
-            glfwSetCursorPosCallback(glfwWindow, nullptr);
-            glfwSetScrollCallback(glfwWindow, nullptr);
-        }
-        #endif
+        s_InputInstance->m_InputListen.get()->DeInit();
+        s_InputInstance->m_InputListen.reset();
+
         delete s_InputInstance;
         s_InputInstance = nullptr;
         ENGINE_LOG_INFO("Input system shutdown");
@@ -160,18 +65,21 @@ namespace Engine::Input
     bool InputSystem::IsKeyPressed(InputKey Key)    // Проверка, зажата ли клавиша в текущем кадре (включая повтор).
     {
         if (!s_InputInstance) return false;
+        if (!s_InputInstance->GetInputListen()) return false;
         return s_InputInstance->GetKeyStateInternal(Key) == InputState::Pressed || s_InputInstance->GetKeyStateInternal(Key) == InputState::Repeated;
     }
 
     bool InputSystem::IsKeyJustPressed(InputKey Key)    // Проверка, было ли только что (в этом кадре) нажатие клавиши.
     {
         if (!s_InputInstance) return false;
+        if (!s_InputInstance->GetInputListen()) return false;
         return s_InputInstance->GetKeyStateInternal(Key) == InputState::Pressed && s_InputInstance->m_prevKeyStates[static_cast<uint32_t>(Key)] == 0;
     }
 
     bool InputSystem::IsKeyJustReleased(InputKey Key)   // Проверка, было ли только что отпускание клавиши.
     {
         if (!s_InputInstance) return false;
+        if (!s_InputInstance->GetInputListen()) return false;
         return s_InputInstance->GetKeyStateInternal(Key) == InputState::Released || s_InputInstance->m_prevKeyStates[static_cast<uint32_t>(Key)] == 0;
     }
 
@@ -179,6 +87,7 @@ namespace Engine::Input
     InputState InputSystem::GetKeyState(InputKey Key)   // Получение текущего состояния клавиши.
     {
         if (!s_InputInstance) return InputState::Unknown;
+        if (!s_InputInstance->GetInputListen()) InputState::Unknown;
         return s_InputInstance->GetKeyStateInternal(Key);
     }
 
@@ -209,37 +118,18 @@ namespace Engine::Input
 
     void InputSystem::SetCursorVisible(bool InVisible)  // Установка видимости курсора.
     {
-        #ifdef ENGINE_GLFW
-        if (s_InputInstance && s_InputInstance->m_windowHandle)
+        if (s_InputInstance && s_InputInstance->GetInputListen())
         {
-            auto* glfwWindow = static_cast<GLFWwindow*>(s_InputInstance->m_windowHandle);
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, InVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+            s_InputInstance->GetInputListen()->SetCursorVisible(InVisible);
         }
-        #endif
     }
 
     void InputSystem::SetCursorMode(int mode)   // Установка режима курсора: 0 - нормальный, 1 - скрытый, 2 - захваченный (disabled).
     {
-        #ifdef ENGINE_GLFW
-        if (s_InputInstance && s_InputInstance->m_windowHandle)
+        if (s_InputInstance && s_InputInstance->GetInputListen())
         {
-            auto* glfwWindow = static_cast<GLFWwindow*>(s_InputInstance->m_windowHandle);
-            int glfwMode;
-            switch (mode)
-            {
-                case 1:
-                glfwMode = GLFW_CURSOR_HIDDEN;
-                break;
-                case 2:
-                glfwMode = GLFW_CURSOR_DISABLED;
-                break;
-            default:
-                glfwMode = GLFW_CURSOR_NORMAL;
-                break;
-            }
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, glfwMode);
+            s_InputInstance->GetInputListen()->SetCursorMode(mode);
         }
-        #endif
     }
 
     /*************** METODS (прочие методы) */
@@ -248,19 +138,6 @@ namespace Engine::Input
     {
         return *s_InputInstance;
     }
-
-    void* InputSystem::GetWindowHandle()        // Возвращает нативный дескриптор окна (платформозависимый).
-    {
-        return s_InputInstance ? s_InputInstance->m_windowHandle : nullptr;
-    }
-
-    InputKey InputSystem::InputKeyFromInt(int IntKey)   // Преобразует целочисленный код клавиши (например, из GLFW) в InputKey.
-    {
-#ifdef ENGINE_GLFW
-    return FromGLFWKey(IntKey);
-#endif
-    return InputKey::Unknown;
-    };
 
     void InputSystem::SetKeyState(InputKey Key, InputState State)   // Устанавливает состояние конкретной клавиши (внутренний метод).
     {
@@ -280,4 +157,30 @@ namespace Engine::Input
         }
         return static_cast<InputState>(m_keyStates[idx]);
     }
+}
+
+void Engine::InputSystem::CallOnKeyPressed(InputKey key, int scancode, int mods, InputState State)
+{
+    if (!s_InputInstance) return;
+    s_InputInstance->SetKeyState(key, State);
+    s_InputInstance->OnKeyPressed().Broadcast(key, scancode, mods);
+}
+
+void Engine::InputSystem::CallOnMouseMoved(float x, float y)
+{
+    if (!s_InputInstance) return;
+     s_InputInstance->OnMouseMoved().Broadcast(x, y);
+}
+
+void Engine::InputSystem::CallOnMouseScrolled(float x, float y)
+{
+    if (!s_InputInstance) return;
+     s_InputInstance->OnMouseScrolled().Broadcast(x, y);
+}
+
+void Engine::InputSystem::CallOnMouseButtonPressed(InputKey button, int mods, InputState State)
+{
+    if (!s_InputInstance) return;
+    s_InputInstance->SetKeyState(button, State);
+    s_InputInstance->OnMouseButtonPressed().Broadcast(button, mods);
 }
