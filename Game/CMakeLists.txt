@@ -1,19 +1,4 @@
 
-#execute_process(
-#    COMMAND git describe --tags --always --dirty
-#    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-#    OUTPUT_VARIABLE GIT_VERSION
-#    OUTPUT_STRIP_TRAILING_WHITESPACE
-#    ERROR_QUIET
-#)
-
-# Создаём .rc файл из шаблона
-#configure_file(
-#    ${CMAKE_CURRENT_SOURCE_DIR}/resources/app.rc.in
-#    ${CMAKE_CURRENT_BINARY_DIR}/app.rc
-#    @ONLY
-#)
-
 add_executable(Game 
     src/Game.cpp
     $<$<PLATFORM_ID:Windows>:appdata/app.rc>
