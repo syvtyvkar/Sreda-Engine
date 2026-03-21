@@ -10,7 +10,7 @@ namespace Engine
      * @brief Создаёт экземпляр класса InputListen в зависимости от платформы/API.
      *
      * Реализация фабричного метода. В зависимости от макросов платформы
-     * (например, ENGINE_GLFW) возвращает соответствующий объект, реализующий
+     * (например, ENGINE_WINDOW_GLFW) возвращает соответствующий объект, реализующий
      * интерфейс InputListen.
      *
      * @return std::unique_ptr<InputListen> Уникальный указатель на созданный объект.
@@ -18,7 +18,7 @@ namespace Engine
      */
     std::unique_ptr<InputListen> InputListenAPIFactory::create()
     {
-        #ifdef ENGINE_GLFW
+        #ifdef ENGINE_WINDOW_GLFW
         // Если используется GLFW, создаём слушатель ввода, специфичный для GLFW.
         return std::make_unique<InputListenGLFWSystem>();
         #endif

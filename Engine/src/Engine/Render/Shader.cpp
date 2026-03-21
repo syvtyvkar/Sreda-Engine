@@ -7,7 +7,7 @@ namespace Engine {
 
     std::unique_ptr<Shader> ShaderFactory::create() 
     {
-        #ifdef ENGINE_GLFW
+        #ifdef ENGINE_WINDOW_GLFW
         return std::make_unique<OpenGLShader>();
         #endif
         return nullptr;

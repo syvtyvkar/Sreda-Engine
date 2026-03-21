@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#ifdef ENGINE_GLFW
+#ifdef ENGINE_WINDOW_GLFW
 
 #include <glad/glad.h>
 
@@ -9,9 +9,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-//#include "OpenGLRender.h"
-
 #include "Engine/Core/Log.h"
+#include <GLFW/glfw3.h>
 
 namespace Engine 
 {
@@ -27,12 +26,12 @@ namespace Engine
     {
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) 
         {
-            std::cerr << "Failed to initialize GLAD" << std::endl;
+            ENGINE_LOG_ERROR("Failed to initialize GLAD");  
             return false;
         }
 
-        std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
-        std::cout << "GLSL Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+        ENGINE_LOG_TRACE("OpenGL Version: {}", *glGetString(GL_VERSION));                           
+        ENGINE_LOG_TRACE("GLSL Version: {}", *glGetString(GL_SHADING_LANGUAGE_VERSION));            
 
         m_initialized = true;
         return true;
@@ -40,6 +39,7 @@ namespace Engine
 
     void OpenGLRenderer::shutdown() 
     {
+        ENGINE_LOG_TRACE("OpenGL render stop");   
         m_initialized = false;
     }
 
@@ -56,15 +56,18 @@ namespace Engine
     {
     }
 
-    void OpenGLRenderer::setViewport(int x, int y, int width, int height) {
+    void OpenGLRenderer::setViewport(int x, int y, int width, int height) 
+    {
         glViewport(x, y, width, height);
     }
 
-    void OpenGLRenderer::setClearColor(const Color& color) {
+    void OpenGLRenderer::setClearColor(const Color& color) 
+    {
         glClearColor(color.r, color.g, color.b, color.a);
     }
 
-    void OpenGLRenderer::clear() {
+    void OpenGLRenderer::clear() 
+    {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 

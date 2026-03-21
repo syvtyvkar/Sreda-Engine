@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#ifdef ENGINE_GLFW
+#ifdef ENGINE_WINDOW_GLFW
 
 #include "InputGLFW.h"                                              // Заголовок класса 
 #include "Engine/Core/Log.h"                                        // Логирование
@@ -8,7 +8,7 @@
 
 #include <GLFW/glfw3.h>                                             // Заголовок GLFW (колбэки, константы)
 #include "Engine/Platform/IWindow.h"        
-#include "Engine/Platform/WindowAPI/WindowGLF3/WindowGLF3.h"        // Класс окна GLFW (для получения native handle)
+#include "Engine/Platform/WindowAPI/WindowGLFW/WindowGLFW.h"        // Класс окна GLFW (для получения native handle)
 
 #include <unordered_map>                                            // TODO: проверить и убрать, возможно, ныне не требуется
 
@@ -25,7 +25,7 @@ namespace Engine
             return;
         }
         // Приведение к конкретному типу окна GLFW.
-        Engine::WindowGLF3* WindowGL = reinterpret_cast<WindowGLF3*>(InWindow);
+        Engine::WindowGLFW* WindowGL = reinterpret_cast<WindowGLFW*>(InWindow);
         auto* glfwWindow = static_cast<GLFWwindow*>(WindowGL->GetHandle());
 
         // Установка колбэков GLFW на это окно.
@@ -149,7 +149,7 @@ namespace Engine
 
     void InputListenGLFWSystem::SetCursorVisible(bool InVisible)
     {
-        #ifdef ENGINE_GLFW
+        #ifdef ENGINE_WINDOW_GLFW
         if (m_windowHandle)
         {
             auto* glfwWindow = static_cast<GLFWwindow*>(m_windowHandle);
@@ -187,10 +187,7 @@ namespace Engine
 
     InputKey InputListenGLFWSystem::InputKeyFromInt(int IntKey)
     {
-#ifdef ENGINE_GLFW
-    return FromGLFWKey(IntKey);
-#endif
-    return InputKey::Unknown;
+        return FromGLFWKey(IntKey);
     }
 
     InputListenGLFWSystem *InputListenGLFWSystem::GetInputListen(GLFWwindow *window)

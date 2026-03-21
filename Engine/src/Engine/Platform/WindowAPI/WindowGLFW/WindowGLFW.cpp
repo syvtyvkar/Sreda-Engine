@@ -1,15 +1,16 @@
 // (c) Nikita Rogalev. All rights reserved.
 
+#include <glad/glad.h>                              // TODO: (УБРАТЬ ОТСЮДА!!!!!!!!!!) Загрузчик OpenGL функций
+
 // Window Class
-//#ifdef ENGINE_GLF3
-#include "WindowGLF3.h"                         // Заголовок класса
+#include "WindowGLFW.h"                         // Заголовок класса
 #include <iostream>
 #include "Engine/Core/Log.h"                    // Логирование
 
 namespace Engine
 {
-    WindowGLF3::WindowGLF3() = default;         // Конструктор по умолчанию
-    WindowGLF3::~WindowGLF3()                   // Деструктор: автоматически закрывает окно при уничтожении объекта
+    WindowGLFW::WindowGLFW() = default;         // Конструктор по умолчанию
+    WindowGLFW::~WindowGLFW()                   // Деструктор: автоматически закрывает окно при уничтожении объекта
     {
         Close();
     }
@@ -19,7 +20,7 @@ namespace Engine
      * @param config Параметры окна (ширина, высота, заголовок, vsync и т.д.)
      * @return true при успехе, false в противном случае.
      */
-    bool WindowGLF3::Init(const WindowConfig& config)
+    bool WindowGLFW::Init(const WindowConfig& config)
     {
         ENGINE_LOG_INFO("Creating window: {}", config.title);
         if (!glfwInit())                                        // Инициализация библиотеки GLFW
@@ -64,19 +65,20 @@ namespace Engine
         glfwSetWindowUserPointer(m_window, this);
 
         ENGINE_LOG_INFO("Window ( {} ) has been created successfully", config.title);
+
         return true;
     }
 
     /**
      * @brief Изменяет заголовок окна, добавляя переданную строку к базовому имени.
      */
-    void WindowGLF3::UpdateWindowName(std::string NewName)
+    void WindowGLFW::UpdateWindowName(std::string NewName)
     {
-        std::string Empty;
-         glfwSetWindowTitle(m_window,Empty.c_str());
+        //std::string Empty;
+        //glfwSetWindowTitle(m_window,Empty.c_str());
         std::string NewNameResult;
-        NewNameResult.append(NameWindow);
-        NewNameResult.append(NewName);
+        NewNameResult.append(NameWindow + " ");
+        NewNameResult.append(NewName + " FPS");
         glfwSetWindowTitle(m_window,NewNameResult.c_str());
     }
 
@@ -84,7 +86,7 @@ namespace Engine
      * @brief Проверяет, должно ли окно быть закрыто.
      * @return true, если окно запросило закрытие.
      */
-    bool WindowGLF3::ShouldClose() const 
+    bool WindowGLFW::ShouldClose() const 
     {
         return glfwWindowShouldClose(m_window);
     }
@@ -92,7 +94,7 @@ namespace Engine
     /**
      * @brief Обновляет окно: обрабатывает события и меняет буферы.
      */
-    void WindowGLF3::Update() 
+    void WindowGLFW::Update() 
     {
         glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
         glfwSwapBuffers(m_window);      // Переключение переднего и заднего буферов
@@ -102,7 +104,7 @@ namespace Engine
      * @brief Устанавливает пользовательскую функцию, вызываемую при изменении размера окна.
      * @param callback Функция, принимающая новую ширину и высоту.
      */
-    void WindowGLF3::SetResizeCallback(std::function<void(int, int)> callback) 
+    void WindowGLFW::SetResizeCallback(std::function<void(int, int)> callback) 
     {
         m_resizeCallback = callback;
     }
@@ -110,7 +112,7 @@ namespace Engine
     /**
      * @brief Закрывает окно и завершает работу GLFW.
      */
-    void WindowGLF3::Close() 
+    void WindowGLFW::Close() 
     {
         if (m_window) 
         {
@@ -124,7 +126,7 @@ namespace Engine
     /**
      * @brief Инициирует закрытие окна (устанавливает флаг ShouldClose).
      */
-    void WindowGLF3::ExitApp()
+    void WindowGLFW::ExitApp()
     {
         ENGINE_CORE_ASSERT(GetHandle(), "FATAL ERROR: NO VALID APPLICATION!");
         glfwSetWindowShouldClose(GetHandle(), true);
@@ -139,9 +141,9 @@ namespace Engine
      * Обновляет внутренние размеры, устанавливает viewport OpenGL и вызывает
      * пользовательский колбэк, если он задан.
      */
-    void WindowGLF3::FramebufferResizeCallback(GLFWwindow* window, int width, int height) 
+    void WindowGLFW::FramebufferResizeCallback(GLFWwindow* window, int width, int height) 
     {
-        auto* win = reinterpret_cast<WindowGLF3*>(glfwGetWindowUserPointer(window));
+        auto* win = reinterpret_cast<WindowGLFW*>(glfwGetWindowUserPointer(window));
         if (win) 
         {
             win->m_width = width;

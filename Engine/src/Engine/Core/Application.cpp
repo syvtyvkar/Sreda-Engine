@@ -1,7 +1,5 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#include <glad/glad.h>                              // TODO: (УБРАТЬ ОТСЮДА!!!!!!!!!!) Загрузчик OpenGL функций
-
 #include "Application.h"                            // Собственный заголовок класса Application
 #include "config.h"                                 // Конфигурационные параметры
 #include "Engine/Platform/PlatformUtils.h"          // Утилиты для работы с платформой (пути и т.д.)
@@ -66,13 +64,6 @@ namespace Engine
 
         Engine::InputSystem::Init(AppWindow.get());                                                  // Инициализация системы ввода с передачей указателя на окно
 
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))                                    // Загрузка OpenGL функций через GLAD (требуется после создания контекста окна)
-        {                                  
-            ENGINE_LOG_ERROR("Failed to initialize GLAD");                                          // Ошибка инициализации
-            return;
-        }
-
-        ENGINE_LOG_TRACE("OpenGL Version: {}", *glGetString(GL_VERSION));                           // Вывод информации о версии OpenGL и рабочей директории
         ENGINE_LOG_TRACE("Working Directory: {}", Engine::PlatformUtils::getCurrentWorkingDirectory());
 
         Engine::CameraConfig camConfig;                                                             // Настройка камеры
@@ -95,17 +86,16 @@ namespace Engine
             if (!m_render) return;                                                                          // Если рендерер потерян, выходим (аварийно)
             Time::TimeSystem::Update();                                                                     // Обновление системы времени
 
-            // TODO: Временно, пока система времени в работе...
-            float currentFrame = static_cast<float>(glfwGetTime());
-            g_deltaTime = currentFrame - g_lastFrame;
-            g_lastFrame = currentFrame;
-            float dt = Time::TimeSystem::GetDeltaTimeSeconds();
-            //////////////////////////////
+            std::stringstream ss;
+            std::string ret;
+            ss << Time::TimeSystem::GetFPS();
+            ss >> ret;
+            AppWindow.get()->UpdateWindowName(ret);
 
             m_render->beginFrame();                                                                         // Начало кадра (подготовка рендерера к отрисовке)
             m_render->clear();                                                                              // Очистка буферов цвета и глубины
 
-            m_currentScene->update(g_deltaTime);                                                            // Обновление логики сцены с передачей deltaTime
+            m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
 
             m_currentScene->render(m_render.get());                                                         // Отрисовка сцены с использованием текущего рендерера
 

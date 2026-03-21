@@ -2,8 +2,7 @@
 
 #pragma once                            // Защита от множественного включения
 
-//#ifdef ENGINE_GLF3
-#ifdef ENGINE_GLFW
+#ifdef ENGINE_WINDOW_GLFW
 #include <GLFW/glfw3.h>
 #endif
 #include "Engine/Platform/IWindow.h"    // Базовый интерфейс окна
@@ -14,18 +13,18 @@
 namespace Engine
 {
     /**
-     * @class WindowGLF3
+     * @class WindowGLFW
      * @brief Реализация окна с использованием библиотеки GLFW.
      *
      * Наследует абстрактный класс Window и предоставляет конкретные методы
      * для работы с GLFW: создание окна, обработка событий, изменение заголовка,
      * колбэки и т.д.
      */
-    class WindowGLF3 : public Window
+    class WindowGLFW : public Window
     {
     public:
-        WindowGLF3();
-        ~WindowGLF3() override;
+        WindowGLFW();
+        ~WindowGLFW() override;
 
         virtual bool Init(const Engine::WindowConfig& config) override;                 // Инициализация окна
         virtual void UpdateWindowName(std::string NewName) override;                    // Поменять имя окна 

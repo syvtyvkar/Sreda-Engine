@@ -1,13 +1,12 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#ifdef ENGINE_GLFW
+#ifdef ENGINE_WINDOW_GLFW
 #pragma once
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Engine/Render/Render.h"
 #include "Engine/Core/Types.h"
-#include <GLFW/glfw3.h>
 
 
 namespace Engine 

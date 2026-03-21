@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#ifdef ENGINE_GLFW
+#ifdef ENGINE_WINDOW_GLFW
 
 #pragma once                                // Защита от множественного включения
 
@@ -11,6 +11,7 @@
 #include "Engine/Platform/IWindow.h"        // Интерфейс окна
 #include <glm/glm.hpp>                      // Математическая библиотека (векторы)
 #include <unordered_map>                    // Для мапы инпутов
+#include <GLFW/glfw3.h>
 
 // Предварительное объявление структуры GLFWwindow (используется для платформозависимых колбэков)
 struct GLFWwindow;

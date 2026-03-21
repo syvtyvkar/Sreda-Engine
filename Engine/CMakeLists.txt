@@ -70,10 +70,10 @@ target_link_libraries(Engine PUBLIC
 )
 
 target_compile_definitions(Engine PRIVATE
-    ENGINE_GLFW
+    ENGINE_WINDOW_GLFW
 )
 target_compile_definitions(Engine PRIVATE
-    ENGINE_GLF3
+    ENGINE_RENDER_OPENGL
 )
 
 

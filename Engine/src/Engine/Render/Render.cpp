@@ -10,7 +10,7 @@ namespace Engine
     {
         // Здесь можно добавить выбор API через конфиг
         // Например: if (config.api == "DirectX") return std::make_unique<DXRenderer>();
-        #ifdef ENGINE_GLFW
+        #ifdef ENGINE_WINDOW_GLFW
         return std::make_unique<OpenGLRenderer>();
         #endif
         return nullptr;

@@ -2,9 +2,6 @@
 
 #pragma once                            // Защита от множественного включения заголовочного файла
 
-#ifdef ENGINE_GLFW
-#include <GLFW/glfw3.h>                 // TODO: НАДО УБРАТЬ!
-#endif
 #include <string>                       // Для std::string
 #include <functional>                   // Для std::function (используется в колбэке изменения размера)
 #include <memory>                       // Для std::unique_ptr
@@ -98,7 +95,7 @@ namespace Engine
          * @brief Создаёт уникальный указатель на объект окна.
          * @return std::unique_ptr<Window> Указатель на созданное окно.
          *
-         * В зависимости от макросов (например, ENGINE_GLFW) возвращает соответствующий
+         * В зависимости от макросов (например, ENGINE_WINDOW_GLFW) возвращает соответствующий
          * наследник Window (например, WindowGLF3). Если ни одна платформа не определена,
          * может вернуть nullptr.
          */

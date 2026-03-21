@@ -2,7 +2,7 @@
 
 // Window Class
 #include "IWindow.h"                                                // Подключаем интерфейс окна (абстрактный класс Window)
-#include "Engine/Platform/WindowAPI/WindowGLF3/WindowGLF3.h"        // Конкретная реализация окна для GLFW
+#include "Engine/Platform/WindowAPI/WindowGLFW/WindowGLFW.h"        // Конкретная реализация окна для GLFW
 
 namespace Engine 
 {
@@ -10,7 +10,7 @@ namespace Engine
     /**
      * @brief Реализация фабричного метода для создания окна.
      *
-     * В зависимости от определённого макроса платформы (здесь ENGINE_GLF3)
+     * В зависимости от определённого макроса платформы (здесь ENGINE_WINDOW_GLFW)
      * создаёт и возвращает соответствующий объект окна.
      * Если макрос не определён, возвращает nullptr.
      *
@@ -19,8 +19,8 @@ namespace Engine
      */
     std::unique_ptr<Window> WindowAPIFactory::create() 
     {
-        #ifdef ENGINE_GLF3
-        return std::make_unique<WindowGLF3>();  // Создаём окно для GLFW
+        #ifdef ENGINE_WINDOW_GLFW
+        return std::make_unique<WindowGLFW>();  // Создаём окно для GLFW
         #endif
         return nullptr;
     }

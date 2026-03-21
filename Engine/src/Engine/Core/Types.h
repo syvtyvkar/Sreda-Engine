@@ -4,10 +4,6 @@
 
 #include <cmath>        // Для математических функций (std::sqrt)
 
-#ifdef ENGINE_GLFW
-#include <GLFW/glfw3.h>
-#endif
-
 namespace Engine {
 
     /*Трёхмерный вектор с компонентами x, y, z.
