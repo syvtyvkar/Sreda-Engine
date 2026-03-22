@@ -9,6 +9,8 @@
 #include "Engine/Input/Input.h"                     // Система ввода
 #include "Engine/Core/Time.h"                       // Система времени (таймеры, дельта-тайм)
 
+#include "Engine/Render/Camera.h"                       
+
 #include <string>
 #include <sstream>
 #include <vector>
@@ -29,7 +31,6 @@ namespace Engine
             return nullptr;
         }
         s_Instance = new Application;                                                   // Создаём новый объект
-        s_Instance->m_currentScene = std::make_unique<Scene>("MainScene");              // Создаём главную сцену с именем "MainScene" и сохраняем её в unique_ptr
         return s_Instance;                                                              // Возвращаем указатель на созданный экземпляр
     }
 
@@ -51,25 +52,9 @@ namespace Engine
             return;
         }
 
-        m_render = RenderAPIFactory::create();                                                      // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
-        m_currentScene->SetParentRender(m_render.get());                                            // Устанавливаем для сцены указатель на рендерер (чтобы сцена могла отрисовывать объекты)
-        if (!m_render || !m_render.get()->initialize())                                             // Инициализация рендерера
-        {
-            ENGINE_LOG_ERROR("Failed to initialize renderer!");                                     // Ошибка инициализации
-            return;
-        }
-
-        m_render->setViewport(0,0,WindowConfig.wight,WindowConfig.height);                          // Установка области вывода (viewport) на весь размер окна
-        m_render->setClearColor(Color(0.1f,0.1f,0.1f,1.f));                                         // Установка цвета очистки экрана (тёмно-серый)
-
         Engine::InputSystem::Init(AppWindow.get());                                                  // Инициализация системы ввода с передачей указателя на окно
 
         ENGINE_LOG_TRACE("Working Directory: {}", Engine::PlatformUtils::getCurrentWorkingDirectory());
-
-        Engine::CameraConfig camConfig;                                                             // Настройка камеры
-        camConfig.position = glm::vec3(0.0f, 0.0f, 3.0f);                                           // Позиция камеры
-        camConfig.screenWidth = WindowConfig.wight;                                                 // Ширина экрана для соотношения сторон
-        camConfig.screenHeight = WindowConfig.height;                                               // Высота экрана
 
         // Подписка на событие нажатия клавиши (Выход из демонстрации)
         Engine::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](InputKey key, int mods, int repeat) 
@@ -79,27 +64,27 @@ namespace Engine
             ExitApp();                                                                                      // Выход из приложения
         });
 
-        m_currentScene->createGameObject("NewObj");                                                         // Создание тестового игрового объекта в сцене
+        Engine::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](InputKey key, int mods, int repeat) 
+        {
+            if (key != InputKey::Control) return;   
+            if (Engine::InputSystem::GetInstance().GetKeyState(key) != InputState::Released) return;                                                               
+            ENGINE_LOG_INFO("Change cursor visible");               
+            bool LCursorVis = Engine::InputSystem::GetInstance().GetCursorVisible();                                    
+            Engine::InputSystem::GetInstance().SetCursorVisible(!LCursorVis);                                                                                    
+        });
+
+        Engine::InputSystem::GetInstance().OnMouseMoved().Subscribe([&,this](float xMove,float yMove)
+        {
+            if (!Engine::InputSystem::GetInstance().GetCursorVisible() && AppWindow)
+            {
+                AppWindow->GetCurrentScene()->GetCamera()->processMouseMovement(xMove,yMove,false);
+            }
+        });
 
         while (!AppWindow->ShouldClose())                                                                   // ОСНОВНОЙ ИГРОВОЙ ЦИКЛ Пока окно не запросило закрытие
         {
-            if (!m_render) return;                                                                          // Если рендерер потерян, выходим (аварийно)
+            if (!AppWindow->GetCurrentRender()) return;                                                                          // Если рендерер потерян, выходим (аварийно)
             Time::TimeSystem::Update();                                                                     // Обновление системы времени
-
-            std::stringstream ss;
-            std::string ret;
-            ss << Time::TimeSystem::GetFPS();
-            ss >> ret;
-            AppWindow.get()->UpdateWindowName(ret);
-
-            m_render->beginFrame();                                                                         // Начало кадра (подготовка рендерера к отрисовке)
-            m_render->clear();                                                                              // Очистка буферов цвета и глубины
-
-            m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
-
-            m_currentScene->render(m_render.get());                                                         // Отрисовка сцены с использованием текущего рендерера
-
-            m_render->endFrame();                                                                           // Завершение кадра (переключение буферов и т.д.)
             AppWindow->Update();                                                                            // Обработка событий окна (GLFW poll events)
         }
         Engine::InputSystem::Shutdown();                                                                     // Выключение системы ввода
@@ -116,8 +101,6 @@ namespace Engine
     void Application::CloseApp()                                                                            // Закрытие приложения и освобождение всех ресурсов
     {
         AppWindow.reset();          // Уничтожение окна (вызов деструктора)
-        m_render.reset();           // Уничтожение рендерера
-        m_currentScene.reset();     // Уничтожение текущей сцены
         s_Instance = nullptr;       // Сброс указателя на экземпляр (синглтон)
     }
 }

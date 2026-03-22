@@ -5,7 +5,7 @@
 #include "Engine/Input/KeyCodes.h"              // Определения клавиш (InputKey)
 #include "Engine/Core/Log.h"                    // Логирование
 #include "Engine/Core/Event.h"                  // Поддержка делегатов
-#include "Engine/Input/InputListen.h"           // Класс-слушатель ввода
+#include "Engine/Input/IInputListen.h"           // Класс-слушатель ввода
 #include "Engine/Platform/IWindow.h"            // Интерфейс окна
 #include <glm/glm.hpp>                          // Математическая библиотека для векторов
 
@@ -52,8 +52,12 @@ namespace Engine
         static glm::vec2 GetMousePosition();                                // Возвращает текущую позицию курсора мыши в координатах окна.
         static glm::vec2 GetMouseDelta();                                   // Возвращает изменение позиции мыши за последний кадр (дельта).
         static double GetMouseScrollDelta();                                // Возвращает величину прокрутки колесика мыши.
+        static float GetMouseSensivity();
+        static bool IsInverMoveY();
 
         // Cursor
+        static bool GetCursorVisible();                         
+        static int GetCursorMode();                         
         static void SetCursorVisible(bool Visible);                         // Устанавливает видимость курсора.
         static void SetCursorMode(int Mode);                                // Устанавливает режим курсора: 0=Normal, 1=Hidden, 2=Disabled
 
@@ -62,7 +66,7 @@ namespace Engine
 
         static void* GetWindowHandle();                                     // Возвращает указатель на нативный дескриптор окна (например, GLFWwindow*).
 
-        InputListen* GetInputListen() {return m_InputListen.get();};        // Возвращает указатель на объект InputListen (используется для расширенной обработки).
+        IInputListen* GetInputListen() {return m_InputListen.get();};        // Возвращает указатель на объект InputListen (используется для расширенной обработки).
 
         // Доступ к делегатам для подписки
         DOnKeyPressed& OnKeyPressed() {return s_OnKeyPressed;}
@@ -73,7 +77,7 @@ namespace Engine
         DOnMouseButtonReleased& OnMouseButtonReleased() {return s_OnMouseButtonReleased;}
 
     protected:
-        std::unique_ptr<InputListen> m_InputListen=nullptr;                 // Слушатель ввода
+        std::unique_ptr<IInputListen> m_InputListen=nullptr;                 // Слушатель ввода
     private:
         InputSystem() = default;
         ~InputSystem() =default;
@@ -91,6 +95,8 @@ namespace Engine
         glm::vec2 m_mousePosition = {0,0};                                  // Текущая позиция курсора.
         glm::vec2 m_mouseDelta = {0,0};                                     // Изменение позиции за кадр.
         double m_scrollDelta = 0.0;                                         // Накопленная прокрутка колесика.
+        float m_mouseSensivity = 0.2f;                                      // Сенса мыши
+        bool m_Invers_Y = true;
 
         // Дружественный класс Window имеет доступ к приватным методам (например, для обработки).
         friend class Window;

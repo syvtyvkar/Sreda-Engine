@@ -147,15 +147,38 @@ namespace Engine
         GetInputListen(window)->OnMouseScrolled().Broadcast(xoffset,yoffset);
     }
 
+    bool InputListenGLFWSystem::GetCursorVisible()
+    {
+        if (m_windowHandle)
+        {
+            if (glfwGetInputMode(static_cast<GLFWwindow*>(m_windowHandle),GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
+            {
+                return true;
+            }else if (glfwGetInputMode(static_cast<GLFWwindow*>(m_windowHandle),GLFW_CURSOR) == GLFW_CURSOR_HIDDEN)
+            {
+                return false;
+            }
+
+        }
+        return false;
+    }
+
+    int InputListenGLFWSystem::GetCursorMode()
+    {
+        if (m_windowHandle)
+        {
+            return glfwGetInputMode(static_cast<GLFWwindow*>(m_windowHandle),GLFW_CURSOR);
+        }
+        return 0;
+    }
+
     void InputListenGLFWSystem::SetCursorVisible(bool InVisible)
     {
-        #ifdef ENGINE_WINDOW_GLFW
         if (m_windowHandle)
         {
             auto* glfwWindow = static_cast<GLFWwindow*>(m_windowHandle);
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, InVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+            glfwSetInputMode(glfwWindow, GLFW_CURSOR, InVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
         }
-        #endif
     }
 
     void InputListenGLFWSystem::SetCursorMode(int mode)

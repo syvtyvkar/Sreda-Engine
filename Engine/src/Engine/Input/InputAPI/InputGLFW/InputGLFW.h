@@ -4,7 +4,7 @@
 
 #pragma once                                // Защита от множественного включения
 
-#include "Engine/Input/InputListen.h"       // Базовый абстрактный класс для слушателей ввода
+#include "Engine/Input/IInputListen.h"       // Базовый абстрактный класс для слушателей ввода
 #include "Engine/Input/KeyCodes.h"          // Коды клавиш (InputKey)
 #include "Engine/Core/Log.h"                // Логирование
 #include "Engine/Core/Event.h"              // Базовые события (для делегатов)
@@ -157,7 +157,7 @@ namespace Engine
      * через унаследованные делегаты (OnKeyPressed и т.д.).
      */
 
-    class InputListenGLFWSystem : public InputListen
+    class InputListenGLFWSystem : public IInputListen
     {
     public:
 
@@ -169,6 +169,8 @@ namespace Engine
         virtual void DeInit() override;
 
         // Управление курсором
+        virtual bool GetCursorVisible();                    
+        virtual int GetCursorMode();
         virtual void SetCursorVisible(bool Visible) override;                    
         virtual void SetCursorMode(int Mode) override; // 0=Normal, 1=Hidden, 2=Disable
 

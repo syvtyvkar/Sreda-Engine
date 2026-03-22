@@ -5,6 +5,8 @@
 #include <string>                       // Для std::string
 #include <functional>                   // Для std::function (используется в колбэке изменения размера)
 #include <memory>                       // Для std::unique_ptr
+#include "Engine/Render/Render.h"       // Интерфейс рендерера (RenderAPI)
+#include "Engine/Render/Scene.h"        // Класс сцены, содержащей игровые объекты
 
 namespace Engine
 {
@@ -79,7 +81,9 @@ namespace Engine
          * @brief Немедленно завершает приложение (закрывает окно и выходит из цикла).
          *        Отличается от Close() тем, что может дополнительно инициировать выход.
          */                                           
-        virtual void ExitApp()= 0;                                                 
+        virtual void ExitApp()= 0;
+        virtual Scene* GetCurrentScene() = 0;
+        virtual RenderAPI* GetCurrentRender() = 0;
     };
 
     /**

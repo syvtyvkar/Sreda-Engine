@@ -6,6 +6,11 @@
 #include "WindowGLFW.h"                         // Заголовок класса
 #include <iostream>
 #include "Engine/Core/Log.h"                    // Логирование
+#include "Engine/Core/Time.h"                   // Система времени (таймеры, дельта-тайм)
+#include <string>
+#include <sstream>
+#include <vector>
+#include "Engine/Render/Camera.h"   
 
 namespace Engine
 {
@@ -65,6 +70,20 @@ namespace Engine
         glfwSetWindowUserPointer(m_window, this);
 
         ENGINE_LOG_INFO("Window ( {} ) has been created successfully", config.title);
+        ///////////////////////////////////////////
+
+        m_render = RenderAPIFactory::create();                                                      // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
+        m_currentScene = std::make_unique<Scene>("MainScene");              // Создаём главную сцену с именем "MainScene" и сохраняем её в unique_ptr
+        m_currentScene->SetParentRender(m_render.get());                                            // Устанавливаем для сцены указатель на рендерер (чтобы сцена могла отрисовывать объекты)
+        if (!m_render || !m_render.get()->initialize())                                             // Инициализация рендерера
+        {
+            ENGINE_LOG_ERROR("Failed to initialize renderer!");                                     // Ошибка инициализации
+            return false;
+        }
+
+        m_render->setViewport(0,0,config.wight,config.height);                          // Установка области вывода (viewport) на весь размер окна
+        m_render->setClearColor(Color(0.1f,0.1f,0.1f,1.f));                                         // Установка цвета очистки экрана (тёмно-серый)
+        m_currentScene->createGameObject("NewObj");                                                         // Создание тестового игрового объекта в сцене
 
         return true;
     }
@@ -96,6 +115,20 @@ namespace Engine
      */
     void WindowGLFW::Update() 
     {
+        std::stringstream ss;
+        std::string ret;
+        ss << Time::TimeSystem::GetFPS();
+        ss >> ret;
+        UpdateWindowName(ret);
+
+        m_render->beginFrame();                                                                         // Начало кадра (подготовка рендерера к отрисовке)
+        m_render->clear();                                                                              // Очистка буферов цвета и глубины
+
+        m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
+
+        m_currentScene->render(m_render.get());                                                         // Отрисовка сцены с использованием текущего рендерера
+
+        m_render->endFrame();  
         glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
         glfwSwapBuffers(m_window);      // Переключение переднего и заднего буферов
     }
@@ -157,6 +190,7 @@ namespace Engine
             {
                 win->m_resizeCallback(width, height);
             }
+            win->GetCurrentScene()->GetCamera()->setScreenSize(width,height);
         }
     }
 }

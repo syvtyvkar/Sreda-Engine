@@ -34,7 +34,7 @@ namespace Engine
         }
 
         const std::string& getName() const { return m_name; }
-        const Engine::Camera* GetCamera() { return r_camera.get();};
+        Engine::Camera* GetCamera() { return r_camera.get();};
 
         void SetParentRender(class RenderAPI* scene) { m_parentRender = scene; }
         class RenderAPI* GetParentRender() const { return m_parentRender; }
@@ -42,7 +42,6 @@ namespace Engine
     private:
         std::string m_name;
         std::unique_ptr<Engine::Camera> r_camera;
-        Engine::CameraConfig camConfig;
         std::vector<std::unique_ptr<GameObject>> m_gameObjects;
         class RenderAPI* m_parentRender = nullptr;
     };

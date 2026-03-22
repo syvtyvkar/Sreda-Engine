@@ -3,8 +3,6 @@
 #pragma once // Директива препроцессора для защиты от множественного включения
 
 #include <string>
-#include "Engine/Render/Render.h"           // Интерфейс рендерера (RenderAPI)
-#include "Engine/Render/Scene.h"            // Класс сцены, содержащей игровые объекты
 #include "Engine/Platform/IWindow.h"        // Интерфейс окна
 #include <vector>
 
@@ -39,7 +37,5 @@ namespace Engine
         bool m_running=true;                                    // Флаг работы приложения (управляет циклом)
 
         std::unique_ptr<Window> AppWindow;                      // Окно приложения
-        std::unique_ptr<RenderAPI> m_render;                    // Рендерер (OpenGL, Vulkan и т.д.)
-        std::unique_ptr<Scene> m_currentScene;                  // Текущая сцена
     };
 }

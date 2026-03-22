@@ -2,6 +2,7 @@
 
 #include "Engine/Input/Input.h"                                 // Основной заголовок системы ввода
 #include "Engine/Core/Log.h"                                    // Логирование
+#include "Engine/Core/Time.h"    
 #include "Input.h"
 
 namespace Engine
@@ -114,9 +115,41 @@ namespace Engine
         return s_InputInstance->m_scrollDelta;
     }
 
+    float InputSystem::GetMouseSensivity()
+    {
+        if (!s_InputInstance) return 0,0;
+        return s_InputInstance->m_mouseSensivity;
+    }
+
+    bool InputSystem::IsInverMoveY()
+    {
+        if (!s_InputInstance) return false;
+        return s_InputInstance->m_Invers_Y;
+    }
+
     /*************** CURSOR (управление курсором) */
 
-    void InputSystem::SetCursorVisible(bool InVisible)  // Установка видимости курсора.
+    bool InputSystem::GetCursorVisible()
+    {
+        if (s_InputInstance && s_InputInstance->GetInputListen())
+        {
+            return s_InputInstance->GetInputListen()->GetCursorVisible();
+        }
+        ENGINE_LOG_WARN("No search InputListen!");
+        return false;
+    }
+
+    int InputSystem::GetCursorMode()
+    {
+        if (s_InputInstance && s_InputInstance->GetInputListen())
+        {
+            return s_InputInstance->GetInputListen()->GetCursorMode();
+        }
+        ENGINE_LOG_WARN("No search InputListen!");
+        return 0;
+    }
+
+    void InputSystem::SetCursorVisible(bool InVisible) // Установка видимости курсора.
     {
         if (s_InputInstance && s_InputInstance->GetInputListen())
         {
@@ -169,7 +202,15 @@ void Engine::InputSystem::CallOnKeyPressed(InputKey key, int scancode, int mods,
 void Engine::InputSystem::CallOnMouseMoved(float x, float y)
 {
     if (!s_InputInstance) return;
-     s_InputInstance->OnMouseMoved().Broadcast(x, y);
+    float LNewX = x-GetMousePosition().x;
+    float LNewY = y-GetMousePosition().y;
+    LNewY = IsInverMoveY() ? LNewY*-1.f : LNewY;
+    //float LDeltaTime = Engine::Time::TimeSystem::GetDeltaTime();
+    //float LSensivityMouse = GetMouseSensivity();
+    ENGINE_LOG_TRACE("Mouse Move: x {} y {}",LNewX,LNewY);
+    s_InputInstance->OnMouseMoved().Broadcast(LNewX, LNewY);
+    s_InputInstance->m_mousePosition.x=x;
+    s_InputInstance->m_mousePosition.y=y;
 }
 
 void Engine::InputSystem::CallOnMouseScrolled(float x, float y)

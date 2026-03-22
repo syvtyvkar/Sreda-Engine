@@ -1,7 +1,7 @@
 // (c) Nikita Rogalev. All rights reserved.
 
 #include "Engine/Core/Log.h"                                        // Подключение системы логирования
-#include "InputListen.h"                                            // Заголовок с определением интерфейса InputListen и фабрики InputListenAPIFactory
+#include "IInputListen.h"                                            // Заголовок с определением интерфейса InputListen и фабрики InputListenAPIFactory
 #include "Engine/Input/InputAPI/InputGLFW/InputGLFW.h"              // Конкретная реализация InputListen для GLFW
 
 namespace Engine 
@@ -16,7 +16,7 @@ namespace Engine
      * @return std::unique_ptr<InputListen> Уникальный указатель на созданный объект.
      *         Если ни одна платформа не определена, возвращает nullptr.
      */
-    std::unique_ptr<InputListen> InputListenAPIFactory::create()
+    std::unique_ptr<IInputListen> InputListenAPIFactory::create()
     {
         #ifdef ENGINE_WINDOW_GLFW
         // Если используется GLFW, создаём слушатель ввода, специфичный для GLFW.

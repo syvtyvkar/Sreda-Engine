@@ -36,7 +36,8 @@ namespace Engine
         virtual void SetResizeCallback(std::function<void(int,int)>callback) override;  // Установить делегат для изменения окна 
         virtual void Close() override;                                                  // Закрываем окно
         virtual void ExitApp() override;                                                // Закрываем окно
-
+        virtual Scene* GetCurrentScene() override {return m_currentScene.get();}
+        virtual RenderAPI* GetCurrentRender() override {return m_render.get();}
     private:
         GLFWwindow* m_window = nullptr;                                                     // Указатель на объект окна GLFW
         static void FramebufferResizeCallback(GLFWwindow* Window, int width, int height);   // Статический колбэк изменения размера фреймбуфера
@@ -44,6 +45,9 @@ namespace Engine
         int m_height = 0;                                                                   // Текущая высота окна
         std::string NameWindow;                                                             // Заголовок окна (хранится, возможно, для обновления)
         std::function<void(int, int)> m_resizeCallback = nullptr;                           // Пользовательский колбэк на изменение размера
+    protected:
+        std::unique_ptr<RenderAPI> m_render;                    // Рендерер (OpenGL, Vulkan и т.д.)
+        std::unique_ptr<Scene> m_currentScene;                  // Текущая сцена
     };
 }
 

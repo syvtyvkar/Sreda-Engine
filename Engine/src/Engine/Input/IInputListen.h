@@ -28,12 +28,12 @@ namespace Engine
      * Класс содержит виртуальные методы Init/DeInit и набор делегатов,
      * через которые можно получать уведомления о событиях ввода.
      */
-    class InputListen
+    class IInputListen
     {
     public:
 
-        //virtual InputListen() = default;
-        virtual ~InputListen() = default;                                                               // Виртуальный деструктор для корректного удаления наследников
+        //virtual IInputListen() = default;
+        virtual ~IInputListen() = default;                                                               // Виртуальный деструктор для корректного удаления наследников
 
         virtual void Init(class Window* InWindow) = 0;                                              // Инициализация слушателя.
         virtual void DeInit() = 0;                                                                      // Деинициализация слушателя, освобождение ресурсов.
@@ -44,6 +44,8 @@ namespace Engine
         DOnMouseScrolledListen& OnMouseScrolled() {return s_OnMouseScrolledListen;}
         DOnMouseButtonPressedListen& OnMouseButtonPressed() {return s_OnMouseButtonPressedListen;}
 
+        virtual bool GetCursorVisible() = 0;                    
+        virtual int GetCursorMode() = 0;
         virtual void SetCursorVisible(bool Visible) = 0;                    
         virtual void SetCursorMode(int Mode) = 0; // 0=Normal, 1=Hidden, 2=Disable
 
@@ -70,6 +72,6 @@ namespace Engine
          * @brief Создаёт уникальный указатель на объект InputListen.
          * @return std::unique_ptr<InputListen> Указатель на созданный экземпляр.
          */
-        static std::unique_ptr<InputListen> create();
+        static std::unique_ptr<IInputListen> create();
     };
 }
