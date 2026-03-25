@@ -24,8 +24,9 @@ namespace Engine
     public:
         static ResourceManager& getInstance();                                  // Получить единственный экземпляр менеджера (синглтон)
         void setBasePath(const std::string& path) {m_basePath = path;};         // Установить базовый путь к ресурсам вручную (если нужно переопределить)
-        std::string getResourcePath(const std::string& relativePath) const;     // Получить полный путь к ресурсу, объединяя базовый путь с относительным
-        const std::string& getBasePath() const { return m_basePath; }           // Получить текущий базовый путь
+        static std::string getResourcePath(const std::string& relativePath);     // Получить полный путь к ресурсу, объединяя базовый путь с относительным
+        static std::string getBasePath();                                        // Получить текущий базовый путь
+
         void init(const std::string& executablePath);                           // Инициализация менеджера (вызывается один раз при старте приложения).
     private:
         ResourceManager() = default;                                            // Приватный конструктор (синглтон)

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Engine/Core/Types.h"
+#include "Engine/Core/Utilities/Types.h"
 #include "Engine/Core/Log.h"
 
 namespace Engine {

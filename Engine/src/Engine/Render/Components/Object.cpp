@@ -6,7 +6,7 @@
 #include "Engine/Render/Render.h"
 #include "Engine/Render/Tools/MeshFactory"
 #include "Engine/Render/Components/Mesh.h"
-#include "Engine/Core/ResourceManager.h"
+#include "Engine/Core/FileSystem/ResourceManager.h"
 #include "Engine/Render/Scene.h"
 #include "Engine/Core/Log.h"
 
@@ -21,10 +21,9 @@ namespace Engine {
         }
         std::unique_ptr<Mesh> LMesh = MeshFactory::CreateCube();
         LMesh.get()->setGameObject(this);
-        auto& resMgr = Engine::ResourceManager::getInstance();
         if (LMesh.get()->m_materialMesh)
         {
-            LMesh.get()->m_materialMesh.get()->loadShader(resMgr.getResourcePath("Resources/Shaders/camera.vert"), resMgr.getResourcePath("Resources/Shaders/camera.frag"));
+            LMesh.get()->m_materialMesh.get()->loadShader(Engine::ResourceManager::getResourcePath("Resources/Shaders/camera.vert"), Engine::ResourceManager::getResourcePath("Resources/Shaders/camera.frag"));
         }
         Transform LTansform = Transform();
         LTansform.scale = Vector3(1,1,1);

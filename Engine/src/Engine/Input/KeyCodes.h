@@ -3,7 +3,7 @@
 #pragma once
 
 #include <cstdint>
-#include "Engine/Core/Event.h"
+#include "Engine/Core/Utilities/Event.h"
 
 namespace Engine
 {
@@ -80,7 +80,8 @@ namespace Engine
     /**
      * Input States
      */
-    enum class InputState : uint8_t {
+    enum class InputState : uint8_t 
+    {
         Released = 0,
         Pressed,
         Repeated,

@@ -10,7 +10,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Engine/Core/Types.h"
+#include "Engine/Core/Utilities/Types.h"
 #include "Engine/Render/Camera.h"
 #include "Engine/Render/RenderAPI/OpenGL/OpenGLRender.h"
 #include "Engine/Core/Log.h"

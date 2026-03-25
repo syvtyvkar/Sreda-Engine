@@ -11,6 +11,8 @@
     #include <limits.h>                         // Для PATH_MAX
 #endif
 
+#include <fstream>
+
 namespace Engine {
 
     ResourceManager& ResourceManager::getInstance()     // Реализация синглтона: статический локальный объект создаётся при первом вызове
@@ -25,15 +27,23 @@ namespace Engine {
         ENGINE_LOG_INFO("Resource Manager initialized. Base path: ");
     }
 
-    std::string ResourceManager::getResourcePath(const std::string& relativePath) const // Возвращает полный путь к ресурсу, добавляя относительный путь к базовому каталогу
+    std::string ResourceManager::getResourcePath(const std::string& relativePath) // Возвращает полный путь к ресурсу, добавляя относительный путь к базовому каталогу
     {
-        return (fs::path(m_basePath) / relativePath).string();
+        auto& lInst = ResourceManager::getInstance();
+        return (fs::path(lInst.m_basePath) / relativePath).string();
+    }
+
+    std::string ResourceManager::getBasePath()
+    {
+        auto& lInst = ResourceManager::getInstance();
+        return lInst.m_basePath;
     }
 
     /*Определяет базовый каталог для ресурсов, анализируя путь к исполняемому файлу
         Ищет папку "Resources" рядом с исполняемым файлом или на уровень выше (для отладочных сборок)*/
     std::string ResourceManager::determineBasePath(const std::string& executablePath) 
     {
+        auto& lInst = ResourceManager::getInstance();
         fs::path exePath(executablePath);           // Преобразуем путь к исполняемому файлу в объект filesystem::path
         fs::path baseDir = exePath.parent_path();   // Директория, где лежит exe
 

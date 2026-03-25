@@ -41,6 +41,8 @@ namespace Engine
         // Включение MSAA (многократная выборка)
         glfwWindowHint(GLFW_SAMPLES, 4);
 
+        //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
         #ifdef __APPLE__
         // Для macOS требуется указать совместимость с форвард-компиляцией
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -163,6 +165,40 @@ namespace Engine
     {
         ENGINE_CORE_ASSERT(GetHandle(), "FATAL ERROR: NO VALID APPLICATION!");
         glfwSetWindowShouldClose(GetHandle(), true);
+    }
+
+    void WindowGLFW::SetWindowMode(WindowMode NewMode)
+    {
+        // На текущий момент попытка сменить режим окна приводит к полной поломке рендеринга
+        if (m_windowMode==NewMode) return;
+
+        return;
+
+        /*if (NewMode==WindowMode::Borderless || NewMode == WindowMode::Fullscreen)
+        {
+            glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+        }else
+        {
+            glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
+        }
+
+        GLFWwindow* tempWindowPtr = glfwCreateWindow(m_width,m_height, NameWindow.c_str(), NewMode==WindowMode::Fullscreen ? glfwGetPrimaryMonitor() : NULL,m_window);
+	
+	    if(!tempWindowPtr)
+	    {
+		    ENGINE_LOG_ERROR("Unknown error when trying to change the window mode!");
+		    return;
+	    }
+
+	    glfwDestroyWindow(m_window);	// destroy the old window
+	    m_window = tempWindowPtr;	// swap the pointers
+
+	    glfwMakeContextCurrent(m_window);
+        //glfwSwapInterval(config.vsync ? 1 : 0); //VSync!!!
+        // Устанавливаем колбэк изменения размера фреймбуфера
+        glfwSetFramebufferSizeCallback(m_window, FramebufferResizeCallback);
+        // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
+        glfwSetWindowUserPointer(m_window, this);*/
     }
 
     /**

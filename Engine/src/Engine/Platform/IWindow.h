@@ -26,6 +26,18 @@ namespace Engine
     };
 
     /**
+     * @struct WindowMode
+     * @brief Режимы окна
+     * 
+     */
+    enum class WindowMode : uint8_t 
+    {
+        Window = 0,
+        Borderless = 1,
+        Fullscreen = 2
+    };
+
+    /**
      * @class Window
      * @brief Абстрактный базовый класс для платформозависимого окна.
      *
@@ -73,6 +85,14 @@ namespace Engine
          * @param callback Функция, принимающая новую ширину и высоту.
          */
         virtual void SetResizeCallback(std::function<void(int,int)>callback)= 0; 
+        /**
+         * @brief Показывает текущий режим окна
+         */
+        virtual WindowMode GetWindowMode() = 0;
+        /**
+         * @brief Меняет текущий режим окна
+         */
+        virtual void SetWindowMode(WindowMode NewMode) = 0;
         /**
          * @brief Закрывает окно (устанавливает флаг ShouldClose в true).
          */

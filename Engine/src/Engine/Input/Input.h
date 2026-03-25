@@ -4,7 +4,7 @@
 
 #include "Engine/Input/KeyCodes.h"              // Определения клавиш (InputKey)
 #include "Engine/Core/Log.h"                    // Логирование
-#include "Engine/Core/Event.h"                  // Поддержка делегатов
+#include "Engine/Core/Utilities/Event.h"                  // Поддержка делегатов
 #include "Engine/Input/IInputListen.h"           // Класс-слушатель ввода
 #include "Engine/Platform/IWindow.h"            // Интерфейс окна
 #include <glm/glm.hpp>                          // Математическая библиотека для векторов

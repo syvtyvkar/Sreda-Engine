@@ -2,10 +2,10 @@
 
 #pragma once                            // Защита от множественного включения
 
-#include "Engine/Core/Types.h"          // Основные типы движка (Vector2, Vector3 и т.д.)
+#include "Engine/Core/Utilities/Types.h"          // Основные типы движка (Vector2, Vector3 и т.д.)
 #include "Engine/Input/KeyCodes.h"      // Коды клавиш (InputKey)
 #include "Engine/Core/Log.h"            // Логирование
-#include "Engine/Core/Event.h"          // Базовые события (вероятно, используется в делегатах)
+#include "Engine/Core/Utilities/Event.h"          // Базовые события (вероятно, используется в делегатах)
 #include <memory>                       // Для std::unique_ptr
 #include <string>                       // Для std::string
 

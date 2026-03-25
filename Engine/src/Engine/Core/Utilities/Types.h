@@ -138,4 +138,21 @@ namespace Engine {
         Vector2 texCoord;
     };
 
+    /*Описывает строки, обертка над std::string*/
+    /*struct SString 
+    {
+    public:
+        SString() : str() {}
+        SString(SString& InStr) : str(InStr.GetStr()){}
+        SString(std::string InStr) : str(InStr){}
+
+        SString& operator+(const SString& other) { return SString(str.append(other.str));}
+        bool operator==(const SString& other) const { return str == other.str;}
+
+        void Empty() {  str.clear(); }
+        std::string GetStr() {return str;}
+        static SString ToString(std::string InStr){return SString(InStr);}
+    private:
+        std::string str;
+    };*/
 }

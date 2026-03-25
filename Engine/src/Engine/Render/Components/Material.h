@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Engine/Render/Shader.h"
-#include "Engine/Core/Types.h"
+#include "Engine/Core/Utilities/Types.h"
 #include <memory>
 #include "Engine/Render/Camera.h"
 

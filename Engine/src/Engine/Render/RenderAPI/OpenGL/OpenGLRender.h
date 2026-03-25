@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "Engine/Render/Render.h"
-#include "Engine/Core/Types.h"
+#include "Engine/Core/Utilities/Types.h"
 
 
 namespace Engine 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Engine/Core/Types.h"
+#include "Engine/Core/Utilities/Types.h"
 #include <vector>
 #include "Engine/Render/Components/Component.h"
 #include "Engine/Render/Components/Material.h"

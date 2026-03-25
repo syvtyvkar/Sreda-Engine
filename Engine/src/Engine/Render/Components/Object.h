@@ -3,7 +3,7 @@
 #pragma once
 
 #include "Component.h"
-#include "Engine/Core/Types.h"
+#include "Engine/Core/Utilities/Types.h"
 #include "Engine/Render/Components/Mesh.h"
 #include "Engine/Render/Components/Material.h"
 #include <vector>

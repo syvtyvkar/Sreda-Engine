@@ -1,19 +1,21 @@
 // (c) Nikita Rogalev. All rights reserved.
 
 #include "Application.h"                            // Собственный заголовок класса Application
-#include "config.h"                                 // Конфигурационные параметры
 #include "Engine/Platform/PlatformUtils.h"          // Утилиты для работы с платформой (пути и т.д.)
-#include "Engine/Core/ResourceManager.h"            // Менеджер ресурсов (текстуры, шейдеры и т.п.)
+#include "Engine/Core/FileSystem/ResourceManager.h"            // Менеджер ресурсов (текстуры, шейдеры и т.п.)
 #include "Engine/Core/Log.h"                        // Система логирования
 #include "Engine/Platform/IWindow.h"                // Интерфейс окна
 #include "Engine/Input/Input.h"                     // Система ввода
 #include "Engine/Core/Time.h"                       // Система времени (таймеры, дельта-тайм)
+#include "Engine/Core/EngineConfig.h"               // Поддержка конфигурационных файлов
 
 #include "Engine/Render/Camera.h"                       
 
 #include <string>
 #include <sstream>
 #include <vector>
+
+using namespace EngineConfig;
 
 namespace Engine
 {
@@ -39,12 +41,19 @@ namespace Engine
         ENGINE_LOG_INFO("Running app...");                                                          // Логируем начало выполнения
         Engine::ResourceManager::getInstance().init(Engine::PlatformUtils::getExecutablePath());    // Инициализация менеджера ресурсов с путём к исполняемому файлу
         Time::TimeSystem::Init();                                                                   // Инициализация системы времени
+
+        auto& config = EngineConfig::ConfigSystem::Get();                                           // Получаем конфигурационную систему
+        config.Init(ENINGE_CONFIG_FILE);                                                            // Инициализация конфигурации движка
+
         AppWindow = WindowAPIFactory::create();                                                     // Создание окна через фабрику (в зависимости от платформы)
         Engine::WindowConfig WindowConfig;                                                          // TODO: ПЕРЕНЕСТИ В КОНФИГИ!!! Настройка параметров окна 
-        WindowConfig.wight = 800;
-        WindowConfig.height = 600;
-        WindowConfig.title = InNameApp;
-        WindowConfig.vsync = false;
+        WindowConfig.wight = config.Get<int>("window.width", 800);
+        WindowConfig.height = config.Get<int>("window.height", 600);
+        WindowConfig.title = config.Get<std::string>("window.DefaultWindowName","Engine Render");
+        WindowConfig.vsync = config.Get<bool>("render.vsync",false);
+        config.Set<int>("window.width", 800);
+        config.Set<int>("window.height", 600);
+        config.SaveConfig(ENINGE_CONFIG_FILE);
 
         if (!AppWindow->Init(WindowConfig))                                                         // Попытка инициализировать окно с заданными параметрами
         {                                                       
@@ -67,10 +76,8 @@ namespace Engine
         Engine::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](InputKey key, int mods, int repeat) 
         {
             if (key != InputKey::Control) return;   
-            if (Engine::InputSystem::GetInstance().GetKeyState(key) != InputState::Released) return;                                                               
-            ENGINE_LOG_INFO("Change cursor visible");               
-            bool LCursorVis = Engine::InputSystem::GetInstance().GetCursorVisible();                                    
-            Engine::InputSystem::GetInstance().SetCursorVisible(!LCursorVis);                                                                                    
+            if (Engine::InputSystem::GetInstance().GetKeyState(key) != InputState::Released) return;                                                                                                           
+            Engine::InputSystem::GetInstance().SetCursorVisible(!Engine::InputSystem::GetInstance().GetCursorVisible());                                                                                    
         });
 
         Engine::InputSystem::GetInstance().OnMouseMoved().Subscribe([&,this](float xMove,float yMove)
@@ -83,12 +90,13 @@ namespace Engine
 
         while (!AppWindow->ShouldClose())                                                                   // ОСНОВНОЙ ИГРОВОЙ ЦИКЛ Пока окно не запросило закрытие
         {
-            if (!AppWindow->GetCurrentRender()) return;                                                                          // Если рендерер потерян, выходим (аварийно)
+            if (!AppWindow->GetCurrentRender()) return;                                                     // Если рендерер потерян, выходим (аварийно)
             Time::TimeSystem::Update();                                                                     // Обновление системы времени
             AppWindow->Update();                                                                            // Обработка событий окна (GLFW poll events)
         }
         Engine::InputSystem::Shutdown();                                                                     // Выключение системы ввода
         Time::TimeSystem::Shutdown();                                                                       // Выключение системы времени
+        config.DeInit();
     }
 
     Application &Application::Get(){ return *s_Instance;}                                                   // Возвращает ссылку на единственный экземпляр приложения

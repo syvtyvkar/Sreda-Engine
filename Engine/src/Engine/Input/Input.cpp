@@ -42,7 +42,7 @@ namespace Engine
     {
         if (!s_InputInstance) return;
 
-        s_InputInstance->m_InputListen.get()->DeInit();
+        //s_InputInstance->m_InputListen.get()->DeInit();
         s_InputInstance->m_InputListen.reset();
 
         delete s_InputInstance;
@@ -154,6 +154,7 @@ namespace Engine
         if (s_InputInstance && s_InputInstance->GetInputListen())
         {
             s_InputInstance->GetInputListen()->SetCursorVisible(InVisible);
+            ENGINE_LOG_INFO("Cursor visible: {}", InVisible);
         }
     }
 
@@ -162,6 +163,7 @@ namespace Engine
         if (s_InputInstance && s_InputInstance->GetInputListen())
         {
             s_InputInstance->GetInputListen()->SetCursorMode(mode);
+            ENGINE_LOG_INFO("Cursor mode: {}", mode);
         }
     }
 
@@ -207,7 +209,7 @@ void Engine::InputSystem::CallOnMouseMoved(float x, float y)
     LNewY = IsInverMoveY() ? LNewY*-1.f : LNewY;
     //float LDeltaTime = Engine::Time::TimeSystem::GetDeltaTime();
     //float LSensivityMouse = GetMouseSensivity();
-    ENGINE_LOG_TRACE("Mouse Move: x {} y {}",LNewX,LNewY);
+    //ENGINE_LOG_TRACE("Mouse Move: x {} y {}",LNewX,LNewY);
     s_InputInstance->OnMouseMoved().Broadcast(LNewX, LNewY);
     s_InputInstance->m_mousePosition.x=x;
     s_InputInstance->m_mousePosition.y=y;

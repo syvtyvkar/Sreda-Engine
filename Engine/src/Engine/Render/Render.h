@@ -2,7 +2,7 @@
 
 #pragma once                                    // Защита от множественного включения
 
-#include "Engine/Core/Types.h"                  // Основные типы движка (Color, Transform и др.)
+#include "Engine/Core/Utilities/Types.h"                  // Основные типы движка (Color, Transform и др.)
 #include "Engine/Render/Components/Mesh.h"      // Класс меша (геометрия)
 #include "Engine/Render/Components/Material.h"  // Класс материала (шейдеры, текстуры, параметры)
 #include <memory>                               // Для std::unique_ptr
