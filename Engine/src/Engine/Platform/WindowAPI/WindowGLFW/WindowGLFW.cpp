@@ -112,6 +112,24 @@ namespace Engine
         return glfwWindowShouldClose(m_window);
     }
 
+    void WindowGLFW::BeginRender()
+    {
+        m_render->beginFrame();                                                                         // Начало кадра (подготовка рендерера к отрисовке)
+        m_render->clear();                                                                              // Очистка буферов цвета и глубины
+    }
+
+    void WindowGLFW::Render()
+    {
+        m_currentScene->render(m_render.get());                                                         // Отрисовка сцены с использованием текущего рендерера
+    }
+
+    void WindowGLFW::EndRender()
+    {
+        m_render->endFrame();  
+        glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
+        glfwSwapBuffers(m_window);      // Переключение переднего и заднего буферов
+    }
+
     /**
      * @brief Обновляет окно: обрабатывает события и меняет буферы.
      */
@@ -123,16 +141,7 @@ namespace Engine
         ss >> ret;
         UpdateWindowName(ret);
 
-        m_render->beginFrame();                                                                         // Начало кадра (подготовка рендерера к отрисовке)
-        m_render->clear();                                                                              // Очистка буферов цвета и глубины
-
         m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
-
-        m_currentScene->render(m_render.get());                                                         // Отрисовка сцены с использованием текущего рендерера
-
-        m_render->endFrame();  
-        glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
-        glfwSwapBuffers(m_window);      // Переключение переднего и заднего буферов
     }
 
     /**

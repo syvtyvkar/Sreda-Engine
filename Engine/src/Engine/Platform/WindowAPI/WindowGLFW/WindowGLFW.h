@@ -29,6 +29,9 @@ namespace Engine
         virtual bool Init(const Engine::WindowConfig& config) override;                 // Инициализация окна
         virtual void UpdateWindowName(std::string NewName) override;                    // Поменять имя окна 
         virtual bool ShouldClose() const override;                                      // Окно должно закрыться
+        virtual void BeginRender() override;
+        virtual void Render() override;
+        virtual void EndRender() override;
         virtual void Update() override;                                                 // Очистка буферов
         virtual int GetWidth() const override {return m_width;}                         // Получить длину и ширину
         virtual int GetHeight() const override {return m_height;}

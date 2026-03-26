@@ -8,6 +8,7 @@
 #include "Engine/Input/Input.h"                     // Система ввода
 #include "Engine/Core/Time.h"                       // Система времени (таймеры, дельта-тайм)
 #include "Engine/Core/EngineConfig.h"               // Поддержка конфигурационных файлов
+#include "Engine/UI/Framework/UISystem.h"           // Поддержка интерфейсов
 
 #include "Engine/Render/Camera.h"                       
 
@@ -92,7 +93,10 @@ namespace Engine
         {
             if (!AppWindow->GetCurrentRender()) return;                                                     // Если рендерер потерян, выходим (аварийно)
             Time::TimeSystem::Update();                                                                     // Обновление системы времени
-            AppWindow->Update();                                                                            // Обработка событий окна (GLFW poll events)
+            AppWindow->Update();   
+            AppWindow->BeginRender();   
+            AppWindow->Render(); 
+            AppWindow->EndRender();  
         }
         Engine::InputSystem::Shutdown();                                                                     // Выключение системы ввода
         Time::TimeSystem::Shutdown();                                                                       // Выключение системы времени

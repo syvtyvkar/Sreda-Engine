@@ -160,6 +160,7 @@ namespace EngineConfig
         }
 
         ENGINE_LOG_ERROR("Error saving user config: {}", Engine::FileIO::GetProjectDirectory() + InTypeConfig);
+        return false;
     }
 
     size_t ConfigSystem::CountKeys(const json &j, size_t depth)         // Считает количество листовых ключей
