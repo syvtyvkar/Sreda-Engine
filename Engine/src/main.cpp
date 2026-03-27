@@ -15,7 +15,8 @@ int main(int argc, char **argv)
     Engine::Log::Init();                                                        // Инициализируем систему логирования
     Engine::Application* App = Engine::Application::CreateNewApplication();     // Создаем приложение
     ENGINE_LOG_INFO("Read arguments program:");
-    for (int i = 0; i < argc; ++i) {
+    for (int i = 0; i < argc; ++i) 
+    {
         ENGINE_LOG_INFO("- Parameter argument: id: {} arg: {}", i, argv[i]);
     }
     //App->PushLayer(GenerateGame());                                           // TODO: Временно отключил, мб стоит пересмотреть подход?

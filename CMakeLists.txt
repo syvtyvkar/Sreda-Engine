@@ -8,6 +8,15 @@ cmake_policy(SET CMP0072 NEW)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/Bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/Bin)
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
 #-----
 
 add_subdirectory(Engine)
@@ -19,10 +28,8 @@ add_subdirectory(Game)
 set(EMBED_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/embed_config.cmake")
 set(EMBEDDED_CONFIG_HEADER "${CMAKE_BINARY_DIR}/generated/config_embed.h")
 
-# ✅ Создаём директорию заранее
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/generated")
 
-# ✅ Отладочный вывод (удали после успешной сборки)
 message(STATUS "=== DEBUG: Embed Config Paths ===")
 message(STATUS "  CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
 message(STATUS "  Config file: ${CMAKE_CURRENT_SOURCE_DIR}/Config/default_engine.json")

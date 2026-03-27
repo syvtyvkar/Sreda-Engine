@@ -126,8 +126,14 @@ namespace Engine
         return (std::filesystem::path(InBase) / InRelative).string();
     }
 
-    std::string FileIO::GetProjectDirectory() 
+    std::string FileIO::GetBinaryDirectory()
     {
         return std::filesystem::current_path().string();
+    }
+
+    std::string FileIO::GetProjectDirectory() 
+    {
+        std::filesystem::path projectPath = std::filesystem::current_path().parent_path();
+        return projectPath.string();
     }
 }

@@ -27,8 +27,8 @@ namespace Engine
         #endif
         std::ostringstream oss;                                             // Формируем строку с датой и временем вида "ГГГГ-ММ-ДД_ЧЧ-ММ-СС"
         oss << std::put_time(&tm_now, "%Y-%m-%d_%H-%M-%S");
-        //std::string NameLogFile = "logs/Log_" + oss.str() + ".log";       // Было задумано динамическое имя файла с временной меткой, но пока используется фиксированное
-        std::string NameLogFile = "Logs/Log.log";
+        //std::string NameLogFile = "../logs/Log_" + oss.str() + ".log";       // Было задумано динамическое имя файла с временной меткой, но пока используется фиксированное
+        std::string NameLogFile = "../Logs/Log.log";
 
         spdlog::sinks_init_list logSinks =                                          // Список приёмников (sinks) лога:
         {                    

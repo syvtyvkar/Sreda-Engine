@@ -3,8 +3,11 @@
 #pragma once // Защита от множественного включения
 
 #include <cmath>        // Для математических функций (std::sqrt)
+#include <cstring>
+#include <string>
 
-namespace Engine {
+namespace Engine 
+{
 
     /*Трёхмерный вектор с компонентами x, y, z.
     Содержит базовые арифметические операции и часто используемые статические векторы*/
@@ -138,21 +141,69 @@ namespace Engine {
         Vector2 texCoord;
     };
 
-    /*Описывает строки, обертка над std::string*/
-    /*struct SString 
+    /*Описывает строки, альтернатива std::string*/
+    struct TString 
     {
     public:
-        SString() : str() {}
-        SString(SString& InStr) : str(InStr.GetStr()){}
-        SString(std::string InStr) : str(InStr){}
+        TString() : m_str() {}
+        TString(char* InStr)
+        {
+            if (InStr == nullptr) 
+            {
+                m_str = new char[1];
+                m_str[0] = '\0';
+            }
+            else 
+            {
+                m_str = new char[strlen(InStr) + 1];
+                strcpy(m_str, InStr);
+                m_str[strlen(InStr)] = '\0';
+            }
+        }
+        TString(const TString& source)
+        {
+            m_str = new char[strlen(source.m_str) + 1];
+            strcpy(m_str, source.m_str);
+            m_str[strlen(source.m_str)] = '\0';
+        };
 
-        SString& operator+(const SString& other) { return SString(str.append(other.str));}
-        bool operator==(const SString& other) const { return str == other.str;}
+        TString(TString&& source)
+        {
+            m_str = source.m_str;
+            source.m_str = nullptr;
+        };
 
-        void Empty() {  str.clear(); }
-        std::string GetStr() {return str;}
-        static SString ToString(std::string InStr){return SString(InStr);}
+        void Empty() {  m_str={}; }
+        char* GetChar() {return m_str;}
+        static TString ToString(char* InStr){return TString(InStr);}
+        bool operator==(const TString& other) const { return m_str == other.m_str;}
+        TString TString::operator +(const TString &q) const
+        {
+            TString s;
+            s.m_str = new char[strlen(m_str)+strlen(q.m_str)+1];
+            strcpy(s.m_str,m_str);
+            strcat(s.m_str,q.m_str);
+            return s;
+        }
+        TString TString::operator =(const TString &q)
+        {
+            if(this!=&q)
+            {
+                if(m_str) delete[] m_str;
+                m_str = new char[strlen(q.m_str)+1];
+                strcpy(m_str,q.m_str);
+            }
+             return *this;
+        }
+        std::string GetSTDString() {return GetChar();}
+        void FromSTDString(std::string InSTDString) 
+        {
+            if(m_str) delete[] m_str;
+            m_str = new char[strlen(InSTDString.c_str())+1];
+            strcpy(m_str, InSTDString.c_str()); 
+        }
+        
     private:
-        std::string str;
-    };*/
+        char* m_str;
+    };
 }

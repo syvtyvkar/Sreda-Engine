@@ -4,6 +4,13 @@ build/*
 # vcpkg installed
 vcpkg_installed/*
 
+# .VSStudio
+.vscode/*
+
+# RmlUi
+Engine/external/RmlUi/*
+*.yml
+
 # Prerequisites
 *.d
 
