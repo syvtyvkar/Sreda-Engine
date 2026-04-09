@@ -5,8 +5,7 @@
     "glfw3",
     "glm",
     "spdlog",
-    "nlohmann-json",
-    "rmlui"
+    "nlohmann-json"
   ],
   "builtin-baseline": "57987637aac17d62bac535bc839baca3754490e6"
 }

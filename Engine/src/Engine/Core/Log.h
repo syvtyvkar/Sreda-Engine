@@ -9,11 +9,29 @@
 #include <iostream>                             // Для std::cerr
 #include <cstdlib>                              // Для std::abort
 
-namespace Engine 
+namespace Engine::Log
 {
+    enum LogType : int8_t
+    {
+        Temp,
+        Trace,
+        Info,
+        Warning,
+        Error,
+        Critical
+    };
+
+    enum Category : int8_t
+    {
+        Custom,
+        Core,
+        Render,
+        Input
+    };
+
     /*  Класс Log отвечает за инициализацию и предоставление глобального логгера spdlog.
         Реализован как статический класс (все методы статические).*/
-    class Log 
+    class LogSystem 
     {
     public:
         static void Init();                                         // Инициализация логгера (вызывать один раз при старте приложения)
@@ -30,6 +48,11 @@ namespace Engine
             Используется для всех сообщений от игрового кода*/
         static std::shared_ptr<spdlog::logger> s_MainLogger;
     };
+}
+
+namespace Engine 
+{
+    using namespace Engine::Log;
 
 } // namespace Engine
 
@@ -40,11 +63,11 @@ namespace Engine
 // Макросы для быстрого логирования с разными уровнями.
 // Они вызывают GetClientLogger() и соответствующий метод spdlog.
 // Использование: ENGINE_LOG_INFO("Player health: {}", health);
-#define ENGINE_LOG_TRACE(...)         ::Engine::Log::GetClientLogger()->trace(__VA_ARGS__)
-#define ENGINE_LOG_INFO(...)          ::Engine::Log::GetClientLogger()->info(__VA_ARGS__)
-#define ENGINE_LOG_WARN(...)          ::Engine::Log::GetClientLogger()->warn(__VA_ARGS__)
-#define ENGINE_LOG_ERROR(...)         ::Engine::Log::GetClientLogger()->error(__VA_ARGS__)
-#define ENGINE_LOG_CRITICAL(...)      ::Engine::Log::GetClientLogger()->critical(__VA_ARGS__)
+#define ENGINE_LOG_TRACE(...)         ::Engine::Log::LogSystem::GetClientLogger()->trace(__VA_ARGS__)
+#define ENGINE_LOG_INFO(...)          ::Engine::Log::LogSystem::GetClientLogger()->info(__VA_ARGS__)
+#define ENGINE_LOG_WARN(...)          ::Engine::Log::LogSystem::GetClientLogger()->warn(__VA_ARGS__)
+#define ENGINE_LOG_ERROR(...)         ::Engine::Log::LogSystem::GetClientLogger()->error(__VA_ARGS__)
+#define ENGINE_LOG_CRITICAL(...)      ::Engine::Log::LogSystem::GetClientLogger()->critical(__VA_ARGS__)
 
 
 // ============================================================================

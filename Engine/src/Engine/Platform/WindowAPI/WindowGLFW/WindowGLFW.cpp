@@ -11,6 +11,7 @@
 #include <sstream>
 #include <vector>
 #include "Engine/Render/Camera.h"   
+#include "Engine/Core/EngineConfig.h"   
 
 namespace Engine
 {
@@ -59,6 +60,7 @@ namespace Engine
         // Сохраняем размеры окна
         m_width = config.wight;
         m_height = config.height;
+        glfwGetWindowPos(m_window,&m_windowedX,&m_windowedY);
 
         // Делаем контекст OpenGL текущим для этого окна
         glfwMakeContextCurrent(m_window);
@@ -68,8 +70,6 @@ namespace Engine
 
         // Устанавливаем колбэк изменения размера фреймбуфера
         glfwSetFramebufferSizeCallback(m_window, FramebufferResizeCallback);
-        // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
-        glfwSetWindowUserPointer(m_window, this);
 
         ENGINE_LOG_INFO("Window ( {} ) has been created successfully", config.title);
         ///////////////////////////////////////////
@@ -86,6 +86,15 @@ namespace Engine
         m_render->setViewport(0,0,config.wight,config.height);                          // Установка области вывода (viewport) на весь размер окна
         m_render->setClearColor(Color(0.1f,0.1f,0.1f,1.f));                                         // Установка цвета очистки экрана (тёмно-серый)
         m_currentScene->createGameObject("NewObj");                                                         // Создание тестового игрового объекта в сцене
+
+        //m_uiSystem = Engine::UI::UISystemFactory::create();
+        //m_uiSystem.get()->Initialize(this);
+
+        m_Nuclear = std::make_unique<CoreNuclear>();
+        m_Nuclear.get()->Init(m_window);
+
+        // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
+        glfwSetWindowUserPointer(m_window, this);
 
         return true;
     }
@@ -114,19 +123,53 @@ namespace Engine
 
     void WindowGLFW::BeginRender()
     {
+        if (m_dirt_width_height)    // В прошлом кадре параметры окна изменились!
+        {
+            if (m_Nuclear.get() && m_Nuclear.get()->Initialized) 
+            {
+                m_Nuclear.get()->UpdateResizeCallback(m_window, GetWidth(), GetHeight());
+            }
+            if (GetCurrentScene() != nullptr)
+            {
+                if (GetCurrentScene()->GetCamera() != nullptr)
+                {
+                    GetCurrentScene()->GetCamera()->setScreenSize(GetWidth(),GetHeight());
+                }
+            }
+            m_dirt_width_height = false;
+        }
+
+        glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
         m_render->beginFrame();                                                                         // Начало кадра (подготовка рендерера к отрисовке)
+        if (m_uiSystem.get() != nullptr)
+        {
+            m_uiSystem.get()->BeginFrame();
+        }
         m_render->clear();                                                                              // Очистка буферов цвета и глубины
     }
 
     void WindowGLFW::Render()
     {
         m_currentScene->render(m_render.get());                                                         // Отрисовка сцены с использованием текущего рендерера
+        if (m_uiSystem.get() != nullptr)
+        {
+            m_uiSystem.get()->Render();
+        }
     }
 
     void WindowGLFW::EndRender()
     {
-        m_render->endFrame();  
-        glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
+        m_render.get()->endFrame(); 
+        if (m_uiSystem.get() != nullptr)
+        {
+            m_uiSystem.get()->EndFrame();
+        }
+       if (m_Nuclear.get())
+       {
+            m_Nuclear.get()->BeginFrame();
+            bool pressed = m_Nuclear.get()->DrawSimpleUI();
+            m_Nuclear.get()->Render();
+       }
         glfwSwapBuffers(m_window);      // Переключение переднего и заднего буферов
     }
 
@@ -142,15 +185,10 @@ namespace Engine
         UpdateWindowName(ret);
 
         m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
-    }
-
-    /**
-     * @brief Устанавливает пользовательскую функцию, вызываемую при изменении размера окна.
-     * @param callback Функция, принимающая новую ширину и высоту.
-     */
-    void WindowGLFW::SetResizeCallback(std::function<void(int, int)> callback) 
-    {
-        m_resizeCallback = callback;
+        if (m_uiSystem.get() != nullptr)
+        {
+            m_uiSystem.get()->Update();
+        }
     }
 
     /**
@@ -164,6 +202,18 @@ namespace Engine
             glfwDestroyWindow(m_window);            // Уничтожаем окно GLFW
             m_window = nullptr;
         }
+        if (m_uiSystem)
+        {
+            m_uiSystem.get()->Shutdown();
+        }
+        if (m_Nuclear.get())
+        {
+            m_Nuclear.get()->Shutdown();
+        }
+        if (m_render)
+        {
+            m_render.reset();
+        }
         glfwTerminate();                            // Завершаем GLFW (вызывается даже если окно уже было уничтожено)
     }
 
@@ -172,42 +222,78 @@ namespace Engine
      */
     void WindowGLFW::ExitApp()
     {
-        ENGINE_CORE_ASSERT(GetHandle(), "FATAL ERROR: NO VALID APPLICATION!");
-        glfwSetWindowShouldClose(GetHandle(), true);
+        ENGINE_CORE_ASSERT(m_window, "FATAL ERROR: NO VALID APPLICATION!");
+        glfwSetWindowShouldClose(m_window, true);
     }
 
     void WindowGLFW::SetWindowMode(WindowMode NewMode)
     {
-        // На текущий момент попытка сменить режим окна приводит к полной поломке рендеринга
-        if (m_windowMode==NewMode) return;
+        if (m_windowMode == NewMode) return;
 
-        return;
+        m_windowMode = NewMode;
+        GLFWmonitor* monitor = nullptr;
+        int x = 0, y = 0, w = m_width, h = m_height, refreshRate = 0;
 
-        /*if (NewMode==WindowMode::Borderless || NewMode == WindowMode::Fullscreen)
+        switch (NewMode)
         {
-            glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-        }else
-        {
-            glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
+            case WindowMode::Window:
+            {
+                monitor = nullptr;                                              // Оконный режим: монитор = nullptr
+                x = 100; y = 100;                                               // или сохранённая позиция
+                w = m_width; h = m_height;
+                refreshRate = 0;                                                // игнорируется
+                glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_TRUE);       // Возвращаем рамку окна
+                break;
+            }
+        
+            case WindowMode::Borderless:
+            {
+                monitor = glfwGetPrimaryMonitor();                              // Borderless = фуллскрин на нулевом мониторе, но с оконными координатами
+                const GLFWvidmode* mode = glfwGetVideoMode(monitor);            // Получаем размеры рабочего стола (учитывая панель задач)
+                int monitorX, monitorY;
+                glfwGetMonitorPos(monitor, &monitorX, &monitorY);
+            
+                x = monitorX; y = monitorY;
+                w = mode->width; h = mode->height;
+                refreshRate = mode->refreshRate;
+                glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_FALSE);      // Убираем рамку, но оставляем окно "оконным" для быстрого переключения
+                break;
+            }
+        
+            case WindowMode::Fullscreen:
+            {
+                monitor = glfwGetPrimaryMonitor();
+                const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+            
+                x = 0; y = 0; // игнорируется в фуллскрине
+                w = mode->width; h = mode->height;
+                refreshRate = mode->refreshRate; // важно для плавности
+            
+                glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_FALSE);
+                break;
+            }
         }
 
-        GLFWwindow* tempWindowPtr = glfwCreateWindow(m_width,m_height, NameWindow.c_str(), NewMode==WindowMode::Fullscreen ? glfwGetPrimaryMonitor() : NULL,m_window);
-	
-	    if(!tempWindowPtr)
-	    {
-		    ENGINE_LOG_ERROR("Unknown error when trying to change the window mode!");
-		    return;
-	    }
+        glfwSetWindowMonitor(m_window, monitor, x, y, w, h, refreshRate);
+    
+        if (NewMode == WindowMode::Window) 
+        {
+            m_width = w; m_height = h;
+        }
 
-	    glfwDestroyWindow(m_window);	// destroy the old window
-	    m_window = tempWindowPtr;	// swap the pointers
+        int fbW, fbH;
+        glfwGetFramebufferSize(m_window, &fbW, &fbH);
+        glViewport(0, 0, fbW, fbH);
+    
+        // Возвращаем фокус окну
+        glfwFocusWindow(m_window);
+    
+        ENGINE_LOG_INFO("Window mode changed to: {}", (NewMode == WindowMode::Window) ? "Windowed" : (NewMode == WindowMode::Borderless ? "Borderless" : "Fullscreen"));
 
-	    glfwMakeContextCurrent(m_window);
-        //glfwSwapInterval(config.vsync ? 1 : 0); //VSync!!!
-        // Устанавливаем колбэк изменения размера фреймбуфера
-        glfwSetFramebufferSizeCallback(m_window, FramebufferResizeCallback);
-        // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
-        glfwSetWindowUserPointer(m_window, this);*/
+        if (m_windowMode == WindowMode::Window) 
+        {
+            glfwSetWindowPos(m_window,m_windowedX,m_windowedY);
+        }
     }
 
     /**
@@ -221,21 +307,23 @@ namespace Engine
      */
     void WindowGLFW::FramebufferResizeCallback(GLFWwindow* window, int width, int height) 
     {
-        auto* win = reinterpret_cast<WindowGLFW*>(glfwGetWindowUserPointer(window));
+        auto* win = (class WindowGLFW *)glfwGetWindowUserPointer(window);
         if (win) 
         {
+            if (win->GetWindowMode() == WindowMode::Window) 
+            {
             win->m_width = width;
             win->m_height = height;
+            win->m_dirt_width_height = true;
+            }
             
             // Устанавливаем область вывода OpenGL на весь новый размер окна
             glViewport(0, 0, width, height);
-            
-            // Вызываем пользовательский колбэк, если он зарегистрирован
-            if (win->m_resizeCallback) 
+            win->OnUpdateWindowSize().Broadcast(window, width, height);
+            if (win->GetWindowMode() == WindowMode::Window) 
             {
-                win->m_resizeCallback(width, height);
+                glfwGetWindowPos(window, &win->m_windowedX, &win->m_windowedY);
             }
-            win->GetCurrentScene()->GetCamera()->setScreenSize(width,height);
         }
     }
 }

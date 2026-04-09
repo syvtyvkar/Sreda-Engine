@@ -9,11 +9,11 @@
 #include <sstream>
 #include <iomanip>
 
-namespace Engine 
+namespace Engine::Log
 {
-    std::shared_ptr<spdlog::logger> Log::s_MainLogger;                      // Статический указатель на основной логгер (инициализируется в Init)
+    std::shared_ptr<spdlog::logger> LogSystem::s_MainLogger;                      // Статический указатель на основной логгер (инициализируется в Init)
 
-    void Log::Init()                                                        // Инициализация системы логирования
+    void LogSystem::Init()                                                        // Инициализация системы логирования
     {          
 
         auto now = std::chrono::system_clock::now();                        // Получаем текущее время для формирования имени файла лога
@@ -42,7 +42,7 @@ namespace Engine
         s_MainLogger->set_level(spdlog::level::trace);                                              // Устанавливаем уровень логирования — trace (самый подробный)
     }
 
-    void Log::SetLevel(spdlog::level::level_enum level)                      // Метод для изменения уровня логирования во время выполнения
+    void LogSystem::SetLevel(spdlog::level::level_enum level)                      // Метод для изменения уровня логирования во время выполнения
     {
         s_MainLogger->set_level(level);
     }

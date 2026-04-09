@@ -35,6 +35,32 @@ namespace Engine
         glfwSetScrollCallback(glfwWindow, OnGLFWScrollCallback);
 
         m_windowHandle = glfwWindow;                                    // Сохраняем native handle для дальнейшего использования
+        DelegateChangeWindowHandle = WindowGL->OnUpdateWindowHandle().Subscribe([&,this](GLFWwindow* OutWindow)
+        {
+            if (m_windowHandle)
+            {
+                auto* glfwWindow = static_cast<GLFWwindow*>(m_windowHandle);
+                if (glfwWindow)
+                {
+                    // Убираем колбэки, чтобы они не вызывались после удаления объекта.
+                    glfwSetKeyCallback(glfwWindow, nullptr);
+                    glfwSetMouseButtonCallback(glfwWindow, nullptr);
+                    glfwSetCursorPosCallback(glfwWindow, nullptr);
+                    glfwSetScrollCallback(glfwWindow, nullptr);
+                }
+                m_windowHandle = nullptr;
+            } 
+            if (OutWindow)
+            {
+                glfwSetKeyCallback(OutWindow, OnGLFWKeyCallback);
+                glfwSetMouseButtonCallback(OutWindow, OnGLFWMouseButtonCallback);
+                glfwSetCursorPosCallback(OutWindow, OnGLFWCursorPosCallback);
+                glfwSetScrollCallback(OutWindow, OnGLFWScrollCallback);
+
+                m_windowHandle = OutWindow;
+            }
+        });
+        m_window=WindowGL;
         ENGINE_LOG_TRACE("Input listen start!");
     }
 
@@ -48,16 +74,27 @@ namespace Engine
         OnMouseMoved().Clear();
         OnMouseScrolled().Clear();
 
-        auto* glfwWindow = static_cast<GLFWwindow*>(m_windowHandle);
-        if (glfwWindow)
+        if (m_window)
         {
-            // Убираем колбэки, чтобы они не вызывались после удаления объекта.
-            glfwSetKeyCallback(glfwWindow, nullptr);
-            glfwSetMouseButtonCallback(glfwWindow, nullptr);
-            glfwSetCursorPosCallback(glfwWindow, nullptr);
-            glfwSetScrollCallback(glfwWindow, nullptr);
+            auto* EngineWindow = static_cast<WindowGLFW*>(m_window);
+            EngineWindow->OnUpdateWindowHandle().Unsubscribe(DelegateChangeWindowHandle);
+
         }
-        m_windowHandle = nullptr; 
+        m_window = nullptr;
+        if (m_windowHandle)
+        {
+            auto* glfwWindow = static_cast<GLFWwindow*>(m_windowHandle);
+            if (glfwWindow)
+            {
+                // Убираем колбэки, чтобы они не вызывались после удаления объекта.
+                glfwSetKeyCallback(glfwWindow, nullptr);
+                glfwSetMouseButtonCallback(glfwWindow, nullptr);
+                glfwSetCursorPosCallback(glfwWindow, nullptr);
+                glfwSetScrollCallback(glfwWindow, nullptr);
+            }
+        }
+        m_windowHandle = nullptr;
+
         ENGINE_LOG_INFO("Input listen shutdown");
     }
 

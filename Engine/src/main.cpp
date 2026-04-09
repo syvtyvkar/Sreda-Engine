@@ -12,7 +12,7 @@
 
 int main(int argc, char **argv)
 {
-    Engine::Log::Init();                                                        // Инициализируем систему логирования
+    Engine::Log::LogSystem::Init();                                                        // Инициализируем систему логирования
     Engine::Application* App = Engine::Application::CreateNewApplication();     // Создаем приложение
     ENGINE_LOG_INFO("Read arguments program:");
     for (int i = 0; i < argc; ++i) 

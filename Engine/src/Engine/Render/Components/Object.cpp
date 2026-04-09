@@ -45,18 +45,20 @@ namespace Engine {
     {
         if (!m_active) return;
 
-        for (auto& [type, component] : m_components) {
+        for (auto& [type, component] : m_components) 
+        {
             component->onUpdate(deltaTime);
         }
     }
 
-    void GameObject::render(RenderAPI* renderer) {
+    void GameObject::render(RenderAPI* renderer) 
+    {
         if (!m_active || !renderer) return;
 
         auto* mesh = getComponent<Mesh>();
 
-        if (mesh && mesh->m_materialMesh) {
-            //renderer->drawMaterial(mesh->m_materialMesh.get(),transform);
+        if (mesh && mesh->m_materialMesh) 
+        {
             if (GetParentScene())
             {
                 mesh->m_materialMesh.get()->use(GetParentScene()->GetCamera());

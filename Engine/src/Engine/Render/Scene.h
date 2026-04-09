@@ -25,6 +25,7 @@ namespace Engine
 
         void update(float deltaTime);
         void render(RenderAPI* renderer);
+        void OnContextRecreated(RenderAPI* renderer);
 
         void clear();
 

@@ -45,11 +45,11 @@ namespace Engine
 
     void OpenGLRenderer::beginFrame()
     {
-        GLint enabled;
+        /*GLint enabled;
         glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &enabled);
         if (!enabled) {
             ENGINE_LOG_ERROR("Vertex attribute 0 (position) is not enabled!");
-        }
+        }*/
     }
 
     void OpenGLRenderer::endFrame()
@@ -101,8 +101,7 @@ namespace Engine
         } 
         else 
         {
-            glDrawArrays(GL_TRIANGLES, 0, 
-                        static_cast<GLsizei>(InMesh->m_vertices.size()));
+            glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(InMesh->m_vertices.size()));
         }
     
         // Проверка ошибок

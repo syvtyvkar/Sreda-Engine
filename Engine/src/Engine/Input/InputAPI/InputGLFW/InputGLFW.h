@@ -183,6 +183,8 @@ namespace Engine
     protected:
 
         void* m_windowHandle = nullptr;                     // Указатель на нативный дескриптор окна (GLFWwindow*)
+        void* m_window = nullptr;
+        DelegateHandle DelegateChangeWindowHandle;
 
         // Преобразования между InputKey и GLFW-кодами
         static InputKey FromGLFWKey(int glfwKey);

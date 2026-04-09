@@ -7,7 +7,8 @@
 
 #include "Engine/Render/Components/Object.h"
 #include "Engine/Input/Input.h"
-#include "Engine/Render/Camera.h"       
+#include "Engine/Render/Camera.h"     
+#include "Engine/Core/FileSystem/ResourceManager.h"  
 
 namespace Engine 
 {
@@ -98,6 +99,27 @@ namespace Engine
         for (auto& obj : m_gameObjects) 
         {
             obj->render(renderer);
+        }
+    }
+
+    void Scene::OnContextRecreated(RenderAPI* renderer)
+    {
+        for (auto& obj : m_gameObjects) 
+        {
+            if (Mesh* LMesh = obj.get()->getComponent<Mesh>())
+            {
+                renderer->removeMesh(LMesh, LMesh->GetTransform());
+            }
+        }
+
+
+        for (auto& obj : m_gameObjects) 
+        {
+            if (Mesh* LMesh = obj.get()->getComponent<Mesh>())
+            {
+                renderer->setupMesh(LMesh, LMesh->GetTransform());
+                LMesh->m_materialMesh.get()->loadShader(Engine::ResourceManager::getResourcePath("Resources/Shaders/camera.vert"), Engine::ResourceManager::getResourcePath("Resources/Shaders/camera.frag"));
+            }
         }
     }
 

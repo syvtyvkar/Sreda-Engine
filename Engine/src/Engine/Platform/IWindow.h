@@ -96,11 +96,6 @@ namespace Engine
          */
         virtual int GetHeight() const = 0;
         /**
-         * @brief Устанавливает функцию обратного вызова, вызываемую при изменении размера окна.
-         * @param callback Функция, принимающая новую ширину и высоту.
-         */
-        virtual void SetResizeCallback(std::function<void(int,int)>callback)= 0; 
-        /**
          * @brief Показывает текущий режим окна
          */
         virtual WindowMode GetWindowMode() = 0;

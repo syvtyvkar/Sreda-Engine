@@ -8,7 +8,6 @@
 #include "Engine/Input/Input.h"                     // Система ввода
 #include "Engine/Core/Time.h"                       // Система времени (таймеры, дельта-тайм)
 #include "Engine/Core/EngineConfig.h"               // Поддержка конфигурационных файлов
-#include "Engine/UI/Framework/UISystem.h"           // Поддержка интерфейсов
 
 #include "Engine/Render/Camera.h"                       
 
@@ -74,6 +73,19 @@ namespace Engine
             ExitApp();                                                                                      // Выход из приложения
         });
 
+        // Тестим смену режима окна
+        Engine::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](InputKey key, int mods, int repeat) 
+        {
+            if (key == InputKey::F1)
+            {
+                AppWindow.get()->SetWindowMode(WindowMode::Window);
+            }  
+            if (key == InputKey::F2)
+            {
+                AppWindow.get()->SetWindowMode(WindowMode::Borderless);
+            }                                                                                                                                             // Выход из приложения
+        });
+
         Engine::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](InputKey key, int mods, int repeat) 
         {
             if (key != InputKey::Control) return;   
@@ -88,13 +100,13 @@ namespace Engine
                 AppWindow->GetCurrentScene()->GetCamera()->processMouseMovement(xMove,yMove,false);
             }
         });
-
+   
         while (!AppWindow->ShouldClose())                                                                   // ОСНОВНОЙ ИГРОВОЙ ЦИКЛ Пока окно не запросило закрытие
         {
             if (!AppWindow->GetCurrentRender()) return;                                                     // Если рендерер потерян, выходим (аварийно)
             Time::TimeSystem::Update();                                                                     // Обновление системы времени
-            AppWindow->Update();   
-            AppWindow->BeginRender();   
+            AppWindow->Update();  
+            AppWindow->BeginRender();    
             AppWindow->Render(); 
             AppWindow->EndRender();  
         }
