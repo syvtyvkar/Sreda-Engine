@@ -92,6 +92,15 @@ namespace Engine
             return;
         }
 
+        /*GLint program;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+
+        if (program != 0)
+        {
+            glUniformMatrix4fv(getUniformLocation(program, "view"), 1, GL_FALSE, m_view.data);
+            glUniformMatrix4fv(getUniformLocation(program, "projection"), 1, GL_FALSE, m_proj.data);
+        }*/
+
         // === Просто привязываем готовый VAO и рисуем ===
         glBindVertexArray(InMesh->m_VAO);
     
@@ -194,6 +203,31 @@ namespace Engine
         if (InMesh->m_VAO != 0) glDeleteVertexArrays(1, &InMesh->m_VAO);
         if (InMesh->m_VBO != 0) glDeleteBuffers(1, &InMesh->m_VBO);
         if (InMesh->m_EBO != 0) glDeleteBuffers(1, &InMesh->m_EBO);
+    }
+
+    void OpenGLRenderer::setViewProjection(const Matrix4 &view, const Matrix4 &proj)
+    {
+        m_view = view;
+        m_proj = proj;
+    }
+
+    void OpenGLRenderer::setDepthTest(bool enabled)
+    {
+        if (enabled) glEnable(GL_DEPTH_TEST);
+        else glDisable(GL_DEPTH_TEST);
+    }
+
+    void OpenGLRenderer::setBlending(bool enabled)
+    {
+        if (enabled) 
+        {
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        } 
+        else 
+        {
+            glDisable(GL_BLEND);
+        }
     }
 
     Matrix4 OpenGLRenderer::getModelMatrix(Transform InTransform)

@@ -39,76 +39,55 @@ namespace Engine
     void Application::RunApp(std::string InNameApp)                         // Основной метод запуска приложения
     {
         ENGINE_LOG_INFO("Running app...");                                                          // Логируем начало выполнения
+        if (!m_AppInstance)
+        {
+            ENGINE_LOG_CRITICAL("Application instance is not set!");
+            return;
+        }
         Engine::ResourceManager::getInstance().init(Engine::PlatformUtils::getExecutablePath());    // Инициализация менеджера ресурсов с путём к исполняемому файлу
         Time::TimeSystem::Init();                                                                   // Инициализация системы времени
 
         auto& config = EngineConfig::ConfigSystem::Get();                                           // Получаем конфигурационную систему
         config.Init(ENINGE_CONFIG_FILE);                                                            // Инициализация конфигурации движка
 
-        AppWindow = WindowAPIFactory::create();                                                     // Создание окна через фабрику (в зависимости от платформы)
+        m_AppWindow = WindowAPIFactory::create();                                                     // Создание окна через фабрику (в зависимости от платформы)
         Engine::WindowConfig WindowConfig;                                                          // TODO: ПЕРЕНЕСТИ В КОНФИГИ!!! Настройка параметров окна 
         WindowConfig.wight = config.Get<int>("window.width", 800);
         WindowConfig.height = config.Get<int>("window.height", 600);
-        WindowConfig.title = config.Get<std::string>("window.DefaultWindowName","Engine Render");
+        WindowConfig.title = m_AppInstance->GetNameApp();
         WindowConfig.vsync = config.Get<bool>("render.vsync",false);
         config.Set<int>("window.width", 800);
         config.Set<int>("window.height", 600);
         config.SaveConfig(ENINGE_CONFIG_FILE);
 
-        if (!AppWindow->Init(WindowConfig))                                                         // Попытка инициализировать окно с заданными параметрами
+        if (!m_AppWindow->Init(WindowConfig))                                                         // Попытка инициализировать окно с заданными параметрами
         {                                                       
             ENGINE_LOG_CRITICAL("Failed to create window!");                                        // Ошибка создания окна
             return;
         }
 
-        Engine::InputSystem::Init(AppWindow.get());                                                  // Инициализация системы ввода с передачей указателя на окно
+        Engine::InputSystem::Init(m_AppWindow.get());                                                  // Инициализация системы ввода с передачей указателя на окно
 
         ENGINE_LOG_TRACE("Working Directory: {}", Engine::PlatformUtils::getCurrentWorkingDirectory());
-
-        // Подписка на событие нажатия клавиши (Выход из демонстрации)
-        Engine::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](InputKey key, int mods, int repeat) 
-        {
-            if (key != InputKey::Escape) return;                                                                 // Если нажата не клавиша X, игнорируем
-            ENGINE_LOG_INFO("Press exit application...");                                                   // Логируем нажатие
-            ExitApp();                                                                                      // Выход из приложения
-        });
-
-        // Тестим смену режима окна
-        Engine::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](InputKey key, int mods, int repeat) 
-        {
-            if (key == InputKey::F1)
-            {
-                AppWindow.get()->SetWindowMode(WindowMode::Window);
-            }  
-            if (key == InputKey::F2)
-            {
-                AppWindow.get()->SetWindowMode(WindowMode::Borderless);
-            }                                                                                                                                             // Выход из приложения
-        });
-
-        Engine::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](InputKey key, int mods, int repeat) 
-        {
-            if (key != InputKey::Control) return;   
-            if (Engine::InputSystem::GetInstance().GetKeyState(key) != InputState::Released) return;                                                                                                           
-            Engine::InputSystem::GetInstance().SetCursorVisible(!Engine::InputSystem::GetInstance().GetCursorVisible());                                                                                    
-        });
-
-        Engine::InputSystem::GetInstance().OnMouseMoved().Subscribe([&,this](float xMove,float yMove)
-        {
-            if (!Engine::InputSystem::GetInstance().GetCursorVisible() && AppWindow)
-            {
-                AppWindow->GetCurrentScene()->GetCamera()->processMouseMovement(xMove,yMove,false);
-            }
-        });
    
-        while (!AppWindow->ShouldClose())                                                                   // ОСНОВНОЙ ИГРОВОЙ ЦИКЛ Пока окно не запросило закрытие
+        m_AppInstance.get()->OnStart();
+
+        while (!m_AppWindow->ShouldClose())                                                                   // ОСНОВНОЙ ИГРОВОЙ ЦИКЛ Пока окно не запросило закрытие
         {
-            if (!AppWindow->GetCurrentRender()) return;                                                     // Если рендерер потерян, выходим (аварийно)
+            if (!m_AppWindow->GetCurrentRender()) return;                                                     // Если рендерер потерян, выходим (аварийно)
             Time::TimeSystem::Update();                                                                     // Обновление системы времени
-            AppWindow->Update();  
-            AppWindow->BeginRender();    
-            AppWindow->Render(); 
-            AppWindow->EndRender();  
+            m_AppWindow->Update();
+            if (m_AppInstance)
+            {
+                m_AppInstance->Update(Time::TimeSystem::GetDeltaTime());
+            }  
+            m_AppWindow->BeginRender();    
+            m_AppWindow->Render(); 
+            if (m_AppInstance)
+            {
+                m_AppInstance->OnRender();
+            }  
+            m_AppWindow->EndRender();  
         }
         Engine::InputSystem::Shutdown();                                                                     // Выключение системы ввода
         Time::TimeSystem::Shutdown();                                                                       // Выключение системы времени
@@ -119,12 +98,26 @@ namespace Engine
 
     void Application::ExitApp()                                                                             // Запрос на выход из приложения (закрытие окна)
     {
-        Engine::Application::Get().AppWindow->ExitApp();
+        Engine::Application::Get().m_AppWindow->ExitApp();
+    }
+
+    void Application::AddInstance(std::unique_ptr<Engine::ApplicationInstance> InInstance)
+    {
+        m_AppInstance=std::move(InInstance);
+        if (m_AppInstance)
+        {
+            m_AppInstance.get()->OnInit(this);
+        }
     }
 
     void Application::CloseApp()                                                                            // Закрытие приложения и освобождение всех ресурсов
     {
-        AppWindow.reset();          // Уничтожение окна (вызов деструктора)
+        if (m_AppInstance)
+        {
+            m_AppInstance->DeInit();
+            m_AppInstance.reset();
+        }
+        m_AppWindow.reset();          // Уничтожение окна (вызов деструктора)
         s_Instance = nullptr;       // Сброс указателя на экземпляр (синглтон)
     }
 }

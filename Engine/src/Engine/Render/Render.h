@@ -85,6 +85,14 @@ namespace Engine
         //virtual const RendererCapabilities& getCapabilities() const = 0;
         // === Получение нативного объекта ===
         //virtual void* getNativeDevice() const = 0;
+
+        /**
+         * @brief Глобальное состояние камеры
+         */
+        virtual void setViewProjection(const Matrix4& view, const Matrix4& proj) = 0;
+
+        virtual void setDepthTest(bool enabled) = 0;
+        virtual void setBlending(bool enabled) = 0;
     };
 
     

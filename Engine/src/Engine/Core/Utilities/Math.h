@@ -71,4 +71,10 @@ namespace EngineMath
 			q1.z * q2.x - q1.x * q2.z,
 			q1.x * q2.y - q1.y * q2.x);
     };
+
+    /*template<typename T> T Range(T,T);
+    template<typename T> T Range(T a, T b)
+    {
+        return a+b;
+    }*/
 }

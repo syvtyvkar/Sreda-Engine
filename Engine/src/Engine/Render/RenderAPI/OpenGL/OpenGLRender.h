@@ -33,6 +33,11 @@ namespace Engine
         virtual void setupMesh(Mesh* InMesh, Transform InTransform) override;
         virtual void removeMesh(Mesh* InMesh, Transform InTransform) override;
 
+        // Камера
+        void setViewProjection(const Matrix4& view, const Matrix4& proj) override;
+        void setDepthTest(bool enabled) override;
+        void setBlending(bool enabled) override;
+
         // Конвертация в типы движка
         static Matrix4 getModelMatrix(Transform InTransform);
         static glm::mat4 toGLM(Matrix4 InMatrix4) {return glm::make_mat4(InMatrix4.data);}
@@ -50,6 +55,8 @@ namespace Engine
     private:
         bool m_initialized = false;
         mutable std::unordered_map<std::string, int> m_uniformLocations;
+        Matrix4 m_view;
+        Matrix4 m_proj;
 
         // Внутренние методы
         int getUniformLocation(unsigned int m_programID, const std::string& name) const;

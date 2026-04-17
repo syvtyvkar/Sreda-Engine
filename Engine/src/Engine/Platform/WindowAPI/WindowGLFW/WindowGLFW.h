@@ -6,10 +6,9 @@
 #include <GLFW/glfw3.h>
 #endif
 #include "Engine/Platform/IWindow.h"    // Базовый интерфейс окна
-#include "Engine/UI/Framework/IUISystem.h"    // Базовый интерфейс окна
+#include "Engine/UI/Framework/UISystem.h"    // Базовый интерфейс окна
 #include <string>
 #include <functional>
-#include "Engine/UI/Nuclear/CoreNuclear.h"
 #include "Engine/Core/Utilities/Event.h"
 
 namespace Engine
@@ -65,8 +64,7 @@ namespace Engine
     protected:
         std::unique_ptr<RenderAPI> m_render;                    // Рендерер (OpenGL, Vulkan и т.д.)
         std::unique_ptr<Scene> m_currentScene;                  // Текущая сцена
-        std::unique_ptr<IUISystem> m_uiSystem;                  // Текущая система UI
-        std::unique_ptr<CoreNuclear> m_Nuclear;                  // Текущая система UI
+        std::unique_ptr<UISystem> m_uiSystem;                  // Текущая система UI
     };
 }
 

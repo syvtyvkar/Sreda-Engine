@@ -87,11 +87,11 @@ namespace Engine
         m_render->setClearColor(Color(0.1f,0.1f,0.1f,1.f));                                         // Установка цвета очистки экрана (тёмно-серый)
         m_currentScene->createGameObject("NewObj");                                                         // Создание тестового игрового объекта в сцене
 
-        //m_uiSystem = Engine::UI::UISystemFactory::create();
-        //m_uiSystem.get()->Initialize(this);
+        m_uiSystem = std::make_unique<UISystem>();
+        m_uiSystem.get()->Initialize(this);
 
-        m_Nuclear = std::make_unique<CoreNuclear>();
-        m_Nuclear.get()->Init(m_window);
+        //m_Nuclear = std::make_unique<NuclearContext>();
+        //m_Nuclear.get()->Init(m_window);
 
         // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
         glfwSetWindowUserPointer(m_window, this);
@@ -125,10 +125,6 @@ namespace Engine
     {
         if (m_dirt_width_height)    // В прошлом кадре параметры окна изменились!
         {
-            if (m_Nuclear.get() && m_Nuclear.get()->Initialized) 
-            {
-                m_Nuclear.get()->UpdateResizeCallback(m_window, GetWidth(), GetHeight());
-            }
             if (GetCurrentScene() != nullptr)
             {
                 if (GetCurrentScene()->GetCamera() != nullptr)
@@ -143,7 +139,7 @@ namespace Engine
         m_render->beginFrame();                                                                         // Начало кадра (подготовка рендерера к отрисовке)
         if (m_uiSystem.get() != nullptr)
         {
-            m_uiSystem.get()->BeginFrame();
+            //m_uiSystem.get()->BeginFrame();
         }
         m_render->clear();                                                                              // Очистка буферов цвета и глубины
     }
@@ -153,7 +149,7 @@ namespace Engine
         m_currentScene->render(m_render.get());                                                         // Отрисовка сцены с использованием текущего рендерера
         if (m_uiSystem.get() != nullptr)
         {
-            m_uiSystem.get()->Render();
+            //m_uiSystem.get()->Render();
         }
     }
 
@@ -162,14 +158,11 @@ namespace Engine
         m_render.get()->endFrame(); 
         if (m_uiSystem.get() != nullptr)
         {
+            m_uiSystem.get()->BeginFrame();
+            m_uiSystem.get()->Update();
+            m_uiSystem.get()->Render();
             m_uiSystem.get()->EndFrame();
         }
-       if (m_Nuclear.get())
-       {
-            m_Nuclear.get()->BeginFrame();
-            bool pressed = m_Nuclear.get()->DrawSimpleUI();
-            m_Nuclear.get()->Render();
-       }
         glfwSwapBuffers(m_window);      // Переключение переднего и заднего буферов
     }
 
@@ -187,7 +180,7 @@ namespace Engine
         m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
         if (m_uiSystem.get() != nullptr)
         {
-            m_uiSystem.get()->Update();
+            //m_uiSystem.get()->Update();
         }
     }
 
@@ -205,10 +198,6 @@ namespace Engine
         if (m_uiSystem)
         {
             m_uiSystem.get()->Shutdown();
-        }
-        if (m_Nuclear.get())
-        {
-            m_Nuclear.get()->Shutdown();
         }
         if (m_render)
         {

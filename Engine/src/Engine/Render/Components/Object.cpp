@@ -7,7 +7,7 @@
 #include "Engine/Render/Tools/MeshFactory"
 #include "Engine/Render/Components/Mesh.h"
 #include "Engine/Core/FileSystem/ResourceManager.h"
-#include "Engine/Render/Scene.h"
+#include "Engine/Scene/Scene.h"
 #include "Engine/Core/Log.h"
 
 namespace Engine {

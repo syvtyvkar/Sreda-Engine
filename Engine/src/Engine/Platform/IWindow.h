@@ -6,7 +6,7 @@
 #include <functional>                   // Для std::function (используется в колбэке изменения размера)
 #include <memory>                       // Для std::unique_ptr
 #include "Engine/Render/Render.h"       // Интерфейс рендерера (RenderAPI)
-#include "Engine/Render/Scene.h"        // Класс сцены, содержащей игровые объекты
+#include "Engine/Scene/Scene.h"        // Класс сцены, содержащей игровые объекты
 
 namespace Engine
 {
