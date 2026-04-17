@@ -24,7 +24,7 @@ namespace Engine
         Shader* getShader() { return m_shader.get(); }
 
     private:
-        std::unique_ptr<Shader> m_shader;
+        TUniquePtr<Shader> m_shader;
         Matrix4 m_modelMatrix;
         //Transform m_modelMatrix;
     };

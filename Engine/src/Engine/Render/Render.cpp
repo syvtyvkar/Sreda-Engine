@@ -6,7 +6,7 @@
 namespace Engine 
 {
 
-    std::unique_ptr<RenderAPI> RenderAPIFactory::create() 
+    TUniquePtr<RenderAPI> RenderAPIFactory::create() 
     {
         // Здесь можно добавить выбор API через конфиг
         // Например: if (config.api == "DirectX") return std::make_unique<DXRenderer>();

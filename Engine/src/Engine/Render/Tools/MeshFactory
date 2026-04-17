@@ -13,7 +13,7 @@ namespace Engine
     {
         public:
         // Создать куб (размер 2x2x2, центр в 0,0,0)
-        static std::unique_ptr<Mesh> CreateCube()
+        static TUniquePtr<Mesh> CreateCube()
         {
             auto mesh = std::make_unique<Mesh>();
         
@@ -85,7 +85,7 @@ namespace Engine
         };
         
         // Создать плоскость (для земли)
-        static std::unique_ptr<Mesh> CreatePlane(float width = 2.0f, float height = 2.0f)
+        static TUniquePtr<Mesh> CreatePlane(float width = 2.0f, float height = 2.0f)
         {
             auto mesh = std::make_unique<Mesh>();
         

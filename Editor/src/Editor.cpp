@@ -2,7 +2,7 @@
 #include <memory>
 #include <functional>
 
-std::unique_ptr<Engine::ApplicationInstance> GenerateApplicationInstance()
+TUniquePtr<ApplicationInstance> GenerateApplicationInstance()
 {
-    return std::make_unique<EditorAppInstance>();
+    return CreateUniquePtr<EditorAppInstance>();
 }

@@ -29,7 +29,7 @@ namespace Engine
 
         void clear();
 
-        const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const 
+        const std::vector<TUniquePtr<GameObject>>& getGameObjects() const 
         { 
             return m_gameObjects; 
         }
@@ -42,8 +42,8 @@ namespace Engine
 
     private:
         std::string m_name;
-        std::unique_ptr<Engine::Camera> r_camera;
-        std::vector<std::unique_ptr<GameObject>> m_gameObjects;
+        TUniquePtr<Engine::Camera> r_camera;
+        std::vector<TUniquePtr<GameObject>> m_gameObjects;
         class RenderAPI* m_parentRender = nullptr;
     };
 

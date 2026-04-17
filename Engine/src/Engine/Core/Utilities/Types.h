@@ -5,10 +5,35 @@
 #include <cmath>        // Для математических функций (std::sqrt)
 #include <cstring>
 #include <string>
+#include <memory>
+#include <unordered_map>
 
 namespace Engine 
 {
     using namespace std;
+
+    /** 
+     * @brief Уникальный указатель
+    */
+    template<typename T>
+	using TUniquePtr = std::unique_ptr<T>;
+	template<typename T, typename ... Args>
+	constexpr TUniquePtr<T> CreateUniquePtr(Args&& ... args)
+	{
+		return std::make_unique<T>(std::forward<Args>(args)...);
+	}
+
+    /** 
+     * @brief Ссылка
+    */
+	template<typename T>
+	using TRef = std::shared_ptr<T>;
+	template<typename T, typename ... Args>
+	constexpr TRef<T> CreateRef(Args&& ... args)
+	{
+		return std::make_shared<T>(std::forward<Args>(args)...);
+	}
+
     /*Трёхмерный вектор с компонентами x, y, z.
     Содержит базовые арифметические операции и часто используемые статические векторы*/
     struct Vector3 

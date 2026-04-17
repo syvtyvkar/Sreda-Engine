@@ -70,8 +70,8 @@ namespace Engine
     public:
         /**
          * @brief Создаёт уникальный указатель на объект InputListen.
-         * @return std::unique_ptr<InputListen> Указатель на созданный экземпляр.
+         * @return TUniquePtr<InputListen> Указатель на созданный экземпляр.
          */
-        static std::unique_ptr<IInputListen> create();
+        static TUniquePtr<IInputListen> create();
     };
 }

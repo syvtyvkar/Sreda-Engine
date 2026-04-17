@@ -10,7 +10,8 @@ namespace Engine::UI
     {
     public:
         UIButton(const std::string& text);
-        virtual void OnRender() override{};
+        void OnRender() override;
+        void OnUpdate(float deltaTime) override;
         std::string GetText() const {return m_text;}
         
     private:
@@ -22,7 +23,8 @@ namespace Engine::UI
     {
     public:
         UITextBlock(const std::string& text);
-        virtual void OnRender() override{};
+        void OnRender() override;
+        void OnUpdate(float deltaTime) override;
         
         void SetText(const std::string& text) {m_text = text;}
         void SetFontSize(float size){m_fontSize = size;}

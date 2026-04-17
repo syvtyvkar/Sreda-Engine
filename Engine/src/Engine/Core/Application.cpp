@@ -101,7 +101,7 @@ namespace Engine
         Engine::Application::Get().m_AppWindow->ExitApp();
     }
 
-    void Application::AddInstance(std::unique_ptr<Engine::ApplicationInstance> InInstance)
+    void Application::AddInstance(TUniquePtr<ApplicationInstance> InInstance)
     {
         m_AppInstance=std::move(InInstance);
         if (m_AppInstance)

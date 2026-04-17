@@ -1,6 +1,5 @@
 #include "EditorInputComponent.h"
 
-using namespace Engine;
 void EditorInputComponent::Init()
 {
     m_ExitApp = Engine::InputSystem::GetInstance().OnKeyPressed().Subscribe([&,this](InputKey key, int mods, int repeat) 

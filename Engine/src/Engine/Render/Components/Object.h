@@ -62,7 +62,7 @@ namespace Engine {
     private:
         std::string m_name;
         bool m_active = true;
-        std::unordered_map<std::type_index, std::unique_ptr<Component>> m_components;
+        std::unordered_map<std::type_index, TUniquePtr<Component>> m_components;
 
 
         Scene* m_parentScene = nullptr;

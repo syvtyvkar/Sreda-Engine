@@ -62,9 +62,9 @@ namespace Engine
         DOnUpdateWindowHandle s_OnUpdateWindowHandle;
         DOnUpdateWindowSize s_OnUpdateWindowSize;
     protected:
-        std::unique_ptr<RenderAPI> m_render;                    // Рендерер (OpenGL, Vulkan и т.д.)
-        std::unique_ptr<Scene> m_currentScene;                  // Текущая сцена
-        std::unique_ptr<UISystem> m_uiSystem;                  // Текущая система UI
+        TUniquePtr<RenderAPI> m_render;                    // Рендерер (OpenGL, Vulkan и т.д.)
+        TUniquePtr<Scene> m_currentScene;                  // Текущая сцена
+        TUniquePtr<UISystem> m_uiSystem;                  // Текущая система UI
     };
 }
 

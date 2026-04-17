@@ -3,6 +3,7 @@
 #include <Engine.h>
 
 #include "../Editor/Input/EditorInputComponent.h"
+#include "Engine/Core/Utilities/Types.h"
 
 #include <memory>
 #include <functional>
@@ -15,5 +16,5 @@ class EditorAppInstance : public Engine::ApplicationInstance
 
 private:
 
-    std::unique_ptr<EditorInputComponent> m_EditorInputHotKey;
+    TUniquePtr<EditorInputComponent> m_EditorInputHotKey;
 };

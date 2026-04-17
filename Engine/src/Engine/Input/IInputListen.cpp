@@ -13,10 +13,10 @@ namespace Engine
      * (например, ENGINE_WINDOW_GLFW) возвращает соответствующий объект, реализующий
      * интерфейс InputListen.
      *
-     * @return std::unique_ptr<InputListen> Уникальный указатель на созданный объект.
+     * @return TUniquePtr<InputListen> Уникальный указатель на созданный объект.
      *         Если ни одна платформа не определена, возвращает nullptr.
      */
-    std::unique_ptr<IInputListen> InputListenAPIFactory::create()
+    TUniquePtr<IInputListen> InputListenAPIFactory::create()
     {
         #ifdef ENGINE_WINDOW_GLFW
         // Если используется GLFW, создаём слушатель ввода, специфичный для GLFW.

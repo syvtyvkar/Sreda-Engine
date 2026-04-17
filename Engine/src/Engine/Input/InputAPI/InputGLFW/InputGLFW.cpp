@@ -8,7 +8,7 @@
 
 #include <GLFW/glfw3.h>                                             // Заголовок GLFW (колбэки, константы)
 #include "Engine/Platform/IWindow.h"        
-#include "Engine/Platform/WindowAPI/WindowGLFW/WindowGLFW.h"        // Класс окна GLFW (для получения native handle)
+#include "Platform/WindowAPI/WindowGLFW/WindowGLFW.h"        // Класс окна GLFW (для получения native handle)
 
 #include <unordered_map>                                            // TODO: проверить и убрать, возможно, ныне не требуется
 

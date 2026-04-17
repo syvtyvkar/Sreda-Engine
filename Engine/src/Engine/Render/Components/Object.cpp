@@ -19,7 +19,7 @@ namespace Engine {
             ENGINE_LOG_ERROR("Error create {} mesh! No valid scene!!!");
             return;
         }
-        std::unique_ptr<Mesh> LMesh = MeshFactory::CreateCube();
+        TUniquePtr<Mesh> LMesh = MeshFactory::CreateCube();
         LMesh.get()->setGameObject(this);
         if (LMesh.get()->m_materialMesh)
         {

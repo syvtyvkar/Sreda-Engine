@@ -40,7 +40,7 @@ namespace Engine
 
         std::vector<Vertex> m_vertices;
         std::vector<unsigned int> m_indices;
-        std::unique_ptr<Material> m_materialMesh;
+        TUniquePtr<Material> m_materialMesh;
         
         unsigned int m_VAO = 0;
         unsigned int m_VBO = 0;

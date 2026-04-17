@@ -108,10 +108,10 @@ namespace Engine
     public:
     /**
          * @brief Создаёт уникальный указатель на объект рендерера.
-         * @return std::unique_ptr<RenderAPI> Указатель на созданный рендерер,
+         * @return TUniquePtr<RenderAPI> Указатель на созданный рендерер,
          *         либо nullptr, если ни одна реализация не доступна.
          */
-        static std::unique_ptr<RenderAPI> create();
+        static TUniquePtr<RenderAPI> create();
     };
 
 }

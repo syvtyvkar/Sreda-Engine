@@ -6,21 +6,32 @@
 #include <unordered_map>
 #include <functional>
 #include "Engine/Core/Utilities/Types.h"
+#include "Engine/Platform/IWindow.h"
+#include "Engine/UI/Framework/UIElement.h"
 
 namespace Engine::UI 
 {
 
+    using namespace Engine;
     class UIContext 
     {
     public:
         virtual ~UIContext() = default; 
         
 
-        virtual void InitContext(int w, int h) = 0;
+        virtual void InitContext(Window* window) = 0;
 
         // Загрузка документа
         virtual bool LoadDocument(const std::string& path) = 0;
         virtual void UnloadDocument() = 0;
+
+        // UI Element Management
+        void RegisterWidget(std::shared_ptr<UIElement> widget);
+        void RemoveWidget(const std::shared_ptr<UIElement>& widget);
+    
+        // Root element management
+        void SetRootWidget(std::shared_ptr<UIElement> root);
+        std::shared_ptr<UIElement> GetRootWidget() const { return m_rootWidget; }
         
         // Видимость
         virtual void Show() = 0;
@@ -31,6 +42,12 @@ namespace Engine::UI
         virtual void Render() = 0;
         virtual void BeginFrame()= 0;
 	    virtual void EndFrame()= 0;
+
+    private:
+        void RenderUIElements(std::shared_ptr<UIElement> element);
+
+        std::shared_ptr<UIElement> m_rootWidget;
+        std::vector<std::shared_ptr<UIElement>> m_widgets;
     };
 
 
@@ -45,12 +62,12 @@ namespace Engine::UI
     public:
     /**
          * @brief Создаёт уникальный указатель на объект окна.
-         * @return std::unique_ptr<Window> Указатель на созданное окно.
+         * @return TUniquePtr<Window> Указатель на созданное окно.
          *
          * В зависимости от макросов (например, ENGINE_WINDOW_GLFW) возвращает соответствующий
          * наследник Window (например, WindowGLF3). Если ни одна платформа не определена,
          * может вернуть nullptr.
          */
-        static std::unique_ptr<UIContext> create();
+        static TUniquePtr<UIContext> create();
     };
 }

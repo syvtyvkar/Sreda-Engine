@@ -1,13 +1,14 @@
 // (c) Nikita Rogalev. All rights reserved.
 
 #include "Engine/Core/Application.h"    // Заголовочный файл приложения
+#include "Engine/Core/Utilities/Types.h"    // Типы
 #include "Engine/Core/Log.h"            // Система логирования
 #include <string>                       // Для работы с строками
 /* 
 * Точка входа
 */
 
-extern std::unique_ptr<Engine::ApplicationInstance> GenerateApplicationInstance(); // Для подключения кода проектов
+extern Engine::TUniquePtr<Engine::ApplicationInstance> GenerateApplicationInstance(); // Для подключения кода проектов
 
 int main(int argc, char **argv)
 {

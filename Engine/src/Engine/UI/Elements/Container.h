@@ -9,8 +9,8 @@ namespace Engine::UI
     class UIContainer : public UIElement
     {
     public:
-        virtual void OnRender() override{};
-        virtual void OnUpdate(float deltaTime) override{};
+        void OnRender() override;
+        void OnUpdate(float deltaTime) override;
         
         // Layout management
         virtual void ArrangeChildren() = 0;  // Pure virtual for different layout types
@@ -22,20 +22,20 @@ namespace Engine::UI
     class VerticalBox : public UIContainer
     {
     public:
-        void ArrangeChildren() override{};
+        void ArrangeChildren() override;
     };
 
     class HorizontalBox : public UIContainer
     {
     public:
-        void ArrangeChildren() override{};
+        void ArrangeChildren() override;
     };
 
     class GridPanel : public UIContainer
     {
     public:
-        void ArrangeChildren() override{};
-        void SetGridColumns(int columns){};
-        void SetGridRows(int rows){};
+        void ArrangeChildren() override;
+        void SetGridColumns(int columns);
+        void SetGridRows(int rows);
     };
 }

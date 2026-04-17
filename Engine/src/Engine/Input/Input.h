@@ -77,7 +77,7 @@ namespace Engine
         DOnMouseButtonReleased& OnMouseButtonReleased() {return s_OnMouseButtonReleased;}
 
     protected:
-        std::unique_ptr<IInputListen> m_InputListen=nullptr;                 // Слушатель ввода
+        TUniquePtr<IInputListen> m_InputListen=nullptr;                 // Слушатель ввода
     private:
         InputSystem() = default;
         ~InputSystem() =default;

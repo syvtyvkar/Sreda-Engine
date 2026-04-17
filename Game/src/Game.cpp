@@ -3,12 +3,12 @@
 #include <memory>
 #include <functional>
 
-class GameAppInstance : public Engine::ApplicationInstance
+class GameAppInstance : public ApplicationInstance
 {
     virtual std::string GetNameApp() override {return "Game";}
 };
 
-std::unique_ptr<Engine::ApplicationInstance> GenerateApplicationInstance()
+TUniquePtr<ApplicationInstance> GenerateApplicationInstance()
 {
-    return std::make_unique<GameAppInstance>();
+    return CreateUniquePtr<GameAppInstance>();
 }

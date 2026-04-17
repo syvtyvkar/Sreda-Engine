@@ -67,7 +67,7 @@ namespace Engine
 
     class ShaderFactory {
     public:
-        static std::unique_ptr<Shader> create();
+        static TUniquePtr<Shader> create();
     };
 
 }

@@ -41,12 +41,12 @@ namespace Engine
 
     void Scene::removeGameObject(GameObject* object) 
     {
-        m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),[object](const std::unique_ptr<GameObject>& obj) {return obj.get() == object;}),m_gameObjects.end());
+        m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),[object](const TUniquePtr<GameObject>& obj) {return obj.get() == object;}),m_gameObjects.end());
     }
 
     void Scene::removeGameObject(const std::string& name) 
     {
-        m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),[&name](const std::unique_ptr<GameObject>& obj) {return obj->getName() == name;}),m_gameObjects.end());
+        m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),[&name](const TUniquePtr<GameObject>& obj) {return obj->getName() == name;}),m_gameObjects.end());
     }
 
     GameObject* Scene::findGameObject(const std::string& name) 
