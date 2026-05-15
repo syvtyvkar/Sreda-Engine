@@ -4,6 +4,9 @@ build/*
 # vcpkg installed
 vcpkg_installed/*
 
+# external
+Engine/external/*
+
 # .VSStudio
 .vscode/*
 
