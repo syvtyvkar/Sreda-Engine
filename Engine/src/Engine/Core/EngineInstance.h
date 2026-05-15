@@ -19,6 +19,7 @@ namespace Engine
         virtual void OnEnd(){}
         virtual void Update(float DeltaTime){}
         virtual void OnRender(){}
+        virtual void OnRenderUI(){}
 
         virtual std::string GetNameApp() {return "Engine application";}
 

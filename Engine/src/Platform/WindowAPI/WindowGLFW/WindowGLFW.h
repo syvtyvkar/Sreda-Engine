@@ -13,6 +13,7 @@
 
 namespace Engine
 {
+    using namespace Engine::Render;
     ADD_DELEGATE_ONE_PARAM(DOnUpdateWindowHandle, GLFWwindow*)                  // При смене окна
     ADD_DELEGATE_THREE_PARAMS(DOnUpdateWindowSize,GLFWwindow*, int,int)         // При смене размера окна
 
@@ -35,7 +36,6 @@ namespace Engine
         virtual void UpdateWindowName(std::string NewName) override;                    // Поменять имя окна 
         virtual bool ShouldClose() const override;                                      // Окно должно закрыться
         virtual void BeginRender() override;
-        virtual void Render() override;
         virtual void EndRender() override;
         virtual void Update() override;                                                 // Очистка буферов
         virtual int GetWidth() const override {return m_width;}                         // Получить длину и ширину
@@ -43,12 +43,20 @@ namespace Engine
         GLFWwindow* GetHandle() {return m_window;}                                      // Получить окно
         virtual void Close() override;                                                  // Закрываем окно
         virtual void ExitApp() override;                                                // Закрываем окно
-        virtual Scene* GetCurrentScene() override {return m_currentScene.get();}
-        virtual RenderAPI* GetCurrentRender() override {return m_render.get();}
+        virtual void SetTittle(const std::string NewTittle) override {NameWindow = NewTittle;};
+        //virtual Scene* GetCurrentScene() override {return m_currentScene.get();}
+        virtual GraphicsContext* GetGraphicsContext() override {return m_context.get();}
         virtual WindowMode GetWindowMode() override {return m_windowMode;};
         virtual void SetWindowMode(WindowMode NewMode) override;
         DOnUpdateWindowHandle& OnUpdateWindowHandle() {return s_OnUpdateWindowHandle;}
         DOnUpdateWindowSize& OnUpdateWindowSize() {return s_OnUpdateWindowSize;}
+
+        virtual bool IsWindowHasFocus() override {return m_WindowHasFocus;};
+        virtual bool IsWindowMinimized() override {return m_WindowIsMinimized;};
+
+        static void FocusCallback(GLFWwindow* window, int focused);
+        static void IconifyCallback(GLFWwindow* window, int iconified);
+
     private:
         GLFWwindow* m_window = nullptr;                                                     // Указатель на объект окна GLFW
         static void FramebufferResizeCallback(GLFWwindow* Window, int width, int height);   // Статический колбэк изменения размера фреймбуфера
@@ -61,10 +69,14 @@ namespace Engine
         WindowMode m_windowMode = WindowMode::Window;
         DOnUpdateWindowHandle s_OnUpdateWindowHandle;
         DOnUpdateWindowSize s_OnUpdateWindowSize;
+
+        bool m_WindowHasFocus = true;
+        bool m_WindowIsMinimized = false;
     protected:
-        TUniquePtr<RenderAPI> m_render;                    // Рендерер (OpenGL, Vulkan и т.д.)
-        TUniquePtr<Scene> m_currentScene;                  // Текущая сцена
+        //TUniquePtr<Scene> m_currentScene;                  // Текущая сцена
         TUniquePtr<UISystem> m_uiSystem;                  // Текущая система UI
+
+        TUniquePtr<GraphicsContext> m_context;             // Графический контекст (OpenGL, Vulkan и т.д.)
     };
 }
 

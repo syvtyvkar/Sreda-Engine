@@ -2,7 +2,7 @@
 
 //#include <glad/glad.h>
 
-#include "Scene.h"
+/*#include "Scene.h"
 #include <algorithm>
 
 #include "Engine/Render/Components/Object.h"
@@ -129,4 +129,4 @@ namespace Engine
         r_camera = {};
     }
 
-}
+}*/

@@ -10,8 +10,10 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include "Engine/Render/Camera.h"   
+//#include "Engine/Render/Camera.h"   
 #include "Engine/Core/EngineConfig.h"   
+
+#include "Platform/RenderAPI/OpenGL/OpenGLContext.h"   
 
 namespace Engine
 {
@@ -35,9 +37,13 @@ namespace Engine
         }
         NameWindow=config.title;                                // Сохраняем базовое имя окна (используется в UpdateWindowName)
         // Настройка версии OpenGL (3.3 Core Profile)
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef DEBUG
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
 
         // Включение MSAA (многократная выборка)
         glfwWindowHint(GLFW_SAMPLES, 4);
@@ -68,30 +74,23 @@ namespace Engine
         // Включение/выключение вертикальной синхронизации
         glfwSwapInterval(config.vsync ? 1 : 0); //VSync!!!
 
-        // Устанавливаем колбэк изменения размера фреймбуфера
+        // Устанавливаем колбэк изменения
         glfwSetFramebufferSizeCallback(m_window, FramebufferResizeCallback);
+        glfwSetWindowFocusCallback(m_window, FocusCallback);
+        glfwSetWindowIconifyCallback(m_window, IconifyCallback);
 
         ENGINE_LOG_INFO("Window ( {} ) has been created successfully", config.title);
         ///////////////////////////////////////////
 
-        m_render = RenderAPIFactory::create();                                                      // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
-        m_currentScene = std::make_unique<Scene>("MainScene");              // Создаём главную сцену с именем "MainScene" и сохраняем её в unique_ptr
-        m_currentScene->SetParentRender(m_render.get());                                            // Устанавливаем для сцены указатель на рендерер (чтобы сцена могла отрисовывать объекты)
-        if (!m_render || !m_render.get()->initialize())                                             // Инициализация рендерера
-        {
-            ENGINE_LOG_ERROR("Failed to initialize renderer!");                                     // Ошибка инициализации
-            return false;
-        }
 
-        m_render->setViewport(0,0,config.wight,config.height);                          // Установка области вывода (viewport) на весь размер окна
-        m_render->setClearColor(Color(0.1f,0.1f,0.1f,1.f));                                         // Установка цвета очистки экрана (тёмно-серый)
-        m_currentScene->createGameObject("NewObj");                                                         // Создание тестового игрового объекта в сцене
+        m_context = Engine::Render::GraphicsContext::Create(m_window);     // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
+		m_context->Init();                                                 // Инициализация
 
-        m_uiSystem = std::make_unique<UISystem>();
-        m_uiSystem.get()->Initialize(this);
+        //m_currentScene = std::make_unique<Scene>("MainScene");              // Создаём главную сцену с именем "MainScene" и сохраняем её в unique_ptr
+        //m_currentScene->SetParentRender(m_render.get());                                            // Устанавливаем для сцены указатель на рендерер (чтобы сцена могла отрисовывать объекты)
 
-        //m_Nuclear = std::make_unique<NuclearContext>();
-        //m_Nuclear.get()->Init(m_window);
+        //m_uiSystem = std::make_unique<UISystem>();
+        //m_uiSystem.get()->Initialize(this);
 
         // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
         glfwSetWindowUserPointer(m_window, this);
@@ -125,45 +124,14 @@ namespace Engine
     {
         if (m_dirt_width_height)    // В прошлом кадре параметры окна изменились!
         {
-            if (GetCurrentScene() != nullptr)
-            {
-                if (GetCurrentScene()->GetCamera() != nullptr)
-                {
-                    GetCurrentScene()->GetCamera()->setScreenSize(GetWidth(),GetHeight());
-                }
-            }
             m_dirt_width_height = false;
-        }
-
-        glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
-        m_render->beginFrame();                                                                         // Начало кадра (подготовка рендерера к отрисовке)
-        if (m_uiSystem.get() != nullptr)
-        {
-            //m_uiSystem.get()->BeginFrame();
-        }
-        m_render->clear();                                                                              // Очистка буферов цвета и глубины
-    }
-
-    void WindowGLFW::Render()
-    {
-        m_currentScene->render(m_render.get());                                                         // Отрисовка сцены с использованием текущего рендерера
-        if (m_uiSystem.get() != nullptr)
-        {
-            //m_uiSystem.get()->Render();
         }
     }
 
     void WindowGLFW::EndRender()
     {
-        m_render.get()->endFrame(); 
-        if (m_uiSystem.get() != nullptr)
-        {
-            m_uiSystem.get()->BeginFrame();
-            m_uiSystem.get()->Update();
-            m_uiSystem.get()->Render();
-            m_uiSystem.get()->EndFrame();
-        }
-        glfwSwapBuffers(m_window);      // Переключение переднего и заднего буферов
+        glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
+		m_context->SwapBuffers();   
     }
 
     /**
@@ -177,11 +145,7 @@ namespace Engine
         ss >> ret;
         UpdateWindowName(ret);
 
-        m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
-        if (m_uiSystem.get() != nullptr)
-        {
-            //m_uiSystem.get()->Update();
-        }
+        //m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
     }
 
     /**
@@ -195,14 +159,10 @@ namespace Engine
             glfwDestroyWindow(m_window);            // Уничтожаем окно GLFW
             m_window = nullptr;
         }
-        if (m_uiSystem)
+        /*if (m_uiSystem)
         {
             m_uiSystem.get()->Shutdown();
-        }
-        if (m_render)
-        {
-            m_render.reset();
-        }
+        }*/
         glfwTerminate();                            // Завершаем GLFW (вызывается даже если окно уже было уничтожено)
     }
 
@@ -309,10 +269,31 @@ namespace Engine
             // Устанавливаем область вывода OpenGL на весь новый размер окна
             glViewport(0, 0, width, height);
             win->OnUpdateWindowSize().Broadcast(window, width, height);
+            win->OnWindowReSize().Broadcast(width,height);
             if (win->GetWindowMode() == WindowMode::Window) 
             {
                 glfwGetWindowPos(window, &win->m_windowedX, &win->m_windowedY);
             }
+        }
+    }
+
+    void WindowGLFW::FocusCallback(GLFWwindow *window, int focused)
+    {
+        auto* win = (class WindowGLFW *)glfwGetWindowUserPointer(window);
+        if (win) 
+        {
+            win->m_WindowHasFocus = (focused == GLFW_TRUE);
+            win->OnHasFocusChange().Broadcast(win->m_WindowHasFocus);
+        }
+    }
+
+    void WindowGLFW::IconifyCallback(GLFWwindow *window, int iconified)
+    {
+        auto* win = (class WindowGLFW *)glfwGetWindowUserPointer(window);
+        if (win) 
+        {
+            win->m_WindowIsMinimized = (iconified == GLFW_TRUE);
+            win->OnMinimizedChange().Broadcast(win->m_WindowIsMinimized);
         }
     }
 }

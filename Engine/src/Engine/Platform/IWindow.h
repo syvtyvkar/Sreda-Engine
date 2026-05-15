@@ -2,14 +2,20 @@
 
 #pragma once                            // Защита от множественного включения заголовочного файла
 
-#include <string>                       // Для std::string
-#include <functional>                   // Для std::function (используется в колбэке изменения размера)
-#include <memory>                       // Для std::unique_ptr
-#include "Engine/Render/Render.h"       // Интерфейс рендерера (RenderAPI)
-#include "Engine/Scene/Scene.h"        // Класс сцены, содержащей игровые объекты
+#include <string>                                   // Для std::string
+#include <functional>                               // Для std::function (используется в колбэке изменения размера)
+#include <memory>                                   // Для std::unique_ptr
+#include "Engine/Render/GraphicsContext.h"      // Графический контекст рендера
+//#include "Engine/Scene/Scene.h"                     // Класс сцены, содержащей игровые объекты
+#include "Engine/Core/Utilities/Event.h"
 
 namespace Engine
 {
+
+    ADD_DELEGATE_TWO_PARAMS(DOnWindowReSize, int,int)         // При смене размера окна
+    ADD_DELEGATE_ONE_PARAM(DOnWindowFocusChange, bool)        // Смена фокуса/сворачивании игры
+
+    using namespace Engine::Render;
     /**
      * @struct WindowConfig
      * @brief Структура, содержащая параметры конфигурации окна при создании.
@@ -71,11 +77,6 @@ namespace Engine
          */
         virtual void BeginRender()= 0;
         /**
-         * @brief Рендеринг сцены
-         * Вызывается каждый кадр в главном цикле приложения.
-         */
-        virtual void Render()= 0;
-        /**
          * @brief Конец отрисовки
          * Вызывается каждый кадр в главном цикле приложения.
          */
@@ -112,8 +113,19 @@ namespace Engine
          *        Отличается от Close() тем, что может дополнительно инициировать выход.
          */                                           
         virtual void ExitApp()= 0;
-        virtual Scene* GetCurrentScene() = 0;
-        virtual RenderAPI* GetCurrentRender() = 0;
+        //virtual Scene* GetCurrentScene() = 0;
+        virtual GraphicsContext* GetGraphicsContext() = 0;
+        virtual void SetTittle(const std::string NewTittle) = 0;
+        DOnWindowReSize& OnWindowReSize() {return s_OnWindowReSize;}
+        DOnWindowFocusChange& OnHasFocusChange() {return s_OnHasFocusChange;}
+        DOnWindowFocusChange& OnMinimizedChange() {return s_OnMinimizedChange;}
+
+        virtual bool IsWindowHasFocus() = 0;
+        virtual bool IsWindowMinimized() = 0;
+    private:
+        DOnWindowReSize s_OnWindowReSize;
+        DOnWindowFocusChange s_OnHasFocusChange;
+        DOnWindowFocusChange s_OnMinimizedChange;
     };
 
     /**

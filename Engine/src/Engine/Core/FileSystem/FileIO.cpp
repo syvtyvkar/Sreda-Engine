@@ -7,7 +7,20 @@
 
 namespace Engine 
 {
- 
+    std::string FileIO::ReadTextDataToString(const std::string &InPath)
+    {
+        std::ifstream file(GetProjectDirectory() + "/" + InPath);
+        if (!file.is_open()) 
+        {
+            ENGINE_LOG_WARN("Failed to open shader file: {}", GetProjectDirectory() + "/" + InPath);
+            return "";
+        }
+
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        return buffer.str();
+    }
+
     std::optional<std::string> FileIO::ReadTextFile(const std::string& InPath) 
     {
         std::ifstream file(InPath, std::ios::binary | std::ios::ate);

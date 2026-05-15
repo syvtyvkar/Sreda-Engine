@@ -33,7 +33,7 @@ void EditorInputComponent::Init()
     {
         if (!Engine::InputSystem::GetInstance().GetCursorVisible() && Application::Get().GetWindow())
         {
-            Application::Get().GetWindow()->GetCurrentScene()->GetCamera()->processMouseMovement(xMove,yMove,false);
+            //Application::Get().GetWindow()->GetCurrentScene()->GetCamera()->processMouseMovement(xMove,yMove,false);
         }
     });
 }

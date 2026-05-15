@@ -6,3 +6,8 @@ TUniquePtr<ApplicationInstance> GenerateApplicationInstance()
 {
     return CreateUniquePtr<EditorAppInstance>();
 }
+
+/*TUniquePtr<Application> GenerateApplication()
+{
+    return CreateUniquePtr<Application>();
+}*/

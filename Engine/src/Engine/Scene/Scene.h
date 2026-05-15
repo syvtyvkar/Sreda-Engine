@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once
+/*#pragma once
 
 #include "Engine/Render/Components/Object.h"
 #include "Engine/Render/Render.h"
@@ -47,4 +47,4 @@ namespace Engine
         class RenderAPI* m_parentRender = nullptr;
     };
 
-}
+}*/

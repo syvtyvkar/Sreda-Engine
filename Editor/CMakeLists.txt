@@ -10,7 +10,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/Editor/Demo)
 
 file(GLOB_RECURSE MY_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-add_executable(Editor 
+add_executable(Editor
     ${MY_SOURCE}
     $<$<PLATFORM_ID:Windows>:appdata/app.rc>
 )

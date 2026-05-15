@@ -19,6 +19,7 @@ namespace Engine
     {
     public:
         // Текстовые данные
+        static std::string ReadTextDataToString(const std::string& InPath);                                                     // Прочитать текстовый файл
         static std::optional<std::string> ReadTextFile(const std::string& InPath);                                              // Прочитать текстовый файл
         static bool WriteTextFile(const std::string& InPath, const std::string& InContent, bool InCreateDirs = true);           // Записать текстовый файл
         // Бинарные данные

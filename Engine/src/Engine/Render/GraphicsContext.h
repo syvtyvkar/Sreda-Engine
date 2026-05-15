@@ -1,0 +1,21 @@
+// (c) Nikita Rogalev. All rights reserved.
+
+#pragma once // Защита от множественного включения
+
+#include "../../Engine/Core/Log.h"
+#include "../../Engine/Core/Utilities/Types.h"
+#include <string>
+
+namespace Engine::Render
+{
+    class GraphicsContext
+	{
+	public:
+		virtual ~GraphicsContext() = default;
+
+		virtual void Init() = 0;
+		virtual void SwapBuffers() = 0;
+
+		static TUniquePtr<GraphicsContext> Create(void* window);
+	};
+}

@@ -1,10 +1,8 @@
 #include <winresrc.h>
 
-// === Иконка приложения ===
 // ID_ICON_APP - произвольное число (например, 101)
 101 ICON "icon.ico"
 
-// === Информация о версии ===
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     1,0,0,0
 PRODUCTVERSION  1,0,0,0
@@ -16,13 +14,13 @@ FILESUBTYPE     VFT2_UNKNOWN
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904E4"  // Язык: Английский (США), Кодировка: Unicode
+        BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName",      "Nikita Rogalev\0"
             VALUE "FileDescription",  "Sreda Engine Editor\0"
             VALUE "FileVersion",      "0.0.0.1\0"
             VALUE "InternalName",     "Editor\0"
-            VALUE "LegalCopyright",   "Copyright (C) 2026\0"
+            VALUE "LegalCopyright",   "Nikita Rogalev Copyright (C) 2026\0"
             VALUE "OriginalFilename", "Editor.exe\0"
             VALUE "ProductName",      "Sreda Engine\0"
             VALUE "ProductVersion",   "0.0.0.1\0"

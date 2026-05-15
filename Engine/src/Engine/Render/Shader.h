@@ -1,73 +1,48 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-// Shaders
+#pragma once // Защита от множественного включения
 
-#pragma once
 #include "Engine/Core/Utilities/Types.h"
-
 #include <string>
 #include <unordered_map>
-//#include <glm/glm.hpp>
-//#include <glm/gtc/type_ptr.hpp>
-#include <memory>
+#include <glm/glm.hpp>
 
-namespace Engine 
+namespace Engine::Render
 {
-    /**
-     * @class Shader
-     * @brief Абстрактный базовый класс для шейдерной программы.
-     *
-     * Определяет интерфейс для загрузки, компиляции и использования шейдеров (вершинного и фрагментного).
-     * Содержит виртуальные методы для установки uniform-переменных, активации программы и т.д.
-     * Конкретные реализации (например, OpenGLShader) должны наследовать этот класс.
-     */
-    class Shader 
-    {
-    public:
-        Shader() = default;
-        virtual ~Shader() = default;
+    class Shader
+	{
+	public:
+		virtual ~Shader() = default;
 
-        // Загрузка шейдеров из файлов
-        virtual bool loadFromFiles(const std::string& vertexPath, const std::string& fragmentPath) {return false;};
-        
-        // Загрузка из строк (для простых случаев)
-        virtual bool loadFromSource(const std::string& vertexSource, const std::string& fragmentSource) {return false;};
+		virtual void Bind() const = 0;
+		virtual void Unbind() const = 0;
 
-        // Активировать шейдерную программу
-        virtual void use() const {};
+		virtual void SetInt(const std::string& name, int value) = 0;
+		virtual void SetIntArray(const std::string& name, int* values, uint32_t count) = 0;
+		virtual void SetFloat(const std::string& name, float value) = 0;
+		virtual void SetFloat2(const std::string& name, const glm::vec2& value) = 0;
+		virtual void SetFloat3(const std::string& name, const glm::vec3& value) = 0;
+		virtual void SetFloat4(const std::string& name, const glm::vec4& value) = 0;
+		virtual void SetMat4(const std::string& name, const glm::mat4& value) = 0;
 
-        // Получить ID программы
-        virtual unsigned int getID() const { return 0;};
+		virtual const std::string& GetName() const = 0;
 
-        // === Uniform методы ===
-        virtual void setBool(const std::string& name, bool value) const {};
-        virtual void setInt(const std::string& name, int value) const {};
-        virtual void setFloat(const std::string& name, float value) const {};
-        
-        virtual void setVec2(const std::string& name, const Vector2& value) const {};
-        virtual void setVec3(const std::string& name, const Vector3& value) const {};
-        virtual void setVec4(const std::string& name, const Vector4& value) const {};
-        
-        virtual void setMat2(const std::string& name, const Matrix2& value) const {};
-        virtual void setMat3(const std::string& name, const Matrix3& value) const {};
-        virtual void setMat4(const std::string& name, const Matrix4& value) const {};
+		static TRef<Shader> Create(const std::string& filepath);
+		static TRef<Shader> Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
+	};
 
-        // Проверка, загружен ли шейдер
-        virtual bool isLoaded() const {return false;};
+	class ShaderLibrary
+	{
+	public:
+		void Add(const std::string& name, const TRef<Shader>& shader);
+		void Add(const TRef<Shader>& shader);
+		TRef<Shader> Load(const std::string& filepath);
+		TRef<Shader> Load(const std::string& name, const std::string& filepath);
 
-        virtual int getUniformLocation(const std::string& name) const {return 0;};
+		TRef<Shader> Get(const std::string& name);
 
-    protected:
-
-        // Внутренние методы
-        virtual unsigned int compileShader(unsigned int type, const std::string& source) {return 0;};
-        virtual bool linkProgram(unsigned int vertexShader, unsigned int fragmentShader) {return false;};
-        virtual std::string loadFileToString(const std::string& path) {return std::string();};
-    };
-
-    class ShaderFactory {
-    public:
-        static TUniquePtr<Shader> create();
-    };
-
+		bool Exists(const std::string& name) const;
+	private:
+		std::unordered_map<std::string, TRef<Shader>> m_Shaders;
+	};
 }
