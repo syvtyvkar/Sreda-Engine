@@ -43,7 +43,7 @@ namespace Engine
     {
         ENGINE_LOG_INFO("Running app...");                                                          // Логируем начало выполнения
         
-        Engine::ResourceManager::getInstance().init(Engine::PlatformUtils::getExecutablePath());    // Инициализация менеджера ресурсов с путём к исполняемому файлу
+        Engine::ResourceManager::getInstance().init(Engine::PlatformUtils::GetExecutablePath());    // Инициализация менеджера ресурсов с путём к исполняемому файлу
         Time::TimeSystem::Init();                                                                   // Инициализация системы времени
 
         auto& config = EngineConfig::ConfigSystem::Get();                                           // Получаем конфигурационную систему
@@ -67,7 +67,7 @@ namespace Engine
 
         Engine::InputSystem::Init(m_AppWindow.get());                                                  // Инициализация системы ввода с передачей указателя на окно
 
-        ENGINE_LOG_TRACE("Working Directory: {}", Engine::PlatformUtils::getCurrentWorkingDirectory());
+        ENGINE_LOG_TRACE("Working Directory: {}", Engine::PlatformUtils::GetProjectDirectory());
 
         Renderer::Init();
 

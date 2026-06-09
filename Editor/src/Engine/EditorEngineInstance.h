@@ -4,6 +4,7 @@
 
 #include "../Editor/Input/EditorInputComponent.h"
 #include "Engine/Core/Utilities/Types.h"
+#include "Engine/Render/Font/Font.h"
 
 #include <memory>
 #include <functional>
@@ -34,7 +35,7 @@ public:
 
     void OnStart() override;
     void OnEnd() override;
-    virtual std::string GetNameApp() override {return "Sreda Engine Editor";}
+    virtual std::string GetNameApp() override {return "Sreda Engine View";}
 
     virtual void Update(float DeltaTime) override;
     virtual void OnRender() override;
@@ -54,8 +55,15 @@ private:
 	TRef<Texture2D> m_Texture, m_CheckerboardTexture;
 
 	OrthographicCameraController m_CameraController;
-	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
+	TColor m_SquareColor = { 0.2f, 0.3f, 0.8f };
 
-    float m_Anim_x,m_Anim_y,m_Anim_z = 0.f;
+    OrthographicCamera m_ui_camera;
+
+    TRef<Font> m_Font;
+
+    float m_Anim_x=0.f;
+    float m_Anim_y=0.f;
+    float m_Anim_z = 0.f;
     bool m_AnimIs_x,m_AnimIs_y,m_AnimIs_z = false;
+    uint32_t m_BoxesCount = 0;
 };

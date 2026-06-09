@@ -1,11 +1,8 @@
 // (c) Nikita Rogalev. All rights reserved.
 
 #pragma once // Защита от множественного включения
-
-#include "Engine/Input/KeyCodes.h"              // Определения клавиш (InputKey)
-#include "Engine/Core/Log.h"                    // Логирование
-#include "Engine/Core/Utilities/Event.h"                  // Поддержка делегатов
-#include "Engine/Input/IInputListen.h"           // Класс-слушатель ввода
+#include "BaseEngine.h"                         // Базовые зависимости движка
+#include "Engine/Input/IInputListen.h"          // Класс-слушатель ввода
 #include "Engine/Platform/IWindow.h"            // Интерфейс окна
 #include <glm/glm.hpp>                          // Математическая библиотека для векторов
 
@@ -49,8 +46,8 @@ namespace Engine
         // Mouse
         static bool IsMouseButtonPressed(InputKey Button);                  // Проверяет, зажата ли кнопка мыши.
         static bool IsMouseButtonJustPressed(InputKey Button);              // Проверяет, была ли кнопка мыши нажата в этом кадре.
-        static glm::vec2 GetMousePosition();                                // Возвращает текущую позицию курсора мыши в координатах окна.
-        static glm::vec2 GetMouseDelta();                                   // Возвращает изменение позиции мыши за последний кадр (дельта).
+        static Vector2 GetMousePosition();                                // Возвращает текущую позицию курсора мыши в координатах окна.
+        static Vector2 GetMouseDelta();                                   // Возвращает изменение позиции мыши за последний кадр (дельта).
         static double GetMouseScrollDelta();                                // Возвращает величину прокрутки колесика мыши.
         static float GetMouseSensivity();
         static bool IsInverMoveY();
@@ -92,8 +89,8 @@ namespace Engine
         uint8_t m_prevKeyStates[static_cast<uint32_t>(InputKey::KeyCount)];
 
         // Состояние мыши
-        glm::vec2 m_mousePosition = {0,0};                                  // Текущая позиция курсора.
-        glm::vec2 m_mouseDelta = {0,0};                                     // Изменение позиции за кадр.
+        Vector2 m_mousePosition = {0,0};                                  // Текущая позиция курсора.
+        Vector2 m_mouseDelta = {0,0};                                     // Изменение позиции за кадр.
         double m_scrollDelta = 0.0;                                         // Накопленная прокрутка колесика.
         float m_mouseSensivity = 0.2f;                                      // Сенса мыши
         bool m_Invers_Y = true;

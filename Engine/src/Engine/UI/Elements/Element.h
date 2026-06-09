@@ -28,12 +28,12 @@ namespace Engine::UI
         
         void SetText(const std::string& text) {m_text = text;}
         void SetFontSize(float size){m_fontSize = size;}
-        void SetColor(const Color& color){m_color = color;}
+        void SetColor(const TColor& color){m_color = color;}
         std::string GetText() const {return m_text;}
         
     private:
         std::string m_text;
         float m_fontSize = 16.0f;
-        Color m_color = {1, 1, 1, 1};
+        TColor m_color = {1, 1, 1, 1};
     };
 }

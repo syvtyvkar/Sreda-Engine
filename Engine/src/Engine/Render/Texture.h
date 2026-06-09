@@ -17,12 +17,21 @@ namespace Engine::Render
 		RGBA32F
 	};
 
+	enum class TextureWrap
+	{
+		Repeat = 0,
+		ClampToEdge,
+		MirroredRepeat
+	};
+
 	struct TextureSpecification
 	{
 		uint32_t Width = 1;
 		uint32_t Height = 1;
 		ImageFormat Format = ImageFormat::RGBA8;
 		bool GenerateMips = true;
+		TextureWrap WrapS = TextureWrap::Repeat;
+		TextureWrap WrapT = TextureWrap::Repeat;
 	};
 
 	class Texture

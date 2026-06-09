@@ -2,12 +2,13 @@
 
 #pragma once                            // Защита от множественного включения заголовочного файла
 
+#include "BaseEngine.h"                             // Базовые зависимости движка
+
 #include <string>                                   // Для std::string
 #include <functional>                               // Для std::function (используется в колбэке изменения размера)
 #include <memory>                                   // Для std::unique_ptr
-#include "Engine/Render/GraphicsContext.h"      // Графический контекст рендера
-//#include "Engine/Scene/Scene.h"                     // Класс сцены, содержащей игровые объекты
-#include "Engine/Core/Utilities/Event.h"
+#include "Engine/Render/GraphicsContext.h"          // Графический контекст рендера
+//#include "Engine/Scene/Scene.h"                   // Класс сцены, содержащей игровые объекты
 
 namespace Engine
 {

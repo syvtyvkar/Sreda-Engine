@@ -1,9 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#include "Engine/Input/Input.h"                                 // Основной заголовок системы ввода
-#include "Engine/Core/Log.h"                                    // Логирование
-#include "Engine/Core/Time.h"    
-#include "Input.h"
+#include "Input.h"                                 // Основной заголовок системы ввода
 
 namespace Engine
 {
@@ -97,13 +94,13 @@ namespace Engine
     bool InputSystem::IsMouseButtonPressed(InputKey Button) {return IsKeyPressed(Button);};             // Проверка, зажата ли кнопка мыши (использует тот же механизм, что и клавиши).
     bool InputSystem::IsMouseButtonJustPressed(InputKey Button) {return IsKeyJustPressed(Button);};     // Проверка, была ли только что нажата кнопка мыши.
 
-    glm::vec2 InputSystem::GetMousePosition()   // Возвращает текущую позицию курсора.
+    Vector2 InputSystem::GetMousePosition()   // Возвращает текущую позицию курсора.
     {
         if (!s_InputInstance) return {0,0};
         return s_InputInstance->m_mousePosition;
     };
 
-    glm::vec2 InputSystem::GetMouseDelta()      // Возвращает изменение позиции курсора за последний кадр.
+    Vector2 InputSystem::GetMouseDelta()      // Возвращает изменение позиции курсора за последний кадр.
     {
         if (!s_InputInstance) return {0,0};
         return s_InputInstance->m_mouseDelta;

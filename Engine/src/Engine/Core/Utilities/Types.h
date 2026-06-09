@@ -8,6 +8,10 @@
 #include <memory>
 #include <unordered_map>
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/glm.hpp>
+
 namespace Engine 
 {
     using namespace std;
@@ -43,6 +47,9 @@ namespace Engine
         // Конструкторы
         Vector3() : x(0), y(0), z(0) {}
         Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
+        Vector3(float xyz) : x(xyz), y(xyz), z(xyz) {}
+        Vector3(glm::vec3 glm) : x(glm.x), y(glm.y), z(glm.z) {}
+        Vector3(const glm::vec4& v) : x(v.x), y(v.y), z(v.z) {}
 
         // Арифметические операторы
         Vector3 operator+(const Vector3& other) const {return Vector3(x + other.x, y + other.y, z + other.z);}
@@ -52,6 +59,7 @@ namespace Engine
         Vector3& operator+=(const Vector3& other) {x += other.x; y += other.y; z += other.z;return *this;}
         Vector3& operator-=(const Vector3& other) {x -= other.x; y -= other.y; z -= other.z;return *this;}
         bool operator==(const Vector3& other) const { return x == other.x && y == other.y && z == other.z;}
+        glm::vec3 GetGlmVec3() const {return glm::vec3(x,y,z);}
 
         // Полезные методы
         float length() const { return std::sqrt(x*x + y*y + z*z); }                                 // Евклидова длина вектора
@@ -71,6 +79,10 @@ namespace Engine
 
         Vector2() : x(0), y(0) {}
         Vector2(float x, float y) : x(x), y(y) {}
+        Vector2(float xy) : x(xy), y(xy) {}
+        Vector2(glm::vec2 glm) : x(glm.x), y(glm.y) {}
+
+        glm::vec2 GetGlmVec2() const { return glm::vec2(x, y); }
 
         Vector2 operator+(const Vector2& other) const {return Vector2(x + other.x, y + other.y);}
         Vector2 operator*(float scalar) const {return Vector2(x * scalar, y * scalar);}
@@ -83,6 +95,9 @@ namespace Engine
 
         Vector4() : x(0), y(0), z(0), w(0) {}
         Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+        Vector4(const glm::vec4& v) : x(v.x), y(v.y), z(v.z), w(v.w) {}
+
+        glm::vec4 GetGlmVec4() const { return glm::vec4(x, y, z, w); }
     };
 
     /*Матрица 4x4 с данными в виде плоского массива*/
@@ -91,6 +106,19 @@ namespace Engine
         float data[16];
 
         Matrix4() {for (int i = 0; i < 16; i++) {data[i] = (i % 5 == 0) ? 1.0f : 0.0f; }}   // Единичная: индексы 0,5,10,15 становятся 1
+
+        Matrix4(const glm::mat4& m) 
+        {
+            const float* src = glm::value_ptr(m);
+            memcpy(data, src, 16 * sizeof(float));
+        }
+    
+        glm::mat4 GetGlmMat4() const 
+        {
+            glm::mat4 result;
+            memcpy(glm::value_ptr(result), data, 16 * sizeof(float));
+            return result;
+        }
 
         static Matrix4 identity() 
         {
@@ -108,6 +136,19 @@ namespace Engine
 
         Matrix3() {for (int i = 0; i < 9; i++) data[i] = (i % 5 == 0) ? 1.0f : 0.0f;} // Инициализация единичной матрицей
 
+        Matrix3(const glm::mat3& m) 
+        {
+            const float* src = glm::value_ptr(m);
+            memcpy(data, src, 9 * sizeof(float));
+        }
+    
+        glm::mat3 GetGlmMat4() const 
+        {
+            glm::mat3 result;
+            memcpy(glm::value_ptr(result), data, 9 * sizeof(float));
+            return result;
+        }
+
         static Matrix3 identity() 
         {
             Matrix3 m;
@@ -123,6 +164,19 @@ namespace Engine
 
         Matrix2() {for (int i = 0; i < 4; i++) data[i] = (i % 5 == 0) ? 1.0f : 0.0f;} // Инициализация единичной матрицей
 
+        Matrix2(const glm::mat2& m) 
+        {
+            const float* src = glm::value_ptr(m);
+            memcpy(data, src, 4 * sizeof(float));
+        }
+    
+        glm::mat2 GetGlmMat2() const 
+        {
+            glm::mat2 result;
+            memcpy(glm::value_ptr(result), data, 4 * sizeof(float));
+            return result;
+        }
+
         static Matrix2 identity() 
         {
             Matrix2 m;
@@ -131,13 +185,50 @@ namespace Engine
         }
     };
 
-    /*Представляет цвет в формате RGBA (float от 0 до 1)*/
-    struct Color
+    /*Представляет цвет в формате RGBA (float от 0 до 255)*/
+    struct TColor
     {
-        float r, g, b, a;
+        int r, g, b, a = 255;
 
-        Color(float r = 1, float g = 1, float b = 1, float a = 1): r(r), g(g), b(b), a(a) {}
-        Vector4 toVec4() const { return Vector4(r, g, b, a); }                                  // Преобразование в Vector4
+        TColor(float r = 1.f, float g = 1.f, float b = 1.f) : r((int)r), g ((int)g), b((int)b) {}
+        TColor(int r = 1, int g = 1, int b = 1, int a = 1): r(r), g(g), b(b), a(a) {}
+        TColor(int r = 1, int g = 1, int b = 1): r(r), g(g), b(b), a(255) {}
+        TColor(TColor& InNewColor): r(InNewColor.r), g(InNewColor.g), b(InNewColor.b), a(InNewColor.a) {}
+        TColor(): r(255), g(255), b(255), a(255) {}
+
+        glm::vec4 GetGlmVec4() const { return glm::vec4(r/255.f, g/255.f, b/255.f, a/255.f); }
+
+        static const TColor White;
+        static const TColor Black;
+        static const TColor Red;
+        static const TColor Orange;
+        static const TColor Yellow;
+        static const TColor Green;
+        static const TColor Blue;
+        static const TColor Magenta;
+        static const TColor Gray;
+
+       /* TColor& operator=(TColor&& InOther) noexcept
+        {
+            if (this == &InOther) return *this;
+            r = InOther.r; g = InOther.g; b = InOther.b; a = InOther.a;
+        }*/
+
+        /*glm::vec4& operator[]() 
+        { 
+            glm::vec4 LV4 = GetGlmVec4();
+            return LV4; 
+        }
+        const glm::vec4& operator[]() const 
+        {
+            glm::vec4 LV4 = GetGlmVec4();
+            return LV4; 
+        }
+        const TColor& operator[]() const 
+        { 
+            TColor LC = TColor(r,g,b,a);
+            return LC; 
+        }*/
     };
 
     /*Хранит позицию, поворот (углы Эйлера в градусах) и масштаб.

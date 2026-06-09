@@ -1,7 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#include "Engine/Core/Log.h"                                        // Подключение системы логирования
-#include "IInputListen.h"                                            // Заголовок с определением интерфейса InputListen и фабрики InputListenAPIFactory
+#include "IInputListen.h"                                         // Заголовок с определением интерфейса InputListen и фабрики InputListenAPIFactory
 #include "Platform/WindowAPI/WindowGLFW/InputGLFW.h"              // Конкретная реализация InputListen для GLFW
 
 namespace Engine 

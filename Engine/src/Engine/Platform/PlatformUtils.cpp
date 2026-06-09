@@ -24,7 +24,7 @@ namespace Engine
      * 
      * @return std::string Абсолютный путь к исполняемому файлу.
      */
-    std::string PlatformUtils::getExecutablePath() 
+    std::string PlatformUtils::GetExecutablePath() 
     {
         char path[4096];                                                    // Буфер для пути (достаточно большой для большинства систем)
 
@@ -51,9 +51,17 @@ namespace Engine
      * 
      * @return std::string Абсолютный путь к текущей рабочей директории.
      */
-    std::string PlatformUtils::getCurrentWorkingDirectory() 
+    std::string PlatformUtils::GetBinaryDirectory()
     {
-        return std::filesystem::current_path().string();
+         return std::filesystem::current_path().string();
     }
 
+    /**
+     * @brief Возвращает путь к проекту, с учетом нахождения исполняемого файла в /Bin
+     */
+    std::string PlatformUtils::GetProjectDirectory()
+    {
+        std::filesystem::path projectPath = std::filesystem::current_path().parent_path();
+        return projectPath.string();
+    }
 }

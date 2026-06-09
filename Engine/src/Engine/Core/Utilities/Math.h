@@ -42,7 +42,7 @@ namespace EngineMath
      * @param InVector Входной вектор
      * @return Нормализованный вектор
      */
-    static Engine::Vector3 Vector3Normal(float Tolerance = 0.f, Engine::Vector3 InVector)
+    static Engine::Vector3 Vector3Normal(float Tolerance = 0.f, Engine::Vector3 InVector = Engine::Vector3())
     {
         const float SquareSum = InVector.x*InVector.x + InVector.y*InVector.y + InVector.z*InVector.z;  // Вычисляем сумму квадратов компонентов (квадрат длины)
         if(SquareSum == 1.f)                                                                            // Если вектор уже единичной длины, возвращаем его без изменений
@@ -53,7 +53,7 @@ namespace EngineMath
         {
             return InVector;
         }
-        const float Scale = InvSqrt(SquareSum);                                                         // Вычисляем масштабный коэффициент как обратный квадратный корень от SquareSum
+        const float Scale = EngineMath::InvSqrt(SquareSum);                                                         // Вычисляем масштабный коэффициент как обратный квадратный корень от SquareSum
         return Engine::Vector3(InVector.x*Scale, InVector.y*Scale, InVector.z*Scale);                   // Умножаем каждую компоненту на Scale и возвращаем новый вектор
     };
 

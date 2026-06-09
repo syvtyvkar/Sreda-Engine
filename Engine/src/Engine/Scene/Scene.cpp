@@ -16,7 +16,7 @@ namespace Engine
     Scene::Scene(const std::string& name) : m_name(name) 
     {
         Engine::CameraConfig camConfig;                                                             // Настройка камеры
-        camConfig.position = glm::vec3(0.0f, 0.0f, 3.0f);                                           // Позиция камеры
+        camConfig.position = Vector3(0.0f, 0.0f, 3.0f);                                           // Позиция камеры
         camConfig.screenWidth = 800;                                                 // Ширина экрана для соотношения сторон
         camConfig.screenHeight = 600;                                               // Высота экрана
         r_camera = std::make_unique<Engine::Camera>(camConfig);

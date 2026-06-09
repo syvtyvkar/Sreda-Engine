@@ -15,24 +15,30 @@ namespace Engine::Render
 		{
 			switch (format)
 			{
-				case ImageFormat::RGB8:  return GL_RGB;
-				case ImageFormat::RGBA8: return GL_RGBA;
+				case ImageFormat::R8:  	 	return GL_RED;
+				case ImageFormat::RGB8:  	return GL_RGB;
+				case ImageFormat::RGBA8: 	return GL_RGBA;
+				case ImageFormat::RGBA32F: 	return GL_RGBA; 
+				default: ENGINE_ASSERT(false, "Unknown ImageFormat"); return 0;
 			}
 
-			ENGINE_ASSERT(false,"");
-			return 0;
+			//ENGINE_ASSERT(false,"");
+			//return 0;
 		}
 		
 		static GLenum ImageFormatToGLInternalFormat(ImageFormat format)
 		{
 			switch (format)
 			{
-			case ImageFormat::RGB8:  return GL_RGB8;
-			case ImageFormat::RGBA8: return GL_RGBA8;
+			case ImageFormat::R8:  			return GL_R8;
+			case ImageFormat::RGB8:  		return GL_RGB8;
+			case ImageFormat::RGBA8: 		return GL_RGBA8;
+			case ImageFormat::RGBA32F: 		return GL_RGBA32F;
+			default: ENGINE_ASSERT(false, "Unknown ImageFormat"); return 0;
 			}
 
-			ENGINE_ASSERT(false,"");
-			return 0;
+			//ENGINE_ASSERT(false,"Load no valid image format!");
+			//return 0;
 		}
 
 	}
@@ -43,15 +49,34 @@ namespace Engine::Render
 
 		m_InternalFormat = Utils::ImageFormatToGLInternalFormat(m_Specification.Format);
 		m_DataFormat = Utils::ImageFormatToGLDataFormat(m_Specification.Format);
+		
+		//ENGINE_LOG_INFO("Created texture with format={0}, internal={1}, data={2}", (int)m_Specification.Format, m_InternalFormat, m_DataFormat);
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
 
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, m_Specification.GenerateMips ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		GLenum wrapS = GL_REPEAT;
+		GLenum wrapT = GL_REPEAT;
+		switch (m_Specification.WrapS)
+		{
+			case TextureWrap::ClampToEdge:  wrapS = GL_CLAMP_TO_EDGE; break;
+			case TextureWrap::MirroredRepeat: wrapS = GL_MIRRORED_REPEAT; break;
+			default: wrapS = GL_REPEAT; break;
+		}
+		switch (m_Specification.WrapT)
+		{
+			case TextureWrap::ClampToEdge:  wrapT = GL_CLAMP_TO_EDGE; break;
+			case TextureWrap::MirroredRepeat: wrapT = GL_MIRRORED_REPEAT; break;
+			default: wrapT = GL_REPEAT; break;
+		}
+		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, wrapS);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, wrapT);
+
+		if (m_Specification.GenerateMips)
+			glGenerateTextureMipmap(m_RendererID);
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path): m_Path(path)
@@ -64,7 +89,7 @@ namespace Engine::Render
     	}
 
 
-		std::string LPath = FileIO::GetProjectDirectory() + path;
+		std::string LPath = PlatformUtils::GetProjectDirectory() + path;
     	stbi_set_flip_vertically_on_load(1);
     
 		int width, height, channels;
@@ -134,13 +159,26 @@ namespace Engine::Render
 
 	void OpenGLTexture2D::SetData(void* data, uint32_t size)
 	{
-		uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
-		ENGINE_ASSERT(size == m_Width * m_Height * bpp, "Data must be entire texture!");
+		uint32_t bpp = 0;
+    	switch (m_Specification.Format) 
+		{
+			case ImageFormat::R8:      bpp = 1; break;
+        	case ImageFormat::RGB8:    bpp = 3; break;
+        	case ImageFormat::RGBA8:   bpp = 4; break;
+        	case ImageFormat::RGBA32F: bpp = 16; break;
+        	default: ENGINE_ASSERT(false, "Unknown format in Data"); return;
+    	}
+		ENGINE_ASSERT(size == m_Width * m_Height * bpp, "Data size mismatch!");
+
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	}
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
 		glBindTextureUnit(slot, m_RendererID);
 	}
+
+
 }

@@ -21,7 +21,7 @@ namespace Engine::Render
 			s_RendererAPI->SetViewport(x, y, width, height);
 		}
 
-		static void SetClearColor(const glm::vec4& color)
+		static void SetClearColor(const TColor& color)
 		{
 			s_RendererAPI->SetClearColor(color);
 		}
@@ -44,6 +44,16 @@ namespace Engine::Render
 		static void SetLineWidth(float width)
 		{
 			s_RendererAPI->SetLineWidth(width);
+		}
+
+		static void SetDepthTest(bool enabled)
+		{
+			s_RendererAPI->SetDepthTest(enabled);
+		}
+
+		static void SetDepthWrite(bool enabled)
+		{
+			s_RendererAPI->SetDepthWrite(enabled);
 		}
 	private:
 		static TUniquePtr<RendererAPI> s_RendererAPI;

@@ -248,7 +248,7 @@ namespace Engine::UI
 
         nk_glfw3_font_stash_begin(GlfwCtx, &Atlas);
 
-        std::string LFilePathFont = FileIO::GetProjectDirectory() + "/Resources/Fonts/Cuprum.ttf";
+        std::string LFilePathFont = PlatformUtils::GetProjectDirectory() + "/Resources/Fonts/Cuprum.ttf";
         nk_font *font = nk_font_atlas_add_from_file(Atlas,LFilePathFont.c_str(),16,0);
         if (!font)
         {

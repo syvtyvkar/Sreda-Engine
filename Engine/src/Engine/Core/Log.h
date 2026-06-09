@@ -9,6 +9,9 @@
 #include <iostream>                             // Для std::cerr
 #include <cstdlib>                              // Для std::abort
 
+#include <string>
+#include <stdexcept>
+
 namespace Engine::Log
 {
     enum LogType : int8_t
@@ -35,6 +38,8 @@ namespace Engine::Log
     {
     public:
         static void Init();                                         // Инициализация логгера (вызывать один раз при старте приложения)
+
+        static void ShowMessageBox(uint8_t Type, const char* Tittle, const char* Message);
 
         static std::shared_ptr<spdlog::logger>& GetClientLogger()   // Получить логгер для клиента (игры)
         { 
@@ -75,6 +80,18 @@ namespace Engine
 // ============================================================================
 
 #ifdef _DEBUG
+    // "CRASH PROGRAMM:\n"
+    // Позволяет вызвать краш с выводом окна ошибки. В отличии от ассертов, сам факт вызова этого макроса означает, 
+    // что мы принудительно хотим завершить программу с выводом визуального отображения ошибки
+    #define ENGINE_CRASH(message) \
+        ENGINE_LOG_CRITICAL(std::string(message "\n\n" "The source of the error:\n" "File: ") + __FILE__ + "\n" "Line: " + std::to_string(__LINE__) + "\n""Function: " + __func__ + "\n\n""Please send this to the developer."); \
+        throw std::runtime_error(std::string(message "\n\n" "The source of the error:\n" "File: ") + __FILE__ + "\n" "Line: " + std::to_string(__LINE__) + "\n""Function: " + __func__ + "\n\n""Please send this to the developer.") \
+
+#else
+    #define ENGINE_CRASH(message) do {} while(false)
+#endif 
+
+#ifdef _DEBUG
     // В отладочной сборке ассерт проверяет условие, и если оно ложно,
     // выводит развёрнутую информацию об ошибке (в лог и в cerr) и аварийно завершает программу.
     #define ENGINE_ASSERT(condition, message) \
@@ -89,6 +106,7 @@ namespace Engine
                 std::cerr << "Message: " << message << "\n"; \
                 std::cerr << "File: " << __FILE__ << ":" << __LINE__ << "\n"; \
                 std::cerr << "=========================\n\n"; \
+                ENGINE_CRASH(message); \
                 std::abort(); \
             } \
         } while(false)

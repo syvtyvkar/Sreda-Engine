@@ -24,7 +24,7 @@ namespace Engine
          * На Windows использует GetModuleFileNameA, на Linux — readlink("/proc/self/exe"),
          * на macOS — _NSGetExecutablePath.
          */
-        static std::string getExecutablePath();
+        static std::string GetExecutablePath();
 
         /**
          * @brief Возвращает текущую рабочую директорию процесса.
@@ -32,6 +32,11 @@ namespace Engine
          *
          * На Windows использует GetCurrentDirectory, на Unix-подобных — getcwd.
          */
-        static std::string getCurrentWorkingDirectory();
+        static std::string GetBinaryDirectory();
+
+        /**
+         * @brief Путь к рабочей директории приложения
+         */
+        static std::string GetProjectDirectory(); 
     };
 }

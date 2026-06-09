@@ -180,11 +180,7 @@ namespace Engine::Time
         }
     }
 
-    // === Singleton ===
-
-    TimeSystem& TimeSystem::GetInstance() {
-        ENGINE_ASSERT(s_Instance, "Time not initialized!");
-        return *s_Instance;
-    }
+    /** @brief Singleton */
+    TimeSystem& TimeSystem::GetInstance() {ENGINE_ASSERT(s_Instance, "Time not initialized!"); return *s_Instance;}
 
 }

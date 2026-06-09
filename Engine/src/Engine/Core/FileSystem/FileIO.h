@@ -6,6 +6,7 @@
 #include <vector>           //
 #include <optional>         //
 #include <filesystem>       //
+#include "Engine/Platform/PlatformUtils.h"
 
 namespace Engine 
 {
@@ -33,8 +34,8 @@ namespace Engine
         static std::string GetDirectoryFile(const std::string& InPath);                                             // Получить директорию файла
         static bool CreateDirectories(const std::string& InPath);                                                   // Создать директорию
         static std::string Join(const std::string& InBase, const std::string& InRelative);                          // Объединить пути платформо-независимо
-        static std::string GetBinaryDirectory();                                                                    // Путь к исполняемому файлу
-        static std::string GetProjectDirectory();                                                                   // Путь к рабочей директории приложения
+        //static std::string GetBinaryDirectory();                                                                    // Путь к исполняемому файлу
+        //static std::string GetProjectDirectory();                                                                   // Путь к рабочей директории приложения
     private:
         FileIO() = delete;                                                                                          // Запрещено создавать экземпляры класса
         ~FileIO() = delete;                                                                                         // Запрещено удалять экземпляры класса

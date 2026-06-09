@@ -23,6 +23,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Engine/lib)
 
 # Поиск пакетов
 find_package(OpenGL REQUIRED)
+find_package(Freetype REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
@@ -50,17 +51,23 @@ if(MSVC)
     )
 endif()
 
+#### msdfgen
+
+######
+
 target_include_directories(Engine PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/stb_image
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/msdf-atlas-gen
 )
 
 target_link_libraries(Engine PRIVATE
     OpenGL::GL
     glfw
     glm::glm
+    Freetype::Freetype
 )
 
 add_library(glad STATIC

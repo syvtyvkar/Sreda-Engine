@@ -9,6 +9,10 @@
 #include <sstream>
 #include <iomanip>
 
+#ifdef WIN32
+    #include <windows.h>
+#endif
+
 namespace Engine::Log
 {
     std::shared_ptr<spdlog::logger> LogSystem::s_MainLogger;                      // Статический указатель на основной логгер (инициализируется в Init)
@@ -40,6 +44,13 @@ namespace Engine::Log
         spdlog::register_logger(s_MainLogger);                                                      // Регистрируем логгер в глобальном реестре spdlog (чтобы можно было получать по имени)
         s_MainLogger->set_pattern("%^[%T] %n: %v%$");                                               // Устанавливаем формат вывода
         s_MainLogger->set_level(spdlog::level::trace);                                              // Устанавливаем уровень логирования — trace (самый подробный)
+    }
+
+    void LogSystem::ShowMessageBox(uint8_t Type, const char* Tittle, const char* Message)
+    {
+        #ifdef WIN32
+        MessageBox(GetActiveWindow(), Message, Tittle, MB_ICONERROR);
+        #endif
     }
 
     void LogSystem::SetLevel(spdlog::level::level_enum level)                      // Метод для изменения уровня логирования во время выполнения

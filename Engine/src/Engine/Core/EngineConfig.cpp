@@ -31,7 +31,7 @@ namespace EngineConfig
 
     bool ConfigSystem::Init(std::string InTypeConfig)  // Инициализация наших конфигураций
     {
-        ENGINE_LOG_INFO("Init configurate file: {}", Engine::FileIO::GetProjectDirectory() + InTypeConfig); 
+        ENGINE_LOG_INFO("Init configurate file: {}", PlatformUtils::GetProjectDirectory() + InTypeConfig); 
         if (!m_embeddedLoaded)   // Пытались ли мы уже грузить сгенерированный файл конфигурации?
         {
 #ifdef ENGINE_CONFIG_EMBEDDED
@@ -57,7 +57,7 @@ namespace EngineConfig
             try 
             {
                 //std::ifstream File;
-                auto lFileContent = Engine::FileIO::ReadTextFile(Engine::FileIO::GetProjectDirectory() + InTypeConfig);                                 
+                auto lFileContent = Engine::FileIO::ReadTextFile(PlatformUtils::GetProjectDirectory() + InTypeConfig);                                 
                 if (!lFileContent->empty()) 
                 {
                     json userConfig = json::parse(lFileContent.value());              // Парсим данные из пользовательских конфигов
@@ -70,7 +70,7 @@ namespace EngineConfig
             } 
             catch (const std::exception& e) 
             {
-                ENGINE_LOG_WARN("Failed to load user config {}: {}", Engine::FileIO::GetProjectDirectory() + InTypeConfig, e.what());
+                ENGINE_LOG_WARN("Failed to load user config {}: {}", PlatformUtils::GetProjectDirectory() + InTypeConfig, e.what());
             }
         }
         else
@@ -153,13 +153,13 @@ namespace EngineConfig
 
         std::string content = delta.dump(4);   // Готовим данные к отправке
 
-        if (FileIO::WriteTextFile(Engine::FileIO::GetProjectDirectory() + InTypeConfig, content)) 
+        if (FileIO::WriteTextFile(PlatformUtils::GetProjectDirectory() + InTypeConfig, content)) 
         {
-            ENGINE_LOG_INFO("Config saved: {} ({} overrides)", Engine::FileIO::GetProjectDirectory() + InTypeConfig, m_overriddenKeys.size());
+            ENGINE_LOG_INFO("Config saved: {} ({} overrides)", PlatformUtils::GetProjectDirectory() + InTypeConfig, m_overriddenKeys.size());
             return true;
         }
 
-        ENGINE_LOG_ERROR("Error saving user config: {}", Engine::FileIO::GetProjectDirectory() + InTypeConfig);
+        ENGINE_LOG_ERROR("Error saving user config: {}", PlatformUtils::GetProjectDirectory() + InTypeConfig);
         return false;
     }
 

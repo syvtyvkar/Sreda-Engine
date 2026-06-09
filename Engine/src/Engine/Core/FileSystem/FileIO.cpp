@@ -9,10 +9,10 @@ namespace Engine
 {
     std::string FileIO::ReadTextDataToString(const std::string &InPath)
     {
-        std::ifstream file(GetProjectDirectory() + "/" + InPath);
+        std::ifstream file(PlatformUtils::GetProjectDirectory() + "/" + InPath);
         if (!file.is_open()) 
         {
-            ENGINE_LOG_WARN("Failed to open shader file: {}", GetProjectDirectory() + "/" + InPath);
+            ENGINE_LOG_WARN("Failed to open shader file: {}", PlatformUtils::GetProjectDirectory() + "/" + InPath);
             return "";
         }
 
@@ -99,7 +99,7 @@ namespace Engine
 
     bool FileIO::IsProjectFileExist(const std::string& InFile) 
     {
-        return std::filesystem::exists(GetProjectDirectory() + InFile);
+        return std::filesystem::exists(PlatformUtils::GetProjectDirectory() + InFile);
     }
 
     std::string FileIO::GetExtensionFile(const std::string& InPath) 
@@ -139,7 +139,7 @@ namespace Engine
         return (std::filesystem::path(InBase) / InRelative).string();
     }
 
-    std::string FileIO::GetBinaryDirectory()
+    /*std::string FileIO::GetBinaryDirectory()
     {
         return std::filesystem::current_path().string();
     }
@@ -148,5 +148,5 @@ namespace Engine
     {
         std::filesystem::path projectPath = std::filesystem::current_path().parent_path();
         return projectPath.string();
-    }
+    }*/
 }
