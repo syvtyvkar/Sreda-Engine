@@ -165,7 +165,6 @@ namespace Engine::UI
     {
         if (!Initialized) return;
 
-            // Сохранение GL состояния
             GLint last_program;
             glGetIntegerv(GL_CURRENT_PROGRAM, &last_program);
 
@@ -186,7 +185,6 @@ namespace Engine::UI
             GLint last_viewport[4];
             glGetIntegerv(GL_VIEWPORT, last_viewport);
 
-            // Рендер Nuklear
             nk_glfw3_render(GlfwCtx, NK_ANTI_ALIASING_ON, 512 * 1024, 128 * 1024);
 
             glUseProgram(last_program);
@@ -195,11 +193,12 @@ namespace Engine::UI
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, last_element_array_buffer);
             glViewport(last_viewport[0], last_viewport[1], last_viewport[2], last_viewport[3]);
 
-            // Восстановление GL состояния
             if (last_blend) glEnable(GL_BLEND); else glDisable(GL_BLEND);
             if (last_cull) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
             if (last_depth) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
             if (last_scissor) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
+
+        RenderUIElements(GetRootWidget());
     }
 
     void NuclearUIContext::Shutdown()
@@ -258,13 +257,6 @@ namespace Engine::UI
         nk_glfw3_font_stash_end(GlfwCtx);
         if (font) nk_style_set_font(Ctx, &font->handle);
         Initialized = true;
-    }
-    bool NuclearUIContext::LoadDocument(const std::string &path)
-    {
-        return false;
-    }
-    void NuclearUIContext::UnloadDocument()
-    {
     }
     void NuclearUIContext::Show()
     {

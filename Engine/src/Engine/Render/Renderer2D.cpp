@@ -191,7 +191,7 @@ namespace Engine::Render
 		for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
 			samplers[i] = i;
 
-		// Текст
+		// Text
 		s_Data.TextVertexArray = VertexArray::Create();
 
 		s_Data.TextVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(TextVertex));
@@ -203,7 +203,7 @@ namespace Engine::Render
 			{ ShaderDataType::Int,    "a_EntityID" }
 		});
 		s_Data.TextVertexArray->AddVertexBuffer(s_Data.TextVertexBuffer);
-		s_Data.TextVertexArray->SetIndexBuffer(quadIB); // используем тот же индексный буфер
+		s_Data.TextVertexArray->SetIndexBuffer(quadIB); // Use the same index buffer
 
 		s_Data.TextVertexBufferBase = new TextVertex[s_Data.MaxVertices];
 		s_Data.TextVertexBufferPtr = s_Data.TextVertexBufferBase;
@@ -523,7 +523,7 @@ namespace Engine::Render
     	s_Data.TextShader->SetInt("u_FontAtlas", 0);
 
 		
-		// Найти или зарезервировать текстурный слот
+		// Find or reserve a texture slot
 		float textureIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; ++i) {
 			if (*s_Data.TextureSlots[i] == *fontAtlas) {

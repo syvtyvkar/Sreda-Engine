@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once // Защита от множественного включения
+#pragma once // Multiple inclusion guard
 
 #include "Engine/Core/Utilities/Types.h"
 #include <glm/glm.hpp>

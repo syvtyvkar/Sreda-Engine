@@ -22,12 +22,13 @@ void EditorAppInstance::OnInit(Application *InOwnerApp)
 		InOwnerApp->GetWindow()->OnWindowReSize().Subscribe([&,this](int x, int y) 
 		{
 			m_CameraController.OnResize(x,y);
+			m_ui_camera.SetProjection(0.0f, (float)x, 0.0f, (float)y);
 		});
 		m_CameraController.OnResize(InOwnerApp->GetWindow()->GetWidth(),InOwnerApp->GetWindow()->GetHeight());
 
 		int w = InOwnerApp->GetWindow()->GetWidth();
 		int h = InOwnerApp->GetWindow()->GetHeight();
-		m_ui_camera = OrthographicCamera(0.0f, (float)w, 0.0f, (float)h);
+		m_ui_camera.SetProjection(0.0f, (float)w, 0.0f, (float)h);
 		m_ui_camera.SetPosition(Vector3(0.0f));
 		m_ui_camera.SetRotation(0.0f);
 	}
@@ -228,10 +229,10 @@ void EditorAppInstance::Update(float DeltaTime)
 	
 	auto textureShader = m_ShaderLibrary.Get("SimpleTexture");
 
-	//m_Texture->Bind();
-	//Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(-100.0f), Vector3(0.2f)));
-	//m_CheckerboardTexture->Bind();
-	//Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(100.f), Vector3(0.5f)));
+	m_Texture->Bind();
+	Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(-100.0f), glm::vec3(0.2f)));
+	m_CheckerboardTexture->Bind();
+	Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(100.f), glm::vec3(0.5f)));
 
 	// Triangle
 	//Renderer::Submit(m_Shader, m_VertexArray);
@@ -254,8 +255,8 @@ void EditorAppInstance::Update(float DeltaTime)
 	Renderer::EndScene();
 
 	Renderer2D::BeginScene(m_ui_camera);
-	Renderer2D::RenderDrawText(L"Привет, мир!", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 100.0f, 1.0f, TColor::White);
-	Renderer2D::RenderDrawText(L"Scale 2x", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 200.0f, 2.0f, TColor::Orange);
+	Renderer2D::RenderDrawText(L"Hello, world!", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 100.0f, 1.0f, TColor::White);
+	Renderer2D::RenderDrawText(L"Big text test", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 200.0f, 2.0f, TColor::Orange);
 
 	Renderer2D::DrawQuad(Vector2(0,500), Vector2(1500,100), m_Font->GetAtlasTexture());
 

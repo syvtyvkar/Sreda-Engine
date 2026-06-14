@@ -130,8 +130,7 @@ namespace Engine::Render
         }
     }
 
-    Font::Font(const std::string& filepath, int fontSize)
-        : m_FontSize(fontSize)
+    Font::Font(const std::string& filepath, int fontSize) : m_FontSize(fontSize)
     {
         auto codepoints = GetDefaultCodepoints();
         GenerateAtlas(filepath, codepoints);

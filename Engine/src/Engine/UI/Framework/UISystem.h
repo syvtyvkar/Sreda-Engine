@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once    // Защита от множественного включения
+#pragma once    // Multiple inclusion guard
 
 #include "Engine/Platform/IWindow.h"
 #include "Engine/UI/Framework/IUIContext.h"
@@ -20,18 +20,18 @@ namespace Engine::UI
         bool Initialize(Window* window);
         void Shutdown();
         
-        // Обновление и рендер (вызывать в главном цикле)
+        // Update and render (call in main loop)
         void Update();
         void Render();
         void BeginFrame();
 	    void EndFrame();
         
-        // Управление контекстами
+        // Context management
         UIContext* CreateContext(Window *window);
         UIContext* GetContext() {return m_context.get();}
         void DestroyContext();
         
-        // Отладка
+        // Debug
         void ToggleDebugger();
     private:
         TUniquePtr<UIContext> m_context;

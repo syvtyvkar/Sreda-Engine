@@ -6,7 +6,7 @@
 //#include <filesystem>
 
 #ifdef ENGINE_CONFIG_EMBEDDED
-    #include "config_embed.h"  // Сгенерированный header
+    #include "config_embed.h"  // Generated header
 #endif
 
 #include <fstream>
@@ -18,7 +18,7 @@ namespace EngineConfig
     using namespace Engine;
 
     /**
-     * @brief Получить синглтон
+     * @brief Get singleton
      */
     ConfigSystem& ConfigSystem::Get() 
     {
@@ -29,30 +29,30 @@ namespace EngineConfig
         return *s_instance;
     }
 
-    bool ConfigSystem::Init(std::string InTypeConfig)  // Инициализация наших конфигураций
+    bool ConfigSystem::Init(std::string InTypeConfig)  // Initialize our configs
     {
         ENGINE_LOG_INFO("Init configurate file: {}", PlatformUtils::GetProjectDirectory() + InTypeConfig); 
-        if (!m_embeddedLoaded)   // Пытались ли мы уже грузить сгенерированный файл конфигурации?
+        if (!m_embeddedLoaded)   // Have we already tried to load the generated config file?
         {
 #ifdef ENGINE_CONFIG_EMBEDDED
-            std::lock_guard<std::mutex> lock(ConfigSystem::Get().m_mutex);              // Никто не имеет права трогать файл, пока с ним работаем мы!
+            std::lock_guard<std::mutex> lock(ConfigSystem::Get().m_mutex);              // Nobody can touch the file while we're working with it!
             try 
             {
-                // Парсим встроенную JSON-строку
-                ConfigSystem::Get().m_data = json::parse(ConfigEmbed::DefaultConfigJSON);                               // Парсим данные
-                ConfigSystem::Get().m_embeddedLoaded = true;                                                            // Сообщаем, что больше считывать данные по умолчанию не требуется
-                ENGINE_LOG_INFO("Embedded config loaded ({} bytes)", strlen(ConfigEmbed::DefaultConfigJSON));           // Логируем
+                // Parse embedded JSON string
+                ConfigSystem::Get().m_data = json::parse(ConfigEmbed::DefaultConfigJSON);                               // Parse data
+                ConfigSystem::Get().m_embeddedLoaded = true;                                                            // Signal that no more default data loading is needed
+                ENGINE_LOG_INFO("Embedded config loaded ({} bytes)", strlen(ConfigEmbed::DefaultConfigJSON));           // Log
             } 
-            catch (const json::parse_error& e)                                                                          // Упс, что-то пошло не так!
+            catch (const json::parse_error& e)                                                                          // Oops, something went wrong!
             {
-                ENGINE_LOG_ERROR("Failed to parse embedded config: {}", e.what()); ConfigSystem::Get().m_data = json::object();  // Пустой объект как fallback
+                ENGINE_LOG_ERROR("Failed to parse embedded config: {}", e.what()); ConfigSystem::Get().m_data = json::object();  // Empty object as fallback
             }
 #else
-            ENGINE_LOG_ERROR("Embedded config not available (ENGINE_CONFIG_EMBEDDED not defined)");  // Если мы пришли сюда - проблема где-то в генерации файла. Возможно, CMake?
+            ENGINE_LOG_ERROR("Embedded config not available (ENGINE_CONFIG_EMBEDDED not defined)");  // If we got here - there's a problem with file generation. Maybe CMake?
             return false;
 #endif
         }
-        if (Engine::FileIO::IsProjectFileExist(InTypeConfig))                                        // Файл существует?
+        if (Engine::FileIO::IsProjectFileExist(InTypeConfig))                                        // Does the file exist?
         {
             try 
             {
@@ -60,9 +60,9 @@ namespace EngineConfig
                 auto lFileContent = Engine::FileIO::ReadTextFile(PlatformUtils::GetProjectDirectory() + InTypeConfig);                                 
                 if (!lFileContent->empty()) 
                 {
-                    json userConfig = json::parse(lFileContent.value());              // Парсим данные из пользовательских конфигов
-                    m_data.merge_patch(userConfig);                                   // Мерджим данные из пользовательских конфигов
-                    MarkOverriddenKeys(userConfig,"");                                // Отмечаем изменённые ключи (упрощённо: все ключи из userConfig)
+                    json userConfig = json::parse(lFileContent.value());              // Parse data from user configs
+                    m_data.merge_patch(userConfig);                                   // Merge data from user configs
+                    MarkOverriddenKeys(userConfig,"");                                // Mark changed keys (simplified: all keys from userConfig)
                     
                     ENGINE_LOG_INFO("User config merged: {} overrides applied", CountKeys(userConfig));
                     return true;
@@ -91,29 +91,29 @@ namespace EngineConfig
         return true;
     }
 
-    void ConfigSystem::MarkOverriddenKeys(const json &InConfig, const std::string &InPrefix)    // Рекурсивно отмечаем все ключи как "изменённые"
+    void ConfigSystem::MarkOverriddenKeys(const json &InConfig, const std::string &InPrefix)    // Recursively mark all keys as "overridden"
     {
         for (auto& [key, value] : InConfig.items()) 
         {
-            std::string fullPath = InPrefix.empty() ? key : InPrefix + "." + key;                   // Путь к цели
+            std::string fullPath = InPrefix.empty() ? key : InPrefix + "." + key;                   // Path to target
             if (value.is_object()) 
             {
-                MarkOverriddenKeys(value, fullPath);        // Рекурсия для вложенных объектов
+                MarkOverriddenKeys(value, fullPath);        // Recursion for nested objects
             } 
             else 
             {
-                m_overriddenKeys.insert(fullPath);          // Помечаем как измененный
+                m_overriddenKeys.insert(fullPath);          // Mark as overridden
             }
         }
     }
 
-    void ConfigSystem::MarkOverridden(const std::string &key)           // Пометить ключи как измененные
+    void ConfigSystem::MarkOverridden(const std::string &key)           // Mark key as overridden
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_overriddenKeys.insert(key);
     }
 
-    bool ConfigSystem::SaveConfig(const std::string &InTypeConfig)        // Сохраняем конфиги определенного типа
+    bool ConfigSystem::SaveConfig(const std::string &InTypeConfig)        // Save configs of a specific type
     {
         json delta;
         {
@@ -144,14 +144,14 @@ namespace EngineConfig
             }
         }
         
-        // Если нет изменений — не создаём файл
+        // If no changes — don't create a file
         if (delta.empty()) 
         {
             ENGINE_LOG_INFO("No config changes to save");
             return true;
         }
 
-        std::string content = delta.dump(4);   // Готовим данные к отправке
+        std::string content = delta.dump(4);   // Prepare data for writing
 
         if (FileIO::WriteTextFile(PlatformUtils::GetProjectDirectory() + InTypeConfig, content)) 
         {
@@ -163,7 +163,7 @@ namespace EngineConfig
         return false;
     }
 
-    size_t ConfigSystem::CountKeys(const json &j, size_t depth)         // Считает количество листовых ключей
+    size_t ConfigSystem::CountKeys(const json &j, size_t depth)         // Count leaf keys
     {
         if (!j.is_object()) return 1;
         
@@ -188,12 +188,12 @@ namespace EngineConfig
         
             if (!current->is_object() || !current->contains(key)) 
             {
-                return nullptr;  // Ключ не найден или не объект
+                return nullptr;  // Key not found or not an object
             }
         
             current = &current->at(key);
         
-            // Если это не последний элемент, но значение не объект — ошибка навигации
+            // If this is not the last element but the value is not an object — navigation error
             if (i < parts.size() - 1 && !current->is_object()) 
             {
                 return nullptr;
@@ -217,7 +217,7 @@ namespace EngineConfig
                 parts.push_back(normalized.substr(start));
                 break;
             }
-            if (end > start)                                            // Избегаем пустых частей при ".."
+            if (end > start)                                            // Avoid empty parts with ".."
             {
                 parts.push_back(normalized.substr(start, end - start));
             }

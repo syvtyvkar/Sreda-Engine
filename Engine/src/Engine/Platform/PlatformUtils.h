@@ -1,41 +1,41 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once                // Защита от множественного включения заголовочного файла
+#pragma once                // Multiple inclusion guard for header file
 
-#include <string>           // Для использования типа std::string
+#include <string>           // For std::string type
 
 namespace Engine 
 {
     /**
      * @class PlatformUtils
-     * @brief Утилиты для получения информации о платформе и файловой системе.
+     * @brief Utilities for obtaining platform and file system information.
      *
-     * Предоставляет статические методы для получения пути к исполняемому файлу
-     * и текущей рабочей директории. Реализация методов зависит от операционной системы
-     * (Windows, Linux, macOS) и скрыта в соответствующем .cpp файле.
+     * Provides static methods for getting the executable path
+     * and current working directory. Method implementations depend on the operating system
+     * (Windows, Linux, macOS) and are hidden in the corresponding .cpp file.
      */
     class PlatformUtils 
     {
     public:
         /**
-         * @brief Возвращает полный абсолютный путь к исполняемому файлу текущего процесса.
-         * @return Строка, содержащая путь к исполняемому файлу.
+         * @brief Returns the full absolute path to the current process executable.
+         * @return String containing the path to the executable.
          *
-         * На Windows использует GetModuleFileNameA, на Linux — readlink("/proc/self/exe"),
-         * на macOS — _NSGetExecutablePath.
+         * On Windows uses GetModuleFileNameA, on Linux — readlink("/proc/self/exe"),
+         * on macOS — _NSGetExecutablePath.
          */
         static std::string GetExecutablePath();
 
         /**
-         * @brief Возвращает текущую рабочую директорию процесса.
-         * @return Строка, содержащая абсолютный путь к рабочей директории.
+         * @brief Returns the current working directory of the process.
+         * @return String containing the absolute path to the working directory.
          *
-         * На Windows использует GetCurrentDirectory, на Unix-подобных — getcwd.
+         * On Windows uses GetCurrentDirectory, on Unix-like — getcwd.
          */
         static std::string GetBinaryDirectory();
 
         /**
-         * @brief Путь к рабочей директории приложения
+         * @brief Path to the application working directory
          */
         static std::string GetProjectDirectory(); 
     };

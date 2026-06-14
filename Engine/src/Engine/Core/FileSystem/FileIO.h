@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once    // Защита от множественного включения
+#pragma once    // Multiple inclusion guard
 
 #include <string>           //
 #include <vector>           //
@@ -11,33 +11,33 @@
 namespace Engine 
 {
     /**
-     * @brief Утилиты для работы с файловой системой
+     * @brief File system utilities
      * 
-     * Отвечает ТОЛЬКО за чтение/запись данных.
-     * Все методы статические — состояние не требуется.
+     * Handles ONLY reading/writing data.
+     * All methods are static — no state required.
      */
     class FileIO
     {
     public:
-        // Текстовые данные
-        static std::string ReadTextDataToString(const std::string& InPath);                                                     // Прочитать текстовый файл
-        static std::optional<std::string> ReadTextFile(const std::string& InPath);                                              // Прочитать текстовый файл
-        static bool WriteTextFile(const std::string& InPath, const std::string& InContent, bool InCreateDirs = true);           // Записать текстовый файл
-        // Бинарные данные
-        static std::optional<std::vector<uint8_t>> ReadBinaryFile(const std::string& InPath);                                   // Прочитать бинарный файл
-        static bool WriteBinaryFile(const std::string& InPath, const std::vector<uint8_t>& InData, bool InCreateDirs = true);   // Записать бинарный файл
-        // Работа с путями
-        static bool IsFileExist(const std::string& InPath);                                                         // Проверить, что файл существует
-        static bool IsProjectFileExist(const std::string& InFile);                                                  // Проверить, что файл проекта существует
-        static std::string GetExtensionFile(const std::string& InPath);                                             // Получить расширение файла
-        static std::string GetFileName(const std::string& InPath);                                                  // Получить имя файла без пути и расширения
-        static std::string GetDirectoryFile(const std::string& InPath);                                             // Получить директорию файла
-        static bool CreateDirectories(const std::string& InPath);                                                   // Создать директорию
-        static std::string Join(const std::string& InBase, const std::string& InRelative);                          // Объединить пути платформо-независимо
-        //static std::string GetBinaryDirectory();                                                                    // Путь к исполняемому файлу
-        //static std::string GetProjectDirectory();                                                                   // Путь к рабочей директории приложения
+        // Text data
+        static std::string ReadTextDataToString(const std::string& InPath);                                                     // Read text file
+        static std::optional<std::string> ReadTextFile(const std::string& InPath);                                              // Read text file
+        static bool WriteTextFile(const std::string& InPath, const std::string& InContent, bool InCreateDirs = true);           // Write text file
+        // Binary data
+        static std::optional<std::vector<uint8_t>> ReadBinaryFile(const std::string& InPath);                                   // Read binary file
+        static bool WriteBinaryFile(const std::string& InPath, const std::vector<uint8_t>& InData, bool InCreateDirs = true);   // Write binary file
+        // Path operations
+        static bool IsFileExist(const std::string& InPath);                                                         // Check if file exists
+        static bool IsProjectFileExist(const std::string& InFile);                                                  // Check if project file exists
+        static std::string GetExtensionFile(const std::string& InPath);                                             // Get file extension
+        static std::string GetFileName(const std::string& InPath);                                                  // Get file name without path and extension
+        static std::string GetDirectoryFile(const std::string& InPath);                                             // Get file directory
+        static bool CreateDirectories(const std::string& InPath);                                                   // Create directory
+        static std::string Join(const std::string& InBase, const std::string& InRelative);                          // Join paths platform-independently
+        //static std::string GetBinaryDirectory();                                                                    // Path to executable
+        //static std::string GetProjectDirectory();                                                                   // Path to application working directory
     private:
-        FileIO() = delete;                                                                                          // Запрещено создавать экземпляры класса
-        ~FileIO() = delete;                                                                                         // Запрещено удалять экземпляры класса
+        FileIO() = delete;                                                                                          // Forbidden to create instances
+        ~FileIO() = delete;                                                                                         // Forbidden to destroy instances
     };
 }

@@ -1,22 +1,22 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#include "Input.h"                                 // Основной заголовок системы ввода
+#include "Input.h"                                 // Main input system header
 
 namespace Engine
 {
-    InputSystem* InputSystem::s_InputInstance = nullptr;        // Инициализация статического указателя на единственный экземпляр InputSystem.
+    InputSystem* InputSystem::s_InputInstance = nullptr;        // Static pointer initialization for the single InputSystem instance.
 
-    /*************** BASE (базовые методы инициализации/завершения) */
+    /*************** BASE (basic init/shutdown methods) */
 
-    void InputSystem::Init(Engine::Window* windowHandle)                    // Инициализация системы ввода.
+    void InputSystem::Init(Engine::Window* windowHandle)                    // Initialize input system.
     {
         if (s_InputInstance) {
-            ENGINE_LOG_WARN("Input already initialized!");                  // Предупреждение о повторной инициализации
+            ENGINE_LOG_WARN("Input already initialized!");                  // Warning about reinitialization
             return;
         }
         s_InputInstance = new InputSystem();
 
-        // Обнуляем массивы состояний клавиш (текущее и предыдущее).
+        // Zero out key state arrays (current and previous).
         for (auto& LState : s_InputInstance->m_keyStates) LState = 0;
         for (auto& LState : s_InputInstance->m_prevKeyStates) LState = 0;
 
@@ -35,7 +35,7 @@ namespace Engine
         ENGINE_LOG_TRACE("Input system start!");
     }
 
-    void InputSystem::Shutdown()                        // Завершение работы системы ввода.
+    void InputSystem::Shutdown()                        // Shutdown input system.
     {
         if (!s_InputInstance) return;
 
@@ -47,34 +47,34 @@ namespace Engine
         ENGINE_LOG_INFO("Input system shutdown");
     }
 
-    void InputSystem::Update()                          // Обновление состояния ввода (вызывается каждый кадр).
+    void InputSystem::Update()                          // Update input state (called every frame).
     {
         if (!s_InputInstance) return;
 
-        // Сохраняем текущие состояния как "предыдущие" для следующего кадра.
+        // Save current states as "previous" for the next frame.
         memcpy(s_InputInstance->m_prevKeyStates, s_InputInstance->m_keyStates, sizeof(s_InputInstance->m_keyStates));
-        // Сбрасываем дельту мыши и скролл, так как они накапливаются только за один кадр.
+        // Reset mouse delta and scroll, as they accumulate only for one frame.
         s_InputInstance->m_mouseDelta={0,0};
         s_InputInstance->m_scrollDelta=0.0;
     }
 
-    /*************** INPUTS (опрос состояния клавиш) */
+    /*************** INPUTS (key state polling) */
 
-    bool InputSystem::IsKeyPressed(InputKey Key)    // Проверка, зажата ли клавиша в текущем кадре (включая повтор).
+    bool InputSystem::IsKeyPressed(InputKey Key)    // Check if a key is held down in the current frame (including repeat).
     {
         if (!s_InputInstance) return false;
         if (!s_InputInstance->GetInputListen()) return false;
         return s_InputInstance->GetKeyStateInternal(Key) == InputState::Pressed || s_InputInstance->GetKeyStateInternal(Key) == InputState::Repeated;
     }
 
-    bool InputSystem::IsKeyJustPressed(InputKey Key)    // Проверка, было ли только что (в этом кадре) нажатие клавиши.
+    bool InputSystem::IsKeyJustPressed(InputKey Key)    // Check if a key was just pressed (this frame).
     {
         if (!s_InputInstance) return false;
         if (!s_InputInstance->GetInputListen()) return false;
         return s_InputInstance->GetKeyStateInternal(Key) == InputState::Pressed && s_InputInstance->m_prevKeyStates[static_cast<uint32_t>(Key)] == 0;
     }
 
-    bool InputSystem::IsKeyJustReleased(InputKey Key)   // Проверка, было ли только что отпускание клавиши.
+    bool InputSystem::IsKeyJustReleased(InputKey Key)   // Check if a key was just released.
     {
         if (!s_InputInstance) return false;
         if (!s_InputInstance->GetInputListen()) return false;
@@ -82,31 +82,31 @@ namespace Engine
     }
 
 
-    InputState InputSystem::GetKeyState(InputKey Key)   // Получение текущего состояния клавиши.
+    InputState InputSystem::GetKeyState(InputKey Key)   // Get current key state.
     {
         if (!s_InputInstance) return InputState::Unknown;
         if (!s_InputInstance->GetInputListen()) InputState::Unknown;
         return s_InputInstance->GetKeyStateInternal(Key);
     }
 
-    /*************** MOUSE (опрос мыши) */
+    /*************** MOUSE (mouse polling) */
 
-    bool InputSystem::IsMouseButtonPressed(InputKey Button) {return IsKeyPressed(Button);};             // Проверка, зажата ли кнопка мыши (использует тот же механизм, что и клавиши).
-    bool InputSystem::IsMouseButtonJustPressed(InputKey Button) {return IsKeyJustPressed(Button);};     // Проверка, была ли только что нажата кнопка мыши.
+    bool InputSystem::IsMouseButtonPressed(InputKey Button) {return IsKeyPressed(Button);};             // Check if a mouse button is held (uses same mechanism as keys).
+    bool InputSystem::IsMouseButtonJustPressed(InputKey Button) {return IsKeyJustPressed(Button);};     // Check if a mouse button was just pressed.
 
-    Vector2 InputSystem::GetMousePosition()   // Возвращает текущую позицию курсора.
+    Vector2 InputSystem::GetMousePosition()   // Returns current cursor position.
     {
         if (!s_InputInstance) return {0,0};
         return s_InputInstance->m_mousePosition;
     };
 
-    Vector2 InputSystem::GetMouseDelta()      // Возвращает изменение позиции курсора за последний кадр.
+    Vector2 InputSystem::GetMouseDelta()      // Returns cursor position change over the last frame.
     {
         if (!s_InputInstance) return {0,0};
         return s_InputInstance->m_mouseDelta;
     }
 
-    double InputSystem::GetMouseScrollDelta()   // Возвращает величину прокрутки колесика за последний кадр.
+    double InputSystem::GetMouseScrollDelta()   // Returns scroll wheel delta over the last frame.
     {
         if (!s_InputInstance) return 0,0;
         return s_InputInstance->m_scrollDelta;
@@ -124,7 +124,7 @@ namespace Engine
         return s_InputInstance->m_Invers_Y;
     }
 
-    /*************** CURSOR (управление курсором) */
+    /*************** CURSOR (cursor management) */
 
     bool InputSystem::GetCursorVisible()
     {
@@ -146,7 +146,7 @@ namespace Engine
         return 0;
     }
 
-    void InputSystem::SetCursorVisible(bool InVisible) // Установка видимости курсора.
+    void InputSystem::SetCursorVisible(bool InVisible) // Set cursor visibility.
     {
         if (s_InputInstance && s_InputInstance->GetInputListen())
         {
@@ -155,7 +155,7 @@ namespace Engine
         }
     }
 
-    void InputSystem::SetCursorMode(int mode)   // Установка режима курсора: 0 - нормальный, 1 - скрытый, 2 - захваченный (disabled).
+    void InputSystem::SetCursorMode(int mode)   // Set cursor mode: 0 - normal, 1 - hidden, 2 - disabled.
     {
         if (s_InputInstance && s_InputInstance->GetInputListen())
         {
@@ -164,14 +164,14 @@ namespace Engine
         }
     }
 
-    /*************** METODS (прочие методы) */
+    /*************** METODS (other methods) */
 
-    InputSystem& InputSystem::GetInstance() // Возвращает ссылку на единственный экземпляр.
+    InputSystem& InputSystem::GetInstance() // Returns reference to the single instance.
     {
         return *s_InputInstance;
     }
 
-    void InputSystem::SetKeyState(InputKey Key, InputState State)   // Устанавливает состояние конкретной клавиши (внутренний метод).
+    void InputSystem::SetKeyState(InputKey Key, InputState State)   // Sets the state of a specific key (internal method).
     {
         auto idx = static_cast<uint32_t>(Key);
         if (idx < static_cast<uint32_t>(InputKey::KeyCount))
@@ -180,7 +180,7 @@ namespace Engine
         }
     }
 
-    InputState InputSystem::GetKeyStateInternal(InputKey Key) const // Внутренний метод получения состояния клавиши.
+    InputState InputSystem::GetKeyStateInternal(InputKey Key) const // Internal method for getting key state.
     {
         auto idx = static_cast<uint32_t>(Key);
         if (idx >= static_cast<uint32_t>(InputKey::KeyCount))

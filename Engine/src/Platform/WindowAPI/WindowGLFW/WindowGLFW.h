@@ -56,6 +56,7 @@ namespace Engine
 
         static void FocusCallback(GLFWwindow* window, int focused);
         static void IconifyCallback(GLFWwindow* window, int iconified);
+        bool LoadIconFromFile(const char* InPathIcon);
 
     private:
         GLFWwindow* m_window = nullptr;                                                     // Указатель на объект окна GLFW

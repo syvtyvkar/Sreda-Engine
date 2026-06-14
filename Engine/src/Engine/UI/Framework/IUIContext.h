@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once    // Защита от множественного включения
+#pragma once    // Multiple inclusion guard
 
 #include <memory>
 #include <unordered_map>
@@ -21,10 +21,6 @@ namespace Engine::UI
 
         virtual void InitContext(Window* window) = 0;
 
-        // Загрузка документа
-        virtual bool LoadDocument(const std::string& path) = 0;
-        virtual void UnloadDocument() = 0;
-
         // UI Element Management
         void RegisterWidget(std::shared_ptr<UIElement> widget);
         void RemoveWidget(const std::shared_ptr<UIElement>& widget);
@@ -33,7 +29,7 @@ namespace Engine::UI
         void SetRootWidget(std::shared_ptr<UIElement> root);
         std::shared_ptr<UIElement> GetRootWidget() const { return m_rootWidget; }
         
-        // Видимость
+        // Visibility
         virtual void Show() = 0;
         virtual void Hide() = 0;
         virtual bool IsVisible() const = 0;
@@ -43,7 +39,7 @@ namespace Engine::UI
         virtual void BeginFrame()= 0;
 	    virtual void EndFrame()= 0;
 
-    private:
+    protected:
         void RenderUIElements(std::shared_ptr<UIElement> element);
 
         std::shared_ptr<UIElement> m_rootWidget;
@@ -53,20 +49,20 @@ namespace Engine::UI
 
     /**
      * @class WindowAPIFactory
-     * @brief Фабрика для создания экземпляра окна в зависимости от платформы/API.
+     * @brief Factory for creating a window instance depending on platform/API.
      *
-     * Скрывает детали конкретной реализации окна за единым интерфейсом Window.
+     * Hides the details of the specific window implementation behind a unified Window interface.
      */
     class UIContextFactory 
     {
     public:
     /**
-         * @brief Создаёт уникальный указатель на объект окна.
-         * @return TUniquePtr<Window> Указатель на созданное окно.
+         * @brief Creates a unique pointer to a window object.
+         * @return TUniquePtr<Window> Pointer to the created window.
          *
-         * В зависимости от макросов (например, ENGINE_WINDOW_GLFW) возвращает соответствующий
-         * наследник Window (например, WindowGLF3). Если ни одна платформа не определена,
-         * может вернуть nullptr.
+         * Depending on macros (e.g., ENGINE_WINDOW_GLFW) returns the corresponding
+         * Window descendant (e.g., WindowGLF3). If no platform is defined,
+         * may return nullptr.
          */
         static TUniquePtr<UIContext> create();
     };

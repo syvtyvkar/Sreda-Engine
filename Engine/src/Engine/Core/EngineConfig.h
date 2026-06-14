@@ -1,17 +1,17 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once                            // Защита от множественного включения заголовочного файла
+#pragma once                            // Multiple inclusion guard for header file
 #include <iostream>                     //
 
 //nlohmann-json
-#include <nlohmann/json.hpp>            // Библиотека для работы с JSON
+#include <nlohmann/json.hpp>            // JSON library
 #include <string>                       // 
 #include <unordered_map>                // 
 #include <functional>                   // 
 #include <mutex>                        // 
 
 #ifdef ENGINE_CONFIG_EMBEDDED
-#include "config_embed.h"               // Сгенерированный header
+#include "config_embed.h"               // Generated header
 #endif
 
 #include <algorithm>                    //
@@ -28,49 +28,49 @@ namespace EngineConfig
     const std::string ENINGE_CONFIG_FILE = "/Config/engine.json";
 
     /**
-     * Система конфигов
+     * Config system
      * 
-     * Обертка над библиотекой nlohmann для работы с конфигурацией. Настройки движка, игры и так далее.
+     * Wrapper over nlohmann library for working with configuration. Engine settings, game settings, etc.
      * 
-     * Написано так, чтобы работать с этим было максимально удобно. Система умеет хранить в сгенерированном 
-     * файле базовые настройки "из коробки", которые затем пользователь переопределяет в конфигурационных файлах.
+     * Designed for maximum convenience. The system can store default "out-of-the-box" settings 
+     * in a generated file, which the user can then override in config files.
      * 
-     * Это низкоуровневый класс. Предполагается, что с ним могут работать только высокоуровневые обертки и базовое 
-     * приложение (для первичной загрузки)
+     * This is a low-level class. It is expected that only high-level wrappers and the base 
+     * application (for initial loading) will work with it.
      */
     class ConfigSystem 
     {
     public:
-        static ConfigSystem& Get();                                                     // Синглтон
+        static ConfigSystem& Get();                                                     // Singleton
 
-        // Шаблонные функции
+        // Template functions
         template<typename T>
         T Get(const std::string& key, const T& defaultValue) const;
         
         template<typename T>
         void Set(const std::string& key, const T& value);
 
-        bool Init(std::string InTypeConfig);                                            // Инициализация, и первичная загрузка файлов.
-        bool DeInit();                                                                  // Вызывать при завершении програмы или перед повторной инициализацией. Чистит данные
+        bool Init(std::string InTypeConfig);                                            // Initialization and initial file loading.
+        bool DeInit();                                                                  // Call at program exit or before reinitialization. Clears data
 
-        void MarkOverridden(const std::string& key);                                    // Пометить ключ как измененный
+        void MarkOverridden(const std::string& key);                                    // Mark key as overridden
         bool SaveConfig(const std::string& InTypeConfig);
     private: 
-        ConfigSystem()= default;                                                        // Конструктор
-        ~ConfigSystem() = default;                                                      // Деструктор стандартный
-        ConfigSystem(const ConfigSystem&) = delete;                                     // Не может существовать одновременно две системы, поэтому запрещаем копирование
-        ConfigSystem& operator=(const ConfigSystem&) = delete;                          // Не может существовать одновременно две системы, поэтому запрещаем копирование
+        ConfigSystem()= default;                                                        // Constructor
+        ~ConfigSystem() = default;                                                      // Default destructor
+        ConfigSystem(const ConfigSystem&) = delete;                                     // Two systems cannot coexist, so copy is forbidden
+        ConfigSystem& operator=(const ConfigSystem&) = delete;                          // Two systems cannot coexist, so copy is forbidden
 
-        void MarkOverriddenKeys(const json& InConfig, const std::string& InPrefix);     // Пометить ключи файла как переопределенные
-        size_t CountKeys(const json& j, size_t depth = 0);                              // Сколько ключей?
-        const json* GetNestedValue(const std::string& path) const;                      // Получить указатель на значение
-        static std::vector<std::string> SplitPath(const std::string& path);             // Разбить путь "a/b/c" на части ["a", "b", "c"]
+        void MarkOverriddenKeys(const json& InConfig, const std::string& InPrefix);     // Mark file keys as overridden
+        size_t CountKeys(const json& j, size_t depth = 0);                              // How many keys?
+        const json* GetNestedValue(const std::string& path) const;                      // Get pointer to value
+        static std::vector<std::string> SplitPath(const std::string& path);             // Split path "a/b/c" into parts ["a", "b", "c"]
 
-        static ConfigSystem* s_instance;                                                // Синглтон
-        bool m_embeddedLoaded = false;                                                  // Были ли загружены сгенерированные файлы
-        json m_data;                                                                    // Текущий JSON-конфиг с данными
-        std::unordered_set<std::string> m_overriddenKeys;                               // Пользовательские ключи поверх дефолтных
-        mutable std::mutex m_mutex;                                                     // Для потокобезопасности
+        static ConfigSystem* s_instance;                                                // Singleton
+        bool m_embeddedLoaded = false;                                                  // Whether generated files have been loaded
+        json m_data;                                                                    // Current JSON config with data
+        std::unordered_set<std::string> m_overriddenKeys;                               // User keys overriding defaults
+        mutable std::mutex m_mutex;                                                     // For thread safety
     };
 
     template<typename T>
@@ -88,7 +88,7 @@ namespace EngineConfig
         } 
         catch (...) 
         {
-            // Если тип не совпадает — возвращаем дефолт
+            // If type doesn't match — return default
             return defaultValue;
         }
     }
@@ -98,14 +98,14 @@ namespace EngineConfig
     {
         json jsonValue;
     
-        // Конвертируем значение в json (с обработкой специальных типов)
+        // Convert value to json (with special type handling)
         try 
         {
             jsonValue = json(value);
         }   
         catch (...) 
         {
-            // Если конвертация не удалась, пробуем вручную для частых случаев
+            // If conversion fails, try manually for common cases
             if constexpr (std::is_same_v<T, glm::vec2>) 
             {
                 jsonValue = {value.x, value.y};
@@ -129,7 +129,7 @@ namespace EngineConfig
         {
             std::lock_guard<std::mutex> lock(m_mutex);
         
-            normalizedKey = key;  // Для подписчиков используем исходный ключ
+            normalizedKey = key;  // Use original key for subscribers
             //SetNestedValue(key, jsonValue);
 
             auto parts = SplitPath(key);
@@ -141,7 +141,7 @@ namespace EngineConfig
             {
                 const std::string& key = parts[i];
         
-                // Если ключ не существует или не объект — создаём объект
+                // If key doesn't exist or isn't an object — create an object
                 if (!current->is_object() || !current->contains(key)) 
                 {
                     (*current)[key] = json::object();
@@ -150,7 +150,7 @@ namespace EngineConfig
                 current = &current->at(key);
             }
     
-            // Устанавливаем финальное значение
+            // Set final value
             const std::string& lastKey = parts.back();
             (*current)[lastKey] = value;
 

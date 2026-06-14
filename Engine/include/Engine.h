@@ -6,6 +6,7 @@
 #include "Engine/Core/Utilities/Event.h"
 #include "Engine/UI/Framework/UIBuilder.h"
 #include "Engine/UI/Framework/UIElement.h"
+#include "Engine/UI/Framework/UIWidget.h"
 #include "Engine/Core/Utilities/Types.h"
 //#include "Engine/Core/EngineCoreMinimal.h"
 

@@ -1,14 +1,14 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once                            // Защита от множественного включения
+#pragma once                            // Multiple inclusion guard
 
-#include "BaseEngine.h"                 // Базовые зависимости движка
-#include <memory>                       // Для std::unique_ptr
-#include <string>                       // Для std::string
+#include "BaseEngine.h"                 // Base engine dependencies
+#include <memory>                       // For std::unique_ptr
+#include <string>                       // For std::string
 
 namespace Engine 
 {
-    // Определение типов делегатов для событий ввода, специфичных для InputListen.
+    // Delegate type definitions for input events specific to InputListen.
     ADD_DELEGATE_FOUR_PARAMS(DOnKeyPressedListen, InputKey, int, int,InputState)       // key, scancode, mods
     ADD_DELEGATE_TWO_PARAMS(DOnMouseMovedListen,float,float)            // x, y
     ADD_DELEGATE_TWO_PARAMS(DOnMouseScrolledListen,float,float)         // xOffset, yOffset
@@ -16,26 +16,26 @@ namespace Engine
 
     /**
      * @class InputListen
-     * @brief Абстрактный базовый класс для обработчиков ввода.
+     * @brief Abstract base class for input handlers.
      *
-     * Предоставляет интерфейс для создания объектов, которые могут подписываться
-     * на события ввода и обрабатывать их. Используется для отделения логики обработки
-     * ввода от конкретной платформы или API
+     * Provides an interface for creating objects that can subscribe
+     * to input events and process them. Used to decouple input processing
+     * logic from the specific platform or API.
      *
-     * Класс содержит виртуальные методы Init/DeInit и набор делегатов,
-     * через которые можно получать уведомления о событиях ввода.
+     * Contains virtual Init/DeInit methods and a set of delegates
+     * through which input event notifications can be received.
      */
     class IInputListen
     {
     public:
 
         //virtual IInputListen() = default;
-        virtual ~IInputListen() = default;                                                               // Виртуальный деструктор для корректного удаления наследников
+        virtual ~IInputListen() = default;                                                               // Virtual destructor for correct deletion of derived classes
 
-        virtual void Init(class Window* InWindow) = 0;                                              // Инициализация слушателя.
-        virtual void DeInit() = 0;                                                                      // Деинициализация слушателя, освобождение ресурсов.
+        virtual void Init(class Window* InWindow) = 0;                                              // Initialize listener.
+        virtual void DeInit() = 0;                                                                      // Deinitialize listener, free resources.
 
-        // Методы доступа к делегатам для подписки.
+        // Delegate access methods for subscription.
         DOnKeyPressedListen& OnKeyPressed() {return s_OnKeyPressedListen;}
         DOnMouseMovedListen& OnMouseMoved() {return s_OnMouseMovedListen;}
         DOnMouseScrolledListen& OnMouseScrolled() {return s_OnMouseScrolledListen;}
@@ -48,7 +48,7 @@ namespace Engine
 
     protected:
 
-        // Защищённые экземпляры делегатов, доступные наследникам.
+        // Protected delegate instances, accessible to derived classes.
         DOnKeyPressedListen s_OnKeyPressedListen;
         DOnMouseMovedListen s_OnMouseMovedListen;
         DOnMouseScrolledListen s_OnMouseScrolledListen;
@@ -57,17 +57,17 @@ namespace Engine
 
     /**
      * @class InputListenAPIFactory
-     * @brief Фабрика для создания экземпляров InputListen в зависимости от платформы.
+     * @brief Factory for creating InputListen instances depending on platform.
      *
-     * Позволяет инкапсулировать логику выбора конкретной реализации InputListen
-     * (например, InputGLF3 для GLFW) и скрыть её за единым интерфейсом.
+     * Encapsulates the logic for selecting a specific InputListen implementation
+     * (e.g., InputGLF3 for GLFW) and hides it behind a unified interface.
      */
     class InputListenAPIFactory 
     {
     public:
         /**
-         * @brief Создаёт уникальный указатель на объект InputListen.
-         * @return TUniquePtr<InputListen> Указатель на созданный экземпляр.
+         * @brief Creates a unique pointer to an InputListen object.
+         * @return TUniquePtr<InputListen> Pointer to the created instance.
          */
         static TUniquePtr<IInputListen> create();
     };

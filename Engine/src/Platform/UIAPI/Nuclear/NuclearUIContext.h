@@ -41,8 +41,6 @@ namespace Engine::UI
         virtual void InitContext(Engine::Window* window) override;
 
         // UIContext
-        virtual bool LoadDocument(const std::string& path) override;
-        virtual void UnloadDocument() override;
 
         virtual void Show() override;
         virtual void Hide() override;

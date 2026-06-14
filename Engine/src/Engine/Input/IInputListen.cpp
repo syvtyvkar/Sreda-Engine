@@ -1,28 +1,28 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#include "IInputListen.h"                                         // Заголовок с определением интерфейса InputListen и фабрики InputListenAPIFactory
-#include "Platform/WindowAPI/WindowGLFW/InputGLFW.h"              // Конкретная реализация InputListen для GLFW
+#include "IInputListen.h"                                         // Header with IInputListen interface definition and InputListenAPIFactory
+#include "Platform/WindowAPI/WindowGLFW/InputGLFW.h"              // Concrete InputListen implementation for GLFW
 
 namespace Engine 
 {
     /**
-     * @brief Создаёт экземпляр класса InputListen в зависимости от платформы/API.
+     * @brief Creates an InputListen class instance depending on platform/API.
      *
-     * Реализация фабричного метода. В зависимости от макросов платформы
-     * (например, ENGINE_WINDOW_GLFW) возвращает соответствующий объект, реализующий
-     * интерфейс InputListen.
+     * Factory method implementation. Depending on platform macros
+     * (e.g., ENGINE_WINDOW_GLFW), returns the appropriate object implementing
+     * the InputListen interface.
      *
-     * @return TUniquePtr<InputListen> Уникальный указатель на созданный объект.
-     *         Если ни одна платформа не определена, возвращает nullptr.
+     * @return TUniquePtr<InputListen> Unique pointer to the created object.
+     *         Returns nullptr if no platform is defined.
      */
     TUniquePtr<IInputListen> InputListenAPIFactory::create()
     {
         #ifdef ENGINE_WINDOW_GLFW
-        // Если используется GLFW, создаём слушатель ввода, специфичный для GLFW.
+        // If using GLFW, create GLFW-specific input listener.
         return std::make_unique<InputListenGLFWSystem>();
         #endif
-        // В случае отсутствия поддерживаемой платформы возвращаем пустой указатель.
-        // В будущем здесь можно добавить другие ветки (например, для Windows Raw Input).
+        // Return null pointer if no supported platform is found.
+        // Additional branches can be added here in the future (e.g., Windows Raw Input).
         return nullptr;
     }
 }

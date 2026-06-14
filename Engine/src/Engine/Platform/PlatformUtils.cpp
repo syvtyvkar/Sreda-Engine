@@ -1,10 +1,10 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#include "PlatformUtils.h"                          // Заголовок
-#include <filesystem>                               // Для std::filesystem (C++17) — используется в getCurrentWorkingDirectory
+#include "PlatformUtils.h"                          // Header
+#include <filesystem>                               // For std::filesystem (C++17) — used in getCurrentWorkingDirectory
 #include <iostream>
 
-// Платформозависимые заголовки
+// Platform-specific headers
 #ifdef _WIN32
     #include <windows.h>
 #elif defined(__linux__) || defined(__APPLE__)
@@ -15,41 +15,41 @@
 namespace Engine 
 {
     /**
-     * @brief Возвращает полный путь к исполняемому файлу текущего процесса.
+     * @brief Returns the full path to the executable file of the current process.
      * 
-     * Реализация зависит от операционной системы:
-     * - Windows: используется GetModuleFileNameA.
-     * - Linux: читается символьная ссылка /proc/self/exe.
-     * - macOS: используется _NSGetExecutablePath.
+     * Implementation depends on the operating system:
+     * - Windows: uses GetModuleFileNameA.
+     * - Linux: reads the symbolic link /proc/self/exe.
+     * - macOS: uses _NSGetExecutablePath.
      * 
-     * @return std::string Абсолютный путь к исполняемому файлу.
+     * @return std::string Absolute path to the executable.
      */
     std::string PlatformUtils::GetExecutablePath() 
     {
-        char path[4096];                                                    // Буфер для пути (достаточно большой для большинства систем)
+        char path[4096];                                                    // Buffer for the path (large enough for most systems)
 
         #ifdef _WIN32                                           
-            GetModuleFileNameA(NULL, path, sizeof(path));                   // Windows: GetModuleFileNameA(NULL, ...) возвращает путь к текущему модулю (exe). 
+            GetModuleFileNameA(NULL, path, sizeof(path));                   // Windows: GetModuleFileNameA(NULL, ...) returns path to the current module (exe). 
         #elif defined(__linux__)
-            ssize_t count = readlink("/proc/self/exe", path, sizeof(path)); // Linux: читаем символьную ссылку /proc/self/exe, которая указывает на исполняемый файл.
+            ssize_t count = readlink("/proc/self/exe", path, sizeof(path)); // Linux: read symbolic link /proc/self/exe, which points to the executable.
             if (count != -1) {
-                path[count] = '\0';                                         // Завершаем строку нулём
+                path[count] = '\0';                                         // Null-terminate the string
             }
         #elif defined(__APPLE__)
-            #include <mach-o/dyld.h>                                        // macOS: _NSGetExecutablePath помещает путь в буфер, размер передаётся по ссылке.
+            #include <mach-o/dyld.h>                                        // macOS: _NSGetExecutablePath places the path in the buffer, size passed by reference.
             uint32_t size = sizeof(path);
             _NSGetExecutablePath(path, &size);
         #endif
 
-        return std::string(path);                                           // Преобразуем C-строку в std::string
+        return std::string(path);                                           // Convert C-string to std::string
     }
 
     /**
-     * @brief Возвращает текущую рабочую директорию процесса.
+     * @brief Returns the current working directory of the process.
      * 
-     * Использует std::filesystem::current_path() (C++17), что кроссплатформенно.
+     * Uses std::filesystem::current_path() (C++17), which is cross-platform.
      * 
-     * @return std::string Абсолютный путь к текущей рабочей директории.
+     * @return std::string Absolute path to the current working directory.
      */
     std::string PlatformUtils::GetBinaryDirectory()
     {
@@ -57,7 +57,7 @@ namespace Engine
     }
 
     /**
-     * @brief Возвращает путь к проекту, с учетом нахождения исполняемого файла в /Bin
+     * @brief Returns the project path, considering the executable is located in /Bin
      */
     std::string PlatformUtils::GetProjectDirectory()
     {

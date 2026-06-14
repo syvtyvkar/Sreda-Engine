@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once    // Защита от множественного включения
+#pragma once    // Multiple inclusion guard
 
 namespace Engine::UI 
 {

@@ -1,8 +1,8 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once // Защита от множественного включения
+#pragma once // Multiple inclusion guard
 
-#include <cmath>        // Для математических функций (std::sqrt)
+#include <cmath>        // For math functions (std::sqrt)
 #include <cstring>
 #include <string>
 #include <memory>
@@ -17,7 +17,7 @@ namespace Engine
     using namespace std;
 
     /** 
-     * @brief Уникальный указатель
+     * @brief Unique pointer
     */
     template<typename T>
 	using TUniquePtr = std::unique_ptr<T>;
@@ -28,7 +28,7 @@ namespace Engine
 	}
 
     /** 
-     * @brief Ссылка
+     * @brief Reference
     */
 	template<typename T>
 	using TRef = std::shared_ptr<T>;
@@ -38,20 +38,20 @@ namespace Engine
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 
-    /*Трёхмерный вектор с компонентами x, y, z.
-    Содержит базовые арифметические операции и часто используемые статические векторы*/
+    /*3D vector with x, y, z components.
+    Contains basic arithmetic operations and commonly used static vectors*/
     struct Vector3 
     {
         float x, y, z;
 
-        // Конструкторы
+        // Constructors
         Vector3() : x(0), y(0), z(0) {}
         Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
         Vector3(float xyz) : x(xyz), y(xyz), z(xyz) {}
         Vector3(glm::vec3 glm) : x(glm.x), y(glm.y), z(glm.z) {}
         Vector3(const glm::vec4& v) : x(v.x), y(v.y), z(v.z) {}
 
-        // Арифметические операторы
+        // Arithmetic operators
         Vector3 operator+(const Vector3& other) const {return Vector3(x + other.x, y + other.y, z + other.z);}
         Vector3 operator-(const Vector3& other) const {return Vector3(x - other.x, y - other.y, z - other.z);}
         Vector3 operator*(float scalar) const {return Vector3(x * scalar, y * scalar, z * scalar);}
@@ -61,10 +61,10 @@ namespace Engine
         bool operator==(const Vector3& other) const { return x == other.x && y == other.y && z == other.z;}
         glm::vec3 GetGlmVec3() const {return glm::vec3(x,y,z);}
 
-        // Полезные методы
-        float length() const { return std::sqrt(x*x + y*y + z*z); }                                 // Евклидова длина вектора
-        Vector3 normalized() const {float len = length();return len > 0 ? *this / len : Vector3();} // Нормализованная копия (если длина не ноль)
-        // Статические методы для получения часто используемых векторов
+        // Utility methods
+        float length() const { return std::sqrt(x*x + y*y + z*z); }                                 // Euclidean length
+        Vector3 normalized() const {float len = length();return len > 0 ? *this / len : Vector3();} // Normalized copy (if length is non-zero)
+        // Static methods for commonly used vectors
         static Vector3 zero() { return Vector3(0, 0, 0); }
         static Vector3 one() { return Vector3(1, 1, 1); }
         static Vector3 up() { return Vector3(0, 1, 0); }
@@ -72,7 +72,7 @@ namespace Engine
         static Vector3 right() { return Vector3(1, 0, 0); }
     };
 
-    /*Двухмерный вектор с компонентами x, y*/
+    /*2D vector with x, y components*/
     struct Vector2 
     {
         float x, y;
@@ -88,7 +88,7 @@ namespace Engine
         Vector2 operator*(float scalar) const {return Vector2(x * scalar, y * scalar);}
     };
 
-    /*Четырёхмерный вектор (используется для представления цветов в формате RGBA или однородных координат)*/
+    /*4D vector (used for RGBA colors or homogeneous coordinates)*/
     struct Vector4 
     {
         float x, y, z, w;
@@ -100,12 +100,12 @@ namespace Engine
         glm::vec4 GetGlmVec4() const { return glm::vec4(x, y, z, w); }
     };
 
-    /*Матрица 4x4 с данными в виде плоского массива*/
+    /*4x4 matrix with data stored as a flat array*/
     struct Matrix4 
     {
         float data[16];
 
-        Matrix4() {for (int i = 0; i < 16; i++) {data[i] = (i % 5 == 0) ? 1.0f : 0.0f; }}   // Единичная: индексы 0,5,10,15 становятся 1
+        Matrix4() {for (int i = 0; i < 16; i++) {data[i] = (i % 5 == 0) ? 1.0f : 0.0f; }}   // Identity: indices 0,5,10,15 become 1
 
         Matrix4(const glm::mat4& m) 
         {
@@ -123,18 +123,18 @@ namespace Engine
         static Matrix4 identity() 
         {
             Matrix4 m;
-            // Единичная матрица (аналогично конструктору)
+            // Identity matrix (same as constructor)
             for (int i = 0; i < 16; i++) m.data[i] = (i % 5 == 0) ? 1.0f : 0.0f;
             return m;
         }
     };
 
-    /*Матрица 3x3*/
+    /*3x3 matrix*/
     struct Matrix3 
     {
         float data[9];
 
-        Matrix3() {for (int i = 0; i < 9; i++) data[i] = (i % 5 == 0) ? 1.0f : 0.0f;} // Инициализация единичной матрицей
+        Matrix3() {for (int i = 0; i < 9; i++) data[i] = (i % 5 == 0) ? 1.0f : 0.0f;} // Initialize with identity matrix
 
         Matrix3(const glm::mat3& m) 
         {
@@ -157,12 +157,12 @@ namespace Engine
         }
     };
 
-    /*Матрица 2x2*/
+    /*2x2 matrix*/
     struct Matrix2 
     {
         float data[4];
 
-        Matrix2() {for (int i = 0; i < 4; i++) data[i] = (i % 5 == 0) ? 1.0f : 0.0f;} // Инициализация единичной матрицей
+        Matrix2() {for (int i = 0; i < 4; i++) data[i] = (i % 5 == 0) ? 1.0f : 0.0f;} // Initialize with identity matrix
 
         Matrix2(const glm::mat2& m) 
         {
@@ -185,7 +185,7 @@ namespace Engine
         }
     };
 
-    /*Представляет цвет в формате RGBA (float от 0 до 255)*/
+    /*Represents a color in RGBA format (float 0 to 255)*/
     struct TColor
     {
         int r, g, b, a = 255;
@@ -193,7 +193,7 @@ namespace Engine
         TColor(float r = 1.f, float g = 1.f, float b = 1.f) : r((int)r), g ((int)g), b((int)b) {}
         TColor(int r = 1, int g = 1, int b = 1, int a = 1): r(r), g(g), b(b), a(a) {}
         TColor(int r = 1, int g = 1, int b = 1): r(r), g(g), b(b), a(255) {}
-        TColor(TColor& InNewColor): r(InNewColor.r), g(InNewColor.g), b(InNewColor.b), a(InNewColor.a) {}
+        TColor(const TColor& InNewColor): r(InNewColor.r), g(InNewColor.g), b(InNewColor.b), a(InNewColor.a) {}
         TColor(): r(255), g(255), b(255), a(255) {}
 
         glm::vec4 GetGlmVec4() const { return glm::vec4(r/255.f, g/255.f, b/255.f, a/255.f); }
@@ -231,25 +231,25 @@ namespace Engine
         }*/
     };
 
-    /*Хранит позицию, поворот (углы Эйлера в градусах) и масштаб.
-    Предоставляет простые методы для изменения и получения направлений*/
+    /*Stores position, rotation (Euler angles in degrees) and scale.
+    Provides simple methods for changing and getting directions*/
     struct Transform 
     {
         Vector3 position;
-        Vector3 rotation;  // Углы Эйлера в градусах (вокруг осей X, Y, Z)
+        Vector3 rotation;  // Euler angles in degrees (around X, Y, Z axes)
         Vector3 scale;
 
         Transform() : position(0, 0, 0), rotation(0, 0, 0), scale(1, 1, 1) {}
 
-        void translate(const Vector3& offset) {position += offset;}                                                         // Перемещение на заданное смещение
-        void rotate(const Vector3& angles) {rotation += angles;}                                                            // Поворот на заданные углы (суммируются с текущими)
-        void scaleBy(const Vector3& factor) {scale = Vector3(scale.x * factor.x, scale.y * factor.y, scale.z * factor.z);}  // Масштабирование покомпонентно
-        Vector3 forward() const {return Vector3(0, 0, 1);}                                                                  // Направление "вперёд" в локальных координатах (просто +Z)
-        Vector3 up() const {return Vector3(0, 1, 0);}                                                                       // Направление "вверх" (+Y)
-        Vector3 right() const {return Vector3(1, 0, 0);}                                                                    // Направление "вправо" (+X)
+        void translate(const Vector3& offset) {position += offset;}                                                         // Move by specified offset
+        void rotate(const Vector3& angles) {rotation += angles;}                                                            // Rotate by specified angles (added to current)
+        void scaleBy(const Vector3& factor) {scale = Vector3(scale.x * factor.x, scale.y * factor.y, scale.z * factor.z);}  // Component-wise scaling
+        Vector3 forward() const {return Vector3(0, 0, 1);}                                                                  // Forward direction in local coordinates (just +Z)
+        Vector3 up() const {return Vector3(0, 1, 0);}                                                                       // Up direction (+Y)
+        Vector3 right() const {return Vector3(1, 0, 0);}                                                                    // Right direction (+X)
     };
 
-    /*Описывает вершину для рендеринга: позиция, нормаль, текстурные координаты*/
+    /*Describes a vertex for rendering: position, normal, texture coordinates*/
     struct Vertex 
     {
         Vector3 position;
@@ -257,7 +257,7 @@ namespace Engine
         Vector2 texCoord;
     };
 
-    /*Описывает строки, альтернатива std::string*/
+    /*Describes strings, alternative to std::string*/
     struct TString 
     {
     public:

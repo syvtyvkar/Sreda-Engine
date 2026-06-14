@@ -11,7 +11,7 @@ namespace Engine::Time
     TimeSystem* TimeSystem::s_Instance = nullptr;
 
     // ========================================================================
-    // === ИНИЦИАЛИЗАЦИЯ ===
+    // === INITIALIZATION ===
     // ========================================================================
 
     void TimeSystem::Init() {
@@ -22,7 +22,7 @@ namespace Engine::Time
 
         s_Instance = new TimeSystem();
         
-        // Запоминаем время запуска
+        // Record startup time
         auto now = std::chrono::high_resolution_clock::now();
         s_Instance->m_StartTime = std::chrono::duration<double>(
             now.time_since_epoch()).count();
@@ -42,28 +42,28 @@ namespace Engine::Time
     }
 
     // ========================================================================
-    // === ОБНОВЛЕНИЕ ===
+    // === UPDATE ===
     // ========================================================================
 
     void TimeSystem::Update() {
         if (!s_Instance) return;
 
-        // Получаем текущее время
+        // Get current time
         auto now = std::chrono::high_resolution_clock::now();
         double currentTime = std::chrono::duration<double>(
             now.time_since_epoch()).count();
 
-        // Вычисляем delta time
+        // Calculate delta time
         s_Instance->m_DeltaTime = currentTime - s_Instance->m_LastTime;
         
-        // Ограничиваем delta time (защита от лагов)
-        // Если игра зависла на 1 секунду, не хотим чтобы персонаж телепортировался
+        // Clamp delta time (protection against lag spikes)
+        // If the game froze for 1 second, we don't want the character to teleport
         s_Instance->m_DeltaTime = std::min(s_Instance->m_DeltaTime, 0.25);
         
         s_Instance->m_LastTime = currentTime;
         s_Instance->m_CurrentTime = currentTime;
 
-        // Применяем time scale
+        // Apply time scale
         double scaledDeltaTime = s_Instance->m_DeltaTime * s_Instance->m_TimeScale;
 
         // === FPS Counter ===
@@ -76,7 +76,7 @@ namespace Engine::Time
             s_Instance->m_FrameCount = 0;
             s_Instance->m_FPSAccumulator = 0.0;
             
-            // Логируем FPS каждые 0.5 сек (можно отключить в релизе)
+            // Log FPS every 0.5 sec (can be disabled in release)
             //ENGINE_LOG_TRACE("FPS: {0}", s_Instance->m_FPS);
         }
 
@@ -85,7 +85,7 @@ namespace Engine::Time
     }
 
     // ========================================================================
-    // === ПУБЛИЧНЫЙ API ===
+    // === PUBLIC API ===
     // ========================================================================
 
     float TimeSystem::GetTime() {
@@ -129,7 +129,7 @@ namespace Engine::Time
 
     void TimeSystem::SetTimeScale(float scale) {
         if (s_Instance) {
-            s_Instance->m_TimeScale = std::max(0.0f, scale);  // Не меньше 0
+            s_Instance->m_TimeScale = std::max(0.0f, scale);  // Not less than 0
             ENGINE_LOG_INFO("Time scale set to: {0}", scale);
         }
     }

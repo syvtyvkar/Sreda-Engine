@@ -1,13 +1,13 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once // Директива препроцессора для защиты от множественного включения
+#pragma once // Preprocessor directive for multiple inclusion guard
 
 #include <string>
 #include <vector>
 
 namespace Engine
 {
-    // Уникальный базовый Instance для конкретного приложения. По сути, "сердце" приложения для пользовательских приложений
+    // Unique base instance for a specific application. Essentially, the "heart" of the application for user apps
     class ApplicationInstance
     {
     public:

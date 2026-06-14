@@ -1,33 +1,33 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once // Директива препроцессора для защиты от множественного включения
+#pragma once // Preprocessor directive for multiple inclusion guard
 
 #include <string>
-#include "Engine/Platform/IWindow.h"        // Интерфейс окна
-#include "Engine/Core/EngineInstance.h"     // Инстансы
+#include "Engine/Platform/IWindow.h"        // Window interface
+#include "Engine/Core/EngineInstance.h"     // Instances
 #include <vector>
 
 namespace Engine
 {
-    // Главный класс приложения (реализует паттерн Singleton)
+    // Main application class (implements Singleton pattern)
     class Application
     {
     public:
-        Application();                                          // Конструктор
-        ~Application();                                         // Деструктор
-        static Application* CreateNewApplication();             // Статический метод для создания единственного экземпляра приложения
-        void RunApp(std::string InNameApp);                     // Запуск основного цикла приложения, InNameApp - заголовок окна
-        static Application& Get();                              // Получение ссылки на единственный экземпляр (синглтон)
-        void ExitApp();                                         // Запрос на выход из приложения (закрытие окна)
+        Application();                                          // Constructor
+        ~Application();                                         // Destructor
+        static Application* CreateNewApplication();             // Static method to create a single application instance
+        void RunApp(std::string InNameApp);                     // Run the main application loop, InNameApp - window title
+        static Application& Get();                              // Get reference to the single instance (singleton)
+        void ExitApp();                                         // Request application exit (close window)
         void AddInstance(TUniquePtr<ApplicationInstance> InInstance);
         Window* GetWindow() const {return m_AppWindow.get();};
     private:
-        void CloseApp();                                        // Внутренний метод для освобождения ресурсов при закрытии
+        void CloseApp();                                        // Internal method to free resources on close
 
-        static Application* s_Instance;                         // Указатель на единственный экземпляр (синглтон)
-        bool m_running=true;                                    // Флаг работы приложения (управляет циклом)
+        static Application* s_Instance;                         // Pointer to the single instance (singleton)
+        bool m_running=true;                                    // Application running flag (controls the loop)
 
-        TUniquePtr<Window> m_AppWindow;                      // Окно приложения
-        TUniquePtr<ApplicationInstance> m_AppInstance;       // Инстанс приложения
+        TUniquePtr<Window> m_AppWindow;                      // Application window
+        TUniquePtr<ApplicationInstance> m_AppInstance;       // Application instance
     };
 }

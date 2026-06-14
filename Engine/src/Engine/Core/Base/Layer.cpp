@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#include "Layer.h"                            // Собственный заголовок класса Application
+#include "Layer.h"                            // Layer class header
 
 namespace Engine
 {

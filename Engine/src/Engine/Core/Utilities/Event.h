@@ -1,78 +1,78 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once // Защита от множественного включения заголовочного файла
+#pragma once // Multiple inclusion guard for header file
 
 #include <string>
-#include "Engine/Core/Log.h"                    // Подключение системы логирования
-#include <cstdint>                              // Для целочисленных типов фиксированной ширины
-#include <functional>                           // Для std::function
-#include <memory>                               // Для умных указателей
-#include <vector>                               // Для std::vector
-#include <unordered_map>                        // Для std::unordered_map
-#include <mutex>                                // Для std::mutex, std::lock_guard
-#include <atomic>                               // Для std::atomic
+#include "Engine/Core/Log.h"                    // Logging system include
+#include <cstdint>                              // For fixed-width integer types
+#include <functional>                           // For std::function
+#include <memory>                               // For smart pointers
+#include <vector>                               // For std::vector
+#include <unordered_map>                        // For std::unordered_map
+#include <mutex>                                // For std::mutex, std::lock_guard
+#include <atomic>                               // For std::atomic
 
 namespace Engine
 {
-    using DelegateHandle = uint64_t;                        // Тип для уникального идентификатора подписки
-    constexpr DelegateHandle InvalidDelegateHandle = 0;     // Константа, обозначающая недействительный идентификатор
+    using DelegateHandle = uint64_t;                        // Type for unique subscription ID
+    constexpr DelegateHandle InvalidDelegateHandle = 0;     // Constant representing an invalid handle
 
     /**
-     * Multicast делегат (шаблон проектирования "Наблюдатель").
-     * Позволяет подписываться на события и уведомлять всех подписчиков.
+     * Multicast delegate (Observer design pattern).
+     * Allows subscribing to events and notifying all subscribers.
      * 
-     * Args - типы параметров, передаваемых при вызове.
+     * Args - parameter types passed on invocation.
      * 
-     * Пример:
+     * Example:
      * 
-     * // Объявление
+     * // Declaration
      * Delegate<int, float> OnDamage;
      * 
-     * // Подписка
-     * OnDamage.Subscribe([](int damage, float multiplier) {YOU CODE;});
+     * // Subscription
+     * OnDamage.Subscribe([](int damage, float multiplier) {YOUR CODE;});
      * 
-     * // Вызов
+     * // Invocation
      * OnDamage.Broadcast(50, 2.0f);
      * 
-     * Реализация потокобезопасна (используется мьютекс).
-     * Поддерживается приоритетная подписка.
+     * Thread-safe implementation (uses mutex).
+     * Supports priority subscription.
      */
 
     template<typename... Args>
     class Delegate 
     {
     public:
-        using CallbackType = std::function<void(Args...)>;          // Тип функции-обработчика
+        using CallbackType = std::function<void(Args...)>;          // Handler function type
 
         Delegate() = default;
         ~Delegate() = default;
 
-        DelegateHandle Subscribe(CallbackType callback) // Добавляет обработчик без приоритета, возвращает уникальный идентификатор для отписки
+        DelegateHandle Subscribe(CallbackType callback) // Adds a handler without priority, returns unique handle for unsubscription
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
-            DelegateHandle handle = s_NextHandle.fetch_add(1);                          // Генерация нового уникального handle
+            DelegateHandle handle = s_NextHandle.fetch_add(1);                          // Generate new unique handle
             m_Callbacks[handle] = std::move(callback);
             return handle;
         }
 
-        DelegateHandle SubscribeWithPriority(CallbackType callback, int priority = 0) // Добавляет обработчик с указанным приоритетом (чем выше число, тем раньше будет вызван)
+        DelegateHandle SubscribeWithPriority(CallbackType callback, int priority = 0) // Adds a handler with specified priority (higher number = earlier execution)
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
             DelegateHandle handle = s_NextHandle.fetch_add(1);
             m_Callbacks[handle] = std::move(callback);
             m_Priorities[handle] = priority;
-            SortByPriority();                                                           // Пересортировка списка вызовов по приоритету
+            SortByPriority();                                                           // Re-sort call list by priority
             return handle;
         }
 
-        void Unsubscribe(DelegateHandle handle)                                         // Удаляет обработчик по его идентификатору
+        void Unsubscribe(DelegateHandle handle)                                         // Removes a handler by its handle
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
             m_Callbacks.erase(handle);
             m_Priorities.erase(handle);
         }
 
-        void Broadcast(Args... args)  // Оповещает всех подписчиков, передавая им аргументы args... Исключения в обработчиках игнорируются (перехватываются и подавляются)
+        void Broadcast(Args... args)  // Notifies all subscribers, passing them args... Exceptions in handlers are ignored (caught and suppressed)
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
             auto callbacksCopy = m_Callbacks;
@@ -81,42 +81,42 @@ namespace Engine
                     try {
                         callback(args...);
                     } catch (...) {
-                        // Игнорируем ошибки в коллбеках
+                        // Ignore errors in callbacks
                     }
                 }
             }
         }
 
-        void Clear()  // Удаляет всех подписчиков
+        void Clear()  // Removes all subscribers
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
             m_Callbacks.clear();
             m_Priorities.clear();
         }
 
-        size_t GetSubscriberCount() const // Возвращает количество текущих подписчиков
+        size_t GetSubscriberCount() const // Returns the number of current subscribers
         {
             std::lock_guard<std::mutex> lock(m_Mutex);
             return m_Callbacks.size();
         }
 
-        bool HasSubscribers() const {return GetSubscriberCount() > 0;} // Проверяет, есть ли хотя бы один подписчик
+        bool HasSubscribers() const {return GetSubscriberCount() > 0;} // Checks if there is at least one subscriber
 
-        // Операторы для удобства использования
-        void operator()(Args... args) { Broadcast(args...); }                               // Вызов как функции
-        DelegateHandle operator+=(CallbackType callback) { return Subscribe(callback); }    // Добавление подписчика через +=
-        void operator-=(DelegateHandle handle) { Unsubscribe(handle); }                     // Удаление через -=
+        // Operators for convenience
+        void operator()(Args... args) { Broadcast(args...); }                               // Call as function
+        DelegateHandle operator+=(CallbackType callback) { return Subscribe(callback); }    // Add subscriber via +=
+        void operator-=(DelegateHandle handle) { Unsubscribe(handle); }                     // Remove via -=
 
     private:
-        void SortByPriority() // Вспомогательный метод для сортировки m_Callbacks в соответствии с приоритетами
+        void SortByPriority() // Helper method to sort m_Callbacks according to priorities
         {
             std::vector<std::pair<DelegateHandle, int>> sortedHandles;
             for (const auto& [handle, priority] : m_Priorities) {
                 sortedHandles.emplace_back(handle, priority);
             }
-            std::sort(sortedHandles.begin(), sortedHandles.end(),[](const auto& a, const auto& b) { return a.second > b.second; }); // Сортировка по убыванию приоритета
+            std::sort(sortedHandles.begin(), sortedHandles.end(),[](const auto& a, const auto& b) { return a.second > b.second; }); // Sort by descending priority
             
-            decltype(m_Callbacks) sortedCallbacks;                  // Создаём новую упорядоченную карту обратных вызовов
+            decltype(m_Callbacks) sortedCallbacks;                  // Create a new ordered callback map
             for (const auto& [handle, priority] : sortedHandles) 
             {
                 if (m_Callbacks.find(handle) != m_Callbacks.end()) 
@@ -127,19 +127,19 @@ namespace Engine
             m_Callbacks = std::move(sortedCallbacks);
         }
 
-        std::unordered_map<DelegateHandle, CallbackType> m_Callbacks;   // Хранилище обработчиков по handle
-        std::unordered_map<DelegateHandle, int> m_Priorities;           // Приоритеты для каждого handle
-        mutable std::mutex m_Mutex;                                     // Мьютекс для потокобезопасности (https://ru.ruwiki.ru/wiki/Мьютекс)
-        static std::atomic<DelegateHandle> s_NextHandle;                // Генератор уникальных идентификаторов
+        std::unordered_map<DelegateHandle, CallbackType> m_Callbacks;   // Handler storage by handle
+        std::unordered_map<DelegateHandle, int> m_Priorities;           // Priorities for each handle
+        mutable std::mutex m_Mutex;                                     // Mutex for thread safety
+        static std::atomic<DelegateHandle> s_NextHandle;                // Unique handle generator
     };
 
-    template<typename... Args>  // Инициализация статического счётчика идентификаторов (начинаем с 1, так как 0 зарезервирован как Invalid)
+    template<typename... Args>  // Initialize static handle counter (start at 1, since 0 is reserved as Invalid)
     std::atomic<DelegateHandle> Delegate<Args...>::s_NextHandle{1};
 
 /*********************************************************/
-// Набор макросов для удобного объявления конкретных типов делегатов (синглтонов) с разным числом параметров.
+// Set of macros for convenient declaration of specific delegate types (singletons) with different parameter counts.
 
-    // Делегат без параметров (синглтон)
+    // Delegate with no parameters (singleton)
     #define ADD_DELEGATE(DelegateName) \                        
         class DelegateName : public Engine::Delegate<> { \
         public: \
@@ -150,7 +150,7 @@ namespace Engine
             using Super = Engine::Delegate<>; \
         };
 
-    // Делегат с одним параметром (синглтон)
+    // Delegate with one parameter (singleton)
     #define ADD_DELEGATE_ONE_PARAM(DelegateName, ParamType1) \
         class DelegateName : public Engine::Delegate<ParamType1> { \
         public: \
@@ -162,7 +162,7 @@ namespace Engine
             using Param1 = ParamType1; \
         };
 
-    // Делегат с двумя параметрами (синглтон)
+    // Delegate with two parameters (singleton)
     #define ADD_DELEGATE_TWO_PARAMS(DelegateName, ParamType1, ParamType2) \
         class DelegateName : public Engine::Delegate<ParamType1, ParamType2> { \
         public: \
@@ -175,7 +175,7 @@ namespace Engine
             using Param2 = ParamType2; \
         };
 
-    // Делегат с тремя параметрами (синглтон)
+    // Delegate with three parameters (singleton)
     #define ADD_DELEGATE_THREE_PARAMS(DelegateName, ParamType1, ParamType2, ParamType3) \
         class DelegateName : public Engine::Delegate<ParamType1, ParamType2, ParamType3> { \
         public: \
@@ -189,7 +189,7 @@ namespace Engine
             using Param3 = ParamType3; \
         };
 
-    // Делегат с четырьмя параметрами (синглтон)
+    // Delegate with four parameters (singleton)
     #define ADD_DELEGATE_FOUR_PARAMS(DelegateName, ParamType1, ParamType2, ParamType3, ParamType4) \
         class DelegateName : public Engine::Delegate<ParamType1, ParamType2, ParamType3, ParamType4> { \
         public: \
@@ -206,24 +206,24 @@ namespace Engine
 
 /****************************************************************/
 
-    // Макросы для привязки методов класса к делегату (используют std::bind)
+    // Macros for binding class methods to delegates (use std::bind)
     #define BIND_DELEGATE_METHOD(DelegateClass, Method) \
         std::bind(&std::decay_t<decltype(*this)>::Method, this, \
                   std::placeholders::_1, std::placeholders::_2, \
                   std::placeholders::_3, std::placeholders::_4)
 
-    // Макрос для создания лямбда-выражения с захватом (просто передаёт список захвата)
+    // Macro for creating lambda expressions with captures (simply passes the capture list)
     #define BIND_DELEGATE_LAMBDA(...) \
         [__VA_ARGS__]
 
-    // Макрос для объявления события (не синглтон, просто псевдоним делегата)
+    // Macro for declaring events (not singleton, just delegate alias)
     #define ADD_EVENT(ClassType, EventName, ...) \
         class EventName : public Engine::Delegate<__VA_ARGS__> { \
         public: \
             using Super = Engine::Delegate<__VA_ARGS__>; \
         };
 
-    // Макросы для объявления multicast делегатов (синонимы ADD_DELEGATE_*, но с другим именем макроса)
+    // Macros for declaring multicast delegates (synonyms for ADD_DELEGATE_*, but with different macro name)
     #define ADD_MULTICAST_DELEGATE(DelegateName) \
         class DelegateName : public Engine::Delegate<> { \
         public: \

@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once // Защита от множественного включения заголовочного файла
+#pragma once // Multiple inclusion guard for header file
 
 #include "Types.h"
 
@@ -10,7 +10,7 @@
 namespace Engine
 {
     /*
-     Преобразования матриц
+     Matrix transformations
     */
 
     inline Matrix4 Translate(const Matrix4& matrix, const Vector3& translation)
@@ -38,7 +38,7 @@ namespace Engine
     }
 
     /*
-     Проекционные матрицы
+     Projection matrices
     */
 
     inline Matrix4 Perspective(float fovDegrees, float aspect, float nearPlane, float farPlane)
@@ -63,12 +63,12 @@ namespace Engine
     }
 
     /*
-     Вспомогательные функции для работы с матрицами
+     Helper functions for matrix operations
     */
 
     inline Matrix4 Identity()
     {
-        return Matrix4::identity();  // уже есть в Types.h
+        return Matrix4::identity();  // already in Types.h
     }
 
     inline Matrix4 Multiply(const Matrix4& a, const Matrix4& b)
@@ -96,7 +96,7 @@ namespace Engine
     }
 
     /*
-    Операции над векторами
+    Vector operations
     */
 
     inline float Dot(const Vector3& a, const Vector3& b)
@@ -122,7 +122,7 @@ namespace Engine
     }
 
     /* 
-    Преобразования типов 
+    Type conversions 
     */
 
     inline glm::vec3 ToGlm(const Vector3& v) { return v.GetGlmVec3(); }

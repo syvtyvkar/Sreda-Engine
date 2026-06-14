@@ -15,6 +15,11 @@
 
 #include "Platform/RenderAPI/OpenGL/OpenGLContext.h"   
 
+//#define STB_IMAGE_IMPLEMENTATION
+//#include <stb_image.h>
+//#include <GLFW/glfw3.h>
+
+
 namespace Engine
 {
     WindowGLFW::WindowGLFW() = default;         // Конструктор по умолчанию
@@ -82,6 +87,9 @@ namespace Engine
         ENGINE_LOG_INFO("Window ( {} ) has been created successfully", config.title);
         ///////////////////////////////////////////
 
+        std::string IconPath = FileIO::GetDirectoryFile("/Resources/Textures/SredaLogo.png");
+        LoadIconFromFile(IconPath.c_str());
+
 
         m_context = Engine::Render::GraphicsContext::Create(m_window);     // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
 		m_context->Init();                                                 // Инициализация
@@ -89,8 +97,8 @@ namespace Engine
         //m_currentScene = std::make_unique<Scene>("MainScene");              // Создаём главную сцену с именем "MainScene" и сохраняем её в unique_ptr
         //m_currentScene->SetParentRender(m_render.get());                                            // Устанавливаем для сцены указатель на рендерер (чтобы сцена могла отрисовывать объекты)
 
-        //m_uiSystem = std::make_unique<UISystem>();
-        //m_uiSystem.get()->Initialize(this);
+       // m_uiSystem = std::make_unique<UISystem>();                         // Создаем систему обработки UI
+       // m_uiSystem.get()->Initialize(this);                                // Инициализируем
 
         // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
         glfwSetWindowUserPointer(m_window, this);
@@ -145,6 +153,11 @@ namespace Engine
         ss >> ret;
         UpdateWindowName(ret);
 
+        if (m_uiSystem.get())
+        {
+            m_uiSystem->Update();
+        }
+
         //m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
     }
 
@@ -159,10 +172,11 @@ namespace Engine
             glfwDestroyWindow(m_window);            // Уничтожаем окно GLFW
             m_window = nullptr;
         }
-        /*if (m_uiSystem)
+        if (m_uiSystem)
         {
             m_uiSystem.get()->Shutdown();
-        }*/
+        }
+        m_uiSystem.reset();
         glfwTerminate();                            // Завершаем GLFW (вызывается даже если окно уже было уничтожено)
     }
 
@@ -295,6 +309,23 @@ namespace Engine
             win->m_WindowIsMinimized = (iconified == GLFW_TRUE);
             win->OnMinimizedChange().Broadcast(win->m_WindowIsMinimized);
         }
+    }
+
+    bool WindowGLFW::LoadIconFromFile(const char* InPathIcon)
+    {
+        /*
+        GLFWimage images[1];
+        int width, height, channels;
+
+        unsigned char* data = stbi_load(iconPath, &width, &height, &channels, 4);
+        ENGINE_ASSERT(data, "Failed to load the icon at path!");
+        images[0].width = width;
+        images[0].height = height;
+        images[0].pixels = data;
+
+        glfwSetWindowIcon(m_window, 1, images);
+        stbi_image_free(data); */
+        return true;
     }
 }
 //#endif

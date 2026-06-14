@@ -1,6 +1,7 @@
 // (c) Nikita Rogalev. All rights reserved.
 
 #include "UISystem.h"
+#include "UIBuilder.h"
 
 namespace Engine::UI 
 {
@@ -15,6 +16,7 @@ namespace Engine::UI
         {
             return false;
         }
+        GetContext()->SetRootWidget(UIBuilder::CreateWidget());
         return true;
     }
 
@@ -58,6 +60,7 @@ namespace Engine::UI
     UIContext *UISystem::CreateContext(Window *window)
     {
         m_context = UIContextFactory::create();
+        ENGINE_ASSERT(m_context, "No UI context! The UI System cannot be initialized!");
         m_context.get()->InitContext(window);
         return m_context.get();
     }

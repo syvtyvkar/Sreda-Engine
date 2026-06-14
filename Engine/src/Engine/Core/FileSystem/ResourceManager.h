@@ -1,40 +1,40 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once    // Защита от множественного включения
+#pragma once    // Multiple inclusion guard
 
 #include <string>               
-#include <filesystem>           // Для работы с путями файловой системы (C++17)
-#include <unordered_map>        // (пока не используется, возможно для будущего кэширования)
-#include <memory>               // (пока не используется)
+#include <filesystem>           // For filesystem path operations (C++17)
+#include <unordered_map>        // (not used yet, possibly for future caching)
+#include <memory>               // (not used yet)
 
 /**
- *  Класс ResourceManager управляет путями к ресурсам приложения (шейдеры, текстуры, модели и т.д.).
- *  Любое взаимодействие с внешними ресурсами должно протекать через этот класс,
- *  либо через связанные с ним оболочки.
+ *  ResourceManager manages paths to application resources (shaders, textures, models, etc.).
+ *  Any interaction with external resources should go through this class
+ *  or through related wrappers.
  *  
- *  Реализован как синглтон (гарантирует единственный экземпляр).
+ *  Implemented as a singleton (guarantees a single instance).
  */
 
 namespace Engine 
 {
 
-    namespace fs = std::filesystem;         // Для удобства использования
+    namespace fs = std::filesystem;         // For convenience
     class ResourceManager 
     {
     public:
-        static ResourceManager& getInstance();                                  // Получить единственный экземпляр менеджера (синглтон)
-        void setBasePath(const std::string& path) {m_basePath = path;};         // Установить базовый путь к ресурсам вручную (если нужно переопределить)
-        static std::string getResourcePath(const std::string& relativePath);     // Получить полный путь к ресурсу, объединяя базовый путь с относительным
-        static std::string getBasePath();                                        // Получить текущий базовый путь
+        static ResourceManager& getInstance();                                  // Get the single manager instance (singleton)
+        void setBasePath(const std::string& path) {m_basePath = path;};         // Set base resource path manually (if override needed)
+        static std::string getResourcePath(const std::string& relativePath);     // Get full resource path by combining base path with relative path
+        static std::string getBasePath();                                        // Get current base path
 
-        void init(const std::string& executablePath);                           // Инициализация менеджера (вызывается один раз при старте приложения).
+        void init(const std::string& executablePath);                           // Initialize manager (called once at application startup).
     private:
-        ResourceManager() = default;                                            // Приватный конструктор (синглтон)
-        ~ResourceManager() = default;                                           // Приватный деструктор (синглтон)
-        ResourceManager(const ResourceManager&) = delete;                       // Запрет копирования
+        ResourceManager() = default;                                            // Private constructor (singleton)
+        ~ResourceManager() = default;                                           // Private destructor (singleton)
+        ResourceManager(const ResourceManager&) = delete;                       // Copy forbidden
         ResourceManager& operator=(const ResourceManager&) = delete;
-        std::string m_basePath;                                                 // Хранит базовый путь, относительно которого ищутся ресурсы
-        std::string determineBasePath(const std::string& executablePath);       // Вспомогательный метод для автоматического определения базового пути на основе местоположения исполняемого файла.
+        std::string m_basePath;                                                 // Stores base path relative to which resources are searched
+        std::string determineBasePath(const std::string& executablePath);       // Helper method to automatically determine base path based on executable location.
     };
 
 }

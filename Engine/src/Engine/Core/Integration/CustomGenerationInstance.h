@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Core/Utilities/Types.h"    // Типы
-#include "Engine/Core/Application.h"    // Типы
+#include "Engine/Core/Utilities/Types.h"    // Types
+#include "Engine/Core/Application.h"    // Types
 
-extern Engine::TUniquePtr<Engine::ApplicationInstance> GenerateApplicationInstance(); // Для подключения кода проектов
+extern Engine::TUniquePtr<Engine::ApplicationInstance> GenerateApplicationInstance(); // For connecting project code

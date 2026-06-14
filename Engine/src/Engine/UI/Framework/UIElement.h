@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once    // Защита от множественного включения
+#pragma once
 
 #include "Engine/Core/Utilities/Types.h"
 #include "Engine/UI/Framework/UITypes.h"
@@ -11,28 +11,94 @@ namespace Engine::UI
 {
     using namespace Engine;
 
+    struct UIMargins
+    {
+        float left = 0.0f;
+        float top = 0.0f;
+        float right = 0.0f;
+        float bottom = 0.0f;
+    };
 
-    class UIElement 
+    struct UIPadding
+    {
+        float left = 0.0f;
+        float top = 0.0f;
+        float right = 0.0f;
+        float bottom = 0.0f;
+    };
+
+    enum class UIHorizontalAlignment
+    {
+        Left,
+        Center,
+        Right,
+        Stretch
+    };
+
+    enum class UIVerticalAlignment
+    {
+        Top,
+        Center,
+        Bottom,
+        Stretch
+    };
+
+    class UIElement : public std::enable_shared_from_this<UIElement>
     {
     public:
         virtual ~UIElement() = default;
         
         virtual void OnRender();
         virtual void OnUpdate(float deltaTime);
-        virtual void SetPosition(const Vector2& position) {m_position=position;}
-        virtual void SetSize(const Vector2& size) {m_size=size;}
-        
-        // Parent-child relationship management
+
+        virtual void SetPosition(const Vector2& position) { m_position = position; }
+        virtual Vector2 GetPosition() const { return m_position; }
+
+        virtual void SetSize(const Vector2& size) { m_size = size; }
+        virtual Vector2 GetSize() const { return m_size; }
+
+        Vector2 GetComputedPosition() const;
+        Vector2 GetComputedSize() const;
+
+        void SetMargins(const UIMargins& margins) { m_margins = margins; }
+        UIMargins GetMargins() const { return m_margins; }
+
+        void SetPadding(const UIPadding& padding) { m_padding = padding; }
+        UIPadding GetPadding() const { return m_padding; }
+
+        void SetHorizontalAlignment(UIHorizontalAlignment align) { m_hAlignment = align; }
+        UIHorizontalAlignment GetHorizontalAlignment() const { return m_hAlignment; }
+
+        void SetVerticalAlignment(UIVerticalAlignment align) { m_vAlignment = align; }
+        UIVerticalAlignment GetVerticalAlignment() const { return m_vAlignment; }
+
+        void SetMinSize(const Vector2& minSize) { m_minSize = minSize; }
+        Vector2 GetMinSize() const { return m_minSize; }
+
+        void SetMaxSize(const Vector2& maxSize) { m_maxSize = maxSize; }
+        Vector2 GetMaxSize() const { return m_maxSize; }
+
         void AddChild(std::shared_ptr<UIElement> child);
         void RemoveChild(const std::shared_ptr<UIElement>& child);
-        
-        bool IsVisible() const {return m_visible;}
-        void SetVisible(bool InNewVis) {m_visible=InNewVis;}
+        const std::vector<std::shared_ptr<UIElement>>& GetChildren() const { return m_children; }
+
+        bool IsVisible() const { return m_visible; }
+        void SetVisible(bool visible) { m_visible = visible; }
+
+        std::shared_ptr<UIElement> GetParent() const { return m_parent.lock(); }
+
     protected:
         std::vector<std::shared_ptr<UIElement>> m_children;
         std::weak_ptr<UIElement> m_parent;
         bool m_visible = true;
-        Vector2 m_position = {0, 0};
-        Vector2 m_size = {100, 30};
+        Vector2 m_position = { 0.0f, 0.0f };
+        Vector2 m_size = { 100.0f, 30.0f };
+        Vector2 m_minSize = { 0.0f, 0.0f };
+        Vector2 m_maxSize = { FLT_MAX, FLT_MAX };
+
+        UIMargins m_margins;
+        UIPadding m_padding;
+        UIHorizontalAlignment m_hAlignment = UIHorizontalAlignment::Left;
+        UIVerticalAlignment m_vAlignment = UIVerticalAlignment::Top;
     };
 }

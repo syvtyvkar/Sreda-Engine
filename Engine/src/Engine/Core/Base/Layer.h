@@ -1,13 +1,13 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once // Директива препроцессора для защиты от множественного включения
+#pragma once // Preprocessor directive for multiple inclusion guard
 
 #include <string>
 #include <vector>
 
 namespace Engine
 {
-    // Слой движка
+    // Engine layer
     class Layer
     {
     public:

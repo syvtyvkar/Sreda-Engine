@@ -1,13 +1,13 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once    // Защита от множественного включения
+#pragma once    // Multiple inclusion guard
 
-#include <spdlog/spdlog.h>                      // Основной заголовок spdlog
-#include <spdlog/sinks/stdout_color_sinks.h>    // Для цветного вывода в консоль
-#include <spdlog/sinks/basic_file_sink.h>       // Для записи в файл
-#include <memory>                               // Для std::shared_ptr
-#include <iostream>                             // Для std::cerr
-#include <cstdlib>                              // Для std::abort
+#include <spdlog/spdlog.h>                      // spdlog main header
+#include <spdlog/sinks/stdout_color_sinks.h>    // For colored console output
+#include <spdlog/sinks/basic_file_sink.h>       // For file output
+#include <memory>                               // For std::shared_ptr
+#include <iostream>                             // For std::cerr
+#include <cstdlib>                              // For std::abort
 
 #include <string>
 #include <stdexcept>
@@ -32,25 +32,25 @@ namespace Engine::Log
         Input
     };
 
-    /*  Класс Log отвечает за инициализацию и предоставление глобального логгера spdlog.
-        Реализован как статический класс (все методы статические).*/
+    /*  Log class handles initialization and provides a global spdlog logger.
+        Implemented as a static class (all methods are static).*/
     class LogSystem 
     {
     public:
-        static void Init();                                         // Инициализация логгера (вызывать один раз при старте приложения)
+        static void Init();                                         // Initialize logger (call once at app startup)
 
         static void ShowMessageBox(uint8_t Type, const char* Tittle, const char* Message);
 
-        static std::shared_ptr<spdlog::logger>& GetClientLogger()   // Получить логгер для клиента (игры)
+        static std::shared_ptr<spdlog::logger>& GetClientLogger()   // Get logger for client (game)
         { 
-            return s_MainLogger;                                    // Возвращает ссылку на shared_ptr, чтобы можно было использовать напрямую
+            return s_MainLogger;                                    // Returns reference to shared_ptr for direct use
         }
 
-        static void SetLevel(spdlog::level::level_enum level);      // Установить уровень логирования (trace, debug, info, warn, error, critical)
+        static void SetLevel(spdlog::level::level_enum level);      // Set logging level (trace, debug, info, warn, error, critical)
 
     private:
-        /*  Статический указатель на основной логгер (инициализируется в Init)
-            Используется для всех сообщений от игрового кода*/
+        /*  Static pointer to the main logger (initialized in Init)
+            Used for all messages from game code*/
         static std::shared_ptr<spdlog::logger> s_MainLogger;
     };
 }
@@ -62,12 +62,12 @@ namespace Engine
 } // namespace Engine
 
 // ============================================================================
-// УДОБНЫЕ МАКРОСЫ ДЛЯ ИСПОЛЬЗОВАНИЯ
+// CONVENIENT MACROS FOR USE
 // ============================================================================
 
-// Макросы для быстрого логирования с разными уровнями.
-// Они вызывают GetClientLogger() и соответствующий метод spdlog.
-// Использование: ENGINE_LOG_INFO("Player health: {}", health);
+// Macros for quick logging with different levels.
+// They call GetClientLogger() and the corresponding spdlog method.
+// Usage: ENGINE_LOG_INFO("Player health: {}", health);
 #define ENGINE_LOG_TRACE(...)         ::Engine::Log::LogSystem::GetClientLogger()->trace(__VA_ARGS__)
 #define ENGINE_LOG_INFO(...)          ::Engine::Log::LogSystem::GetClientLogger()->info(__VA_ARGS__)
 #define ENGINE_LOG_WARN(...)          ::Engine::Log::LogSystem::GetClientLogger()->warn(__VA_ARGS__)
@@ -76,13 +76,13 @@ namespace Engine
 
 
 // ============================================================================
-// АССЕРТЫ (проверки условий)
+// ASSERTIONS (condition checks)
 // ============================================================================
 
 #ifdef _DEBUG
     // "CRASH PROGRAMM:\n"
-    // Позволяет вызвать краш с выводом окна ошибки. В отличии от ассертов, сам факт вызова этого макроса означает, 
-    // что мы принудительно хотим завершить программу с выводом визуального отображения ошибки
+    // Allows triggering a crash with an error window. Unlike assertions, calling this macro means
+    // we forcibly want to terminate the program with a visual error display
     #define ENGINE_CRASH(message) \
         ENGINE_LOG_CRITICAL(std::string(message "\n\n" "The source of the error:\n" "File: ") + __FILE__ + "\n" "Line: " + std::to_string(__LINE__) + "\n""Function: " + __func__ + "\n\n""Please send this to the developer."); \
         throw std::runtime_error(std::string(message "\n\n" "The source of the error:\n" "File: ") + __FILE__ + "\n" "Line: " + std::to_string(__LINE__) + "\n""Function: " + __func__ + "\n\n""Please send this to the developer.") \
@@ -92,8 +92,8 @@ namespace Engine
 #endif 
 
 #ifdef _DEBUG
-    // В отладочной сборке ассерт проверяет условие, и если оно ложно,
-    // выводит развёрнутую информацию об ошибке (в лог и в cerr) и аварийно завершает программу.
+    // In debug builds, assert checks the condition, and if it's false,
+    // outputs detailed error information (to log and cerr) and terminates the program abnormally.
     #define ENGINE_ASSERT(condition, message) \
         do { \
             if (!(condition)) { \
@@ -111,12 +111,12 @@ namespace Engine
             } \
         } while(false)
 #else
-     // В релизной сборке ассерты превращаются в пустую операцию (удаляются компилятором)
+     // In release builds, assertions become no-ops (removed by compiler)
     #define ENGINE_ASSERT(condition, message) do {} while(false)
 #endif
 
-// Упрощённый вариант ассерта для внутренних нужд движка (без детального вывода)
-// Всегда активен (даже в релизе), но лучше использовать с умом.
+// Simplified assert for internal engine use (without detailed output)
+// Always active (even in release), but use wisely.
 #define ENGINE_CORE_ASSERT(condition, message) \
     do { \
         if (!(condition)) { \

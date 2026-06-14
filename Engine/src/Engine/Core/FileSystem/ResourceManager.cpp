@@ -4,30 +4,30 @@
 #include <iostream>
 #include "Engine/Core/Log.h"
 
-#ifdef _WIN32                                   // Платформозависимые заголовки для получения информации о путях
-    #include <windows.h>                        // Для Windows API (может понадобиться для работы с путями)
+#ifdef _WIN32                                   // Platform-specific headers for path information
+    #include <windows.h>                        // For Windows API (may be needed for path operations)
 #elif defined(__linux__) || defined(__APPLE__)
-    #include <unistd.h>                         // Для POSIX (readlink и т.д.)
-    #include <limits.h>                         // Для PATH_MAX
+    #include <unistd.h>                         // For POSIX (readlink, etc.)
+    #include <limits.h>                         // For PATH_MAX
 #endif
 
 #include <fstream>
 
 namespace Engine {
 
-    ResourceManager& ResourceManager::getInstance()     // Реализация синглтона: статический локальный объект создаётся при первом вызове
+    ResourceManager& ResourceManager::getInstance()     // Singleton implementation: static local object created on first call
     {
         static ResourceManager instance;
         return instance;
     }
 
-    void ResourceManager::init(const std::string& executablePath)   // Инициализация менеджера ресурсов: сохраняет базовый путь, определённый на основе пути к исполняемому файлу
+    void ResourceManager::init(const std::string& executablePath)   // Initialize resource manager: saves base path determined from executable path
     {
         m_basePath = determineBasePath(executablePath);
         ENGINE_LOG_INFO("Resource Manager initialized. Base path: ");
     }
 
-    std::string ResourceManager::getResourcePath(const std::string& relativePath) // Возвращает полный путь к ресурсу, добавляя относительный путь к базовому каталогу
+    std::string ResourceManager::getResourcePath(const std::string& relativePath) // Returns full resource path by appending relative path to base directory
     {
         auto& lInst = ResourceManager::getInstance();
         return (fs::path(lInst.m_basePath) / relativePath).string();
@@ -39,25 +39,25 @@ namespace Engine {
         return lInst.m_basePath;
     }
 
-    /*Определяет базовый каталог для ресурсов, анализируя путь к исполняемому файлу
-        Ищет папку "Resources" рядом с исполняемым файлом или на уровень выше (для отладочных сборок)*/
+    /*Determines the base resource directory by analyzing the executable path
+        Looks for a "Resources" folder next to the executable or one level up (for debug builds)*/
     std::string ResourceManager::determineBasePath(const std::string& executablePath) 
     {
         auto& lInst = ResourceManager::getInstance();
-        fs::path exePath(executablePath);           // Преобразуем путь к исполняемому файлу в объект filesystem::path
-        fs::path baseDir = exePath.parent_path();   // Директория, где лежит exe
+        fs::path exePath(executablePath);           // Convert executable path to filesystem::path object
+        fs::path baseDir = exePath.parent_path();   // Directory where the exe is located
 
-        if (fs::exists(baseDir / "Resources/")) // Проверяем, существует ли поддиректория "Resources" в той же папке
+        if (fs::exists(baseDir / "Resources/")) // Check if "Resources" subdirectory exists in the same folder
         {   
-            return baseDir.string();            // Если да, то базовый путь — текущая директория
+            return baseDir.string();            // If yes, base path is the current directory
         }
 
-        fs::path parentDir = baseDir.parent_path(); // Если нет, пробуем подняться на один уровень вверх (например, из папки Debug/Release)
+        fs::path parentDir = baseDir.parent_path(); // If not, try going one level up (e.g., from Debug/Release folder)
         if (fs::exists(parentDir / "Resources/")) 
         {
-            return parentDir.string();              // Базовый путь — родительская директория
+            return parentDir.string();              // Base path is the parent directory
         }
 
-        return baseDir.string();                    // Если ничего не найдено, возвращаем директорию исполняемого файла как запасной вариант
+        return baseDir.string();                    // If nothing found, return executable directory as fallback
     }
 }

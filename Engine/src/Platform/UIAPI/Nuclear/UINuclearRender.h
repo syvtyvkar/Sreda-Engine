@@ -3,7 +3,7 @@
 #pragma once    // Защита от множественного включения
 
 #include "Engine/UI/Framework/UIRender.h"
-#include "Engine/UI/Nuclear/NuclearUIContext.h"
+#include "Platform/UIAPI/Nuclear/NuclearUIContext.h"
 
 namespace Engine::UI 
 {

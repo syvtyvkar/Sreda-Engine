@@ -1,39 +1,39 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once    // Защита от множественного включения
+#pragma once
 
-#include "Engine/UI/Framework/UIElement.h"
+#include "Engine/UI/Framework/UIWidget.h"
 
 namespace Engine::UI 
 {
-    class UIButton : public UIElement
+    class UIButton : public UIWidget
     {
     public:
         UIButton(const std::string& text);
         void OnRender() override;
         void OnUpdate(float deltaTime) override;
-        std::string GetText() const {return m_text;}
-        
+        std::string GetText() const { return m_text; }
+        void SetText(const std::string& text) { m_text = text; }
+
     private:
         std::string m_text;
-        bool m_hovered = false;
     };
 
-    class UITextBlock : public UIElement
+    class UITextBlock : public UIWidget
     {
     public:
         UITextBlock(const std::string& text);
         void OnRender() override;
         void OnUpdate(float deltaTime) override;
-        
-        void SetText(const std::string& text) {m_text = text;}
-        void SetFontSize(float size){m_fontSize = size;}
-        void SetColor(const TColor& color){m_color = color;}
-        std::string GetText() const {return m_text;}
-        
+
+        void SetText(const std::string& text) { m_text = text; }
+        std::string GetText() const { return m_text; }
+
+        void SetFontSize(float size) { m_fontSize = size; }
+        float GetFontSize() const { return m_fontSize; }
+
     private:
         std::string m_text;
         float m_fontSize = 16.0f;
-        TColor m_color = {1, 1, 1, 1};
     };
 }

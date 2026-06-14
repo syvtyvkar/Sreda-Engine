@@ -30,7 +30,7 @@ namespace Engine
             return std::nullopt;
         }
         
-        // Получаем размер и читаем всё сразу
+        // Get size and read everything at once
         std::streamsize size = file.tellg();
         file.seekg(0, std::ios::beg);
         

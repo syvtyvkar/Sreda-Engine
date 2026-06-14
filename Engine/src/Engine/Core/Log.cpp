@@ -1,9 +1,9 @@
 // (c) Nikita Rogalev. All rights reserved.
 
 #include "Log.h"
-#include <spdlog/fmt/ostr.h>  // Для поддержки пользовательских типов в логах
+#include <spdlog/fmt/ostr.h>  // For custom type support in logs
 
-// Заголовки для работы со временем
+// Headers for time operations
 #include <chrono>
 #include <ctime>
 #include <sstream>
@@ -15,35 +15,35 @@
 
 namespace Engine::Log
 {
-    std::shared_ptr<spdlog::logger> LogSystem::s_MainLogger;                      // Статический указатель на основной логгер (инициализируется в Init)
+    std::shared_ptr<spdlog::logger> LogSystem::s_MainLogger;                      // Static pointer to the main logger (initialized in Init)
 
-    void LogSystem::Init()                                                        // Инициализация системы логирования
+    void LogSystem::Init()                                                        // Initialize logging system
     {          
 
-        auto now = std::chrono::system_clock::now();                        // Получаем текущее время для формирования имени файла лога
+        auto now = std::chrono::system_clock::now();                        // Get current time for log file name
         auto time_t_now = std::chrono::system_clock::to_time_t(now);
-        std::tm tm_now;                                                     // Преобразуем время в локальное (структура tm) с учётом платформы
+        std::tm tm_now;                                                     // Convert time to local (tm struct) platform-dependently
 
         #ifdef WIN32
-            localtime_s(&tm_now, &time_t_now);                              // Windows: используем безопасную функцию localtime_s
+            localtime_s(&tm_now, &time_t_now);                              // Windows: use safe localtime_s
         #else
-            localtime_r(&time_t_now, &tm_now);                              // Unix-подобные: localtime_r (потокобезопасная)
+            localtime_r(&time_t_now, &tm_now);                              // Unix-like: localtime_r (thread-safe)
         #endif
-        std::ostringstream oss;                                             // Формируем строку с датой и временем вида "ГГГГ-ММ-ДД_ЧЧ-ММ-СС"
+        std::ostringstream oss;                                             // Format date-time string as "YYYY-MM-DD_HH-MM-SS"
         oss << std::put_time(&tm_now, "%Y-%m-%d_%H-%M-%S");
-        //std::string NameLogFile = "../logs/Log_" + oss.str() + ".log";       // Было задумано динамическое имя файла с временной меткой, но пока используется фиксированное
+        //std::string NameLogFile = "../logs/Log_" + oss.str() + ".log";       // Was planned to have dynamic file name with timestamp, but fixed name is used for now
         std::string NameLogFile = "../Logs/Log.log";
 
-        spdlog::sinks_init_list logSinks =                                          // Список приёмников (sinks) лога:
+        spdlog::sinks_init_list logSinks =                                          // List of log sinks:
         {                    
-            std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),                // - stdout_color_sink_mt — цветной вывод в консоль (поддержка многопоточности)
-            std::make_shared<spdlog::sinks::basic_file_sink_mt>(NameLogFile, true)  // - basic_file_sink_mt — запись в файл (с дозаписью, true)
+            std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),                // - stdout_color_sink_mt — colored console output (multi-threaded)
+            std::make_shared<spdlog::sinks::basic_file_sink_mt>(NameLogFile, true)  // - basic_file_sink_mt — file output (append, true)
         };
         
-        s_MainLogger = std::make_shared<spdlog::logger>("LOG", logSinks.begin(), logSinks.end());   // Создаём логгер с именем "LOG" и заданными приёмниками
-        spdlog::register_logger(s_MainLogger);                                                      // Регистрируем логгер в глобальном реестре spdlog (чтобы можно было получать по имени)
-        s_MainLogger->set_pattern("%^[%T] %n: %v%$");                                               // Устанавливаем формат вывода
-        s_MainLogger->set_level(spdlog::level::trace);                                              // Устанавливаем уровень логирования — trace (самый подробный)
+        s_MainLogger = std::make_shared<spdlog::logger>("LOG", logSinks.begin(), logSinks.end());   // Create logger with name "LOG" and specified sinks
+        spdlog::register_logger(s_MainLogger);                                                      // Register logger in spdlog global registry (so it can be retrieved by name)
+        s_MainLogger->set_pattern("%^[%T] %n: %v%$");                                               // Set output format
+        s_MainLogger->set_level(spdlog::level::trace);                                              // Set logging level to trace (most detailed)
     }
 
     void LogSystem::ShowMessageBox(uint8_t Type, const char* Tittle, const char* Message)
@@ -53,7 +53,7 @@ namespace Engine::Log
         #endif
     }
 
-    void LogSystem::SetLevel(spdlog::level::level_enum level)                      // Метод для изменения уровня логирования во время выполнения
+    void LogSystem::SetLevel(spdlog::level::level_enum level)                      // Method to change logging level at runtime
     {
         s_MainLogger->set_level(level);
     }
