@@ -15,10 +15,6 @@
 
 #include "Platform/RenderAPI/OpenGL/OpenGLContext.h"   
 
-//#define STB_IMAGE_IMPLEMENTATION
-//#include <stb_image.h>
-//#include <GLFW/glfw3.h>
-
 
 namespace Engine
 {
@@ -71,37 +67,34 @@ namespace Engine
         // Сохраняем размеры окна
         m_width = config.wight;
         m_height = config.height;
-        glfwGetWindowPos(m_window,&m_windowedX,&m_windowedY);
+        glfwGetWindowPos(GetHandle(),&m_windowedX,&m_windowedY);
 
         // Делаем контекст OpenGL текущим для этого окна
-        glfwMakeContextCurrent(m_window);
+        glfwMakeContextCurrent(GetHandle());
 
         // Включение/выключение вертикальной синхронизации
         glfwSwapInterval(config.vsync ? 1 : 0); //VSync!!!
 
         // Устанавливаем колбэк изменения
-        glfwSetFramebufferSizeCallback(m_window, FramebufferResizeCallback);
-        glfwSetWindowFocusCallback(m_window, FocusCallback);
-        glfwSetWindowIconifyCallback(m_window, IconifyCallback);
+        glfwSetFramebufferSizeCallback(GetHandle(), FramebufferResizeCallback);
+        glfwSetWindowFocusCallback(GetHandle(), FocusCallback);
+        glfwSetWindowIconifyCallback(GetHandle(), IconifyCallback);
 
         ENGINE_LOG_INFO("Window ( {} ) has been created successfully", config.title);
         ///////////////////////////////////////////
 
-        std::string IconPath = FileIO::GetDirectoryFile("/Resources/Textures/SredaLogo.png");
-        LoadIconFromFile(IconPath.c_str());
 
-
-        m_context = Engine::Render::GraphicsContext::Create(m_window);     // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
+        m_context = Engine::Render::GraphicsContext::Create(GetHandle());     // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
 		m_context->Init();                                                 // Инициализация
 
-        //m_currentScene = std::make_unique<Scene>("MainScene");              // Создаём главную сцену с именем "MainScene" и сохраняем её в unique_ptr
+        //m_currentScene = CreateUniquePtr<Scene>("MainScene");              // Создаём главную сцену с именем "MainScene" и сохраняем её в unique_ptr
         //m_currentScene->SetParentRender(m_render.get());                                            // Устанавливаем для сцены указатель на рендерер (чтобы сцена могла отрисовывать объекты)
 
-       // m_uiSystem = std::make_unique<UISystem>();                         // Создаем систему обработки UI
+       // m_uiSystem = CreateUniquePtr<UISystem>();                         // Создаем систему обработки UI
        // m_uiSystem.get()->Initialize(this);                                // Инициализируем
 
         // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
-        glfwSetWindowUserPointer(m_window, this);
+        glfwSetWindowUserPointer(GetHandle(), this);
 
         return true;
     }
@@ -116,7 +109,7 @@ namespace Engine
         std::string NewNameResult;
         NewNameResult.append(NameWindow + " ");
         NewNameResult.append(NewName + " FPS");
-        glfwSetWindowTitle(m_window,NewNameResult.c_str());
+        glfwSetWindowTitle(GetHandle(),NewNameResult.c_str());
     }
 
     /**
@@ -169,7 +162,7 @@ namespace Engine
         if (m_window) 
         {
             ENGINE_LOG_INFO("The Window close");
-            glfwDestroyWindow(m_window);            // Уничтожаем окно GLFW
+            glfwDestroyWindow(GetHandle());            // Уничтожаем окно GLFW
             m_window = nullptr;
         }
         if (m_uiSystem)
@@ -186,7 +179,7 @@ namespace Engine
     void WindowGLFW::ExitApp()
     {
         ENGINE_CORE_ASSERT(m_window, "FATAL ERROR: NO VALID APPLICATION!");
-        glfwSetWindowShouldClose(m_window, true);
+        glfwSetWindowShouldClose(GetHandle(), true);
     }
 
     void WindowGLFW::SetWindowMode(WindowMode NewMode)
@@ -205,7 +198,7 @@ namespace Engine
                 x = 100; y = 100;                                               // или сохранённая позиция
                 w = m_width; h = m_height;
                 refreshRate = 0;                                                // игнорируется
-                glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_TRUE);       // Возвращаем рамку окна
+                glfwSetWindowAttrib(GetHandle(), GLFW_DECORATED, GLFW_TRUE);       // Возвращаем рамку окна
                 break;
             }
         
@@ -219,7 +212,7 @@ namespace Engine
                 x = monitorX; y = monitorY;
                 w = mode->width; h = mode->height;
                 refreshRate = mode->refreshRate;
-                glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_FALSE);      // Убираем рамку, но оставляем окно "оконным" для быстрого переключения
+                glfwSetWindowAttrib(GetHandle(), GLFW_DECORATED, GLFW_FALSE);      // Убираем рамку, но оставляем окно "оконным" для быстрого переключения
                 break;
             }
         
@@ -232,12 +225,12 @@ namespace Engine
                 w = mode->width; h = mode->height;
                 refreshRate = mode->refreshRate; // важно для плавности
             
-                glfwSetWindowAttrib(m_window, GLFW_DECORATED, GLFW_FALSE);
+                glfwSetWindowAttrib(GetHandle(), GLFW_DECORATED, GLFW_FALSE);
                 break;
             }
         }
 
-        glfwSetWindowMonitor(m_window, monitor, x, y, w, h, refreshRate);
+        glfwSetWindowMonitor(GetHandle(), monitor, x, y, w, h, refreshRate);
     
         if (NewMode == WindowMode::Window) 
         {
@@ -245,17 +238,17 @@ namespace Engine
         }
 
         int fbW, fbH;
-        glfwGetFramebufferSize(m_window, &fbW, &fbH);
+        glfwGetFramebufferSize(GetHandle(), &fbW, &fbH);
         glViewport(0, 0, fbW, fbH);
     
         // Возвращаем фокус окну
-        glfwFocusWindow(m_window);
+        glfwFocusWindow(GetHandle());
     
         ENGINE_LOG_INFO("Window mode changed to: {}", (NewMode == WindowMode::Window) ? "Windowed" : (NewMode == WindowMode::Borderless ? "Borderless" : "Fullscreen"));
 
         if (m_windowMode == WindowMode::Window) 
         {
-            glfwSetWindowPos(m_window,m_windowedX,m_windowedY);
+            glfwSetWindowPos(GetHandle(),m_windowedX,m_windowedY);
         }
     }
 
@@ -311,20 +304,23 @@ namespace Engine
         }
     }
 
-    bool WindowGLFW::LoadIconFromFile(const char* InPathIcon)
+    bool WindowGLFW::LoadIconFromFile()
     {
-        /*
+        TRef<Texture2D> LIcon = Engine::Render::Texture2D::Create("/Resources/Textures/SredaIco.png");
+        ENGINE_ASSERT(LIcon.get(), "Failed to load the icon at path!");
+        
         GLFWimage images[1];
         int width, height, channels;
 
-        unsigned char* data = stbi_load(iconPath, &width, &height, &channels, 4);
-        ENGINE_ASSERT(data, "Failed to load the icon at path!");
-        images[0].width = width;
-        images[0].height = height;
-        images[0].pixels = data;
+        //unsigned char* data = stbi_load(iconPath, &width, &height, &channels, 4);
+        auto data = LIcon->GetDataRGBA8();
 
-        glfwSetWindowIcon(m_window, 1, images);
-        stbi_image_free(data); */
+        images[0].width = LIcon.get()->GetWidth();
+        images[0].height = LIcon.get()->GetHeight();
+        images[0].pixels = data.data();
+
+        glfwSetWindowIcon(GetHandle(), 1, images);
+
         return true;
     }
 }

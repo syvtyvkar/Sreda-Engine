@@ -19,7 +19,7 @@ namespace Engine
         camConfig.position = Vector3(0.0f, 0.0f, 3.0f);                                           // Camera position
         camConfig.screenWidth = 800;                                                 // Screen width for aspect ratio
         camConfig.screenHeight = 600;                                               // Screen height
-        r_camera = std::make_unique<Engine::Camera>(camConfig);
+        r_camera = CreateUniquePtr<Engine::Camera>(camConfig);
     }
 
     Scene::~Scene()
@@ -30,7 +30,7 @@ namespace Engine
 
     GameObject* Scene::createGameObject(const std::string& name) 
     {
-        auto object = std::make_unique<GameObject>(name, this);
+        auto object = CreateUniquePtr<GameObject>(name, this);
 
         object.get()->SetParentScene(this);
 

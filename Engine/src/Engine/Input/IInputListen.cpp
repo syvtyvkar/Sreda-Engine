@@ -19,7 +19,7 @@ namespace Engine
     {
         #ifdef ENGINE_WINDOW_GLFW
         // If using GLFW, create GLFW-specific input listener.
-        return std::make_unique<InputListenGLFWSystem>();
+        return CreateUniquePtr<InputListenGLFWSystem>();
         #endif
         // Return null pointer if no supported platform is found.
         // Additional branches can be added here in the future (e.g., Windows Raw Input).

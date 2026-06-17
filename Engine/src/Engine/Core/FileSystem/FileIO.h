@@ -7,6 +7,7 @@
 #include <optional>         //
 #include <filesystem>       //
 #include "Engine/Platform/PlatformUtils.h"
+#include "Engine/Render/Texture.h"
 
 namespace Engine 
 {
@@ -26,6 +27,9 @@ namespace Engine
         // Binary data
         static std::optional<std::vector<uint8_t>> ReadBinaryFile(const std::string& InPath);                                   // Read binary file
         static bool WriteBinaryFile(const std::string& InPath, const std::vector<uint8_t>& InData, bool InCreateDirs = true);   // Write binary file
+        // Image data
+        static TRef<Engine::Render::Texture2D> ReadImageFile(const std::string& InPath);                                   // Read binary file
+        static bool WriteImageFile(const std::string& InPath, const TRef<Engine::Render::Texture2D>& InData, bool InCreateDirs = true);   // Write binary file
         // Path operations
         static bool IsFileExist(const std::string& InPath);                                                         // Check if file exists
         static bool IsProjectFileExist(const std::string& InFile);                                                  // Check if project file exists

@@ -40,7 +40,7 @@ namespace Engine
         virtual void Update() override;                                                 // Очистка буферов
         virtual int GetWidth() const override {return m_width;}                         // Получить длину и ширину
         virtual int GetHeight() const override {return m_height;}
-        GLFWwindow* GetHandle() {return m_window;}                                      // Получить окно
+        GLFWwindow* GetHandle() {return m_window;}                                // Получить окно
         virtual void Close() override;                                                  // Закрываем окно
         virtual void ExitApp() override;                                                // Закрываем окно
         virtual void SetTittle(const std::string NewTittle) override {NameWindow = NewTittle;};
@@ -56,10 +56,11 @@ namespace Engine
 
         static void FocusCallback(GLFWwindow* window, int focused);
         static void IconifyCallback(GLFWwindow* window, int iconified);
-        bool LoadIconFromFile(const char* InPathIcon);
+        virtual bool LoadIconFromFile() override;
 
     private:
-        GLFWwindow* m_window = nullptr;                                                     // Указатель на объект окна GLFW
+        GLFWwindow* m_window = nullptr;                                          // Указатель на объект окна GLFW
+        //GLFWwindow* m_window = nullptr;                                                     // Указатель на объект окна GLFW
         static void FramebufferResizeCallback(GLFWwindow* Window, int width, int height);   // Статический колбэк изменения размера фреймбуфера
         int m_width = 0;                                                                    // Текущая ширина окн
         int m_height = 0;                                                                   // Текущая высота окна
@@ -76,7 +77,6 @@ namespace Engine
     protected:
         //TUniquePtr<Scene> m_currentScene;                  // Текущая сцена
         TUniquePtr<UISystem> m_uiSystem;                  // Текущая система UI
-
         TUniquePtr<GraphicsContext> m_context;             // Графический контекст (OpenGL, Vulkan и т.д.)
     };
 }

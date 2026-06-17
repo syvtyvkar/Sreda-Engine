@@ -38,6 +38,17 @@ namespace Engine
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 
+    /** 
+     * @brief Weak
+    */
+	template<typename T>
+	using TWeak = std::weak_ptr<T>;
+	template<typename T, typename ... Args>
+	constexpr TWeak<T> CreateWeak(Args&& ... args)
+	{
+		return std::shared_ptr<Args>(args)...;
+	}
+
     /*3D vector with x, y, z components.
     Contains basic arithmetic operations and commonly used static vectors*/
     struct Vector3 

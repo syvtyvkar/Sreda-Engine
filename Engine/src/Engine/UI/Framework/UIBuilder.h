@@ -15,34 +15,34 @@ namespace Engine::UI
     class UIBuilder
     {
     public:
-        static std::shared_ptr<UIWidget> CreateWidget()
+        static TRef<UIWidget> CreateWidget()
         {
-            return std::make_shared<UIWidget>();
+            return CreateRef<UIWidget>();
         }
 
-        static std::shared_ptr<VerticalBox> CreateVerticalBox()
+        static TRef<VerticalBox> CreateVerticalBox()
         {
-            return std::make_shared<VerticalBox>();
+            return CreateRef<VerticalBox>();
         }
 
-        static std::shared_ptr<HorizontalBox> CreateHorizontalBox()
+        static TRef<HorizontalBox> CreateHorizontalBox()
         {
-            return std::make_shared<HorizontalBox>();
+            return CreateRef<HorizontalBox>();
         }
 
-        static std::shared_ptr<UIButton> CreateButton(const std::string& text)
+        static TRef<UIButton> CreateButton(const std::string& text)
         {
-            return std::make_shared<UIButton>(text);
+            return CreateRef<UIButton>(text);
         }
 
-        static std::shared_ptr<UITextBlock> CreateTextBlock(const std::string& text)
+        static TRef<UITextBlock> CreateTextBlock(const std::string& text)
         {
-            return std::make_shared<UITextBlock>(text);
+            return CreateRef<UITextBlock>(text);
         }
 
         template<typename TElement>
-        static std::shared_ptr<TElement> WithProperties(
-            std::shared_ptr<TElement> element,
+        static TRef<TElement> WithProperties(
+            TRef<TElement> element,
             std::function<void(TElement*)> propertiesSetter)
         {
             propertiesSetter(element.get());
@@ -50,8 +50,8 @@ namespace Engine::UI
         }
 
         template<typename TElement>
-        static std::shared_ptr<TElement> WithStyle(
-            std::shared_ptr<TElement> element,
+        static TRef<TElement> WithStyle(
+            TRef<TElement> element,
             std::function<void(UIWidgetStyle&)> styleSetter)
         {
             if constexpr (std::is_base_of_v<UIWidget, TElement>)

@@ -6,7 +6,7 @@
 
 #include <string>                                   // For std::string
 #include <functional>                               // For std::function (used in resize callback)
-#include <memory>                                   // For std::unique_ptr
+#include <memory>                                   
 #include "Engine/Render/GraphicsContext.h"          // Render graphics context
 //#include "Engine/Scene/Scene.h"                   // Scene class containing game objects
 
@@ -120,6 +120,7 @@ namespace Engine
         DOnWindowReSize& OnWindowReSize() {return s_OnWindowReSize;}
         DOnWindowFocusChange& OnHasFocusChange() {return s_OnHasFocusChange;}
         DOnWindowFocusChange& OnMinimizedChange() {return s_OnMinimizedChange;}
+        virtual bool LoadIconFromFile() = 0;
 
         virtual bool IsWindowHasFocus() = 0;
         virtual bool IsWindowMinimized() = 0;

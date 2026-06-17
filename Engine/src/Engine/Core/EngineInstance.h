@@ -21,6 +21,8 @@ namespace Engine
         virtual void OnRender(){}
         virtual void OnRenderUI(){}
 
+        class Application* GetOwnerApp() {return m_OwnerApp;}
+
         virtual std::string GetNameApp() {return "Engine application";}
 
     private:

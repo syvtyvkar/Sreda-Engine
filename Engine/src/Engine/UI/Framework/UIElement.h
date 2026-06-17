@@ -78,18 +78,18 @@ namespace Engine::UI
         void SetMaxSize(const Vector2& maxSize) { m_maxSize = maxSize; }
         Vector2 GetMaxSize() const { return m_maxSize; }
 
-        void AddChild(std::shared_ptr<UIElement> child);
-        void RemoveChild(const std::shared_ptr<UIElement>& child);
-        const std::vector<std::shared_ptr<UIElement>>& GetChildren() const { return m_children; }
+        void AddChild(TRef<UIElement> child);
+        void RemoveChild(const TRef<UIElement>& child);
+        const std::vector<TRef<UIElement>>& GetChildren() const { return m_children; }
 
         bool IsVisible() const { return m_visible; }
         void SetVisible(bool visible) { m_visible = visible; }
 
-        std::shared_ptr<UIElement> GetParent() const { return m_parent.lock(); }
+        TRef<UIElement> GetParent() const { return m_parent.lock(); }
 
     protected:
-        std::vector<std::shared_ptr<UIElement>> m_children;
-        std::weak_ptr<UIElement> m_parent;
+        std::vector<TRef<UIElement>> m_children;
+        TWeak<UIElement> m_parent;
         bool m_visible = true;
         Vector2 m_position = { 0.0f, 0.0f };
         Vector2 m_size = { 100.0f, 30.0f };

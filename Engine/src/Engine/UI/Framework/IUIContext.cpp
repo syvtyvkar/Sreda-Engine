@@ -2,7 +2,7 @@
 
 #include "IUIContext.h"
 #include "Engine/Core/Log.h"
-#include "Platform/UIAPI/Nuclear/NuclearUIContext.h"
+#include "Platform/UIAPI/UISreda/UISredaContext.h"
 #include <algorithm>
 
 namespace Engine::UI 
@@ -10,29 +10,26 @@ namespace Engine::UI
     TUniquePtr<UIContext> Engine::UI::UIContextFactory::create()
     {
 
-        #ifdef ENGINE_WINDOW_GLFW
-        //return std::make_unique<NuclearUIContext>();
+        return CreateUniquePtr<UISredaContext>();
 
-        //return std::make_unique<SredaUIContext>();
-        #endif
-        return nullptr;
+        //return nullptr;
     }
-    void UIContext::RegisterWidget(std::shared_ptr<UIElement> widget)
+    void UIContext::RegisterWidget(TRef<UIElement> widget)
     {
         if (widget)
             m_widgets.push_back(widget);
     }
-    void UIContext::RemoveWidget(const std::shared_ptr<UIElement> &widget)
+    void UIContext::RemoveWidget(const TRef<UIElement> &widget)
     {
         auto it = std::find(m_widgets.begin(), m_widgets.end(), widget);
         if (it != m_widgets.end())
             m_widgets.erase(it);
     }
-    void UIContext::SetRootWidget(std::shared_ptr<UIElement> root)
+    void UIContext::SetRootWidget(TRef<UIElement> root)
     {
         m_rootWidget = root;
     }
-    void UIContext::RenderUIElements(std::shared_ptr<UIElement> element)
+    void UIContext::RenderUIElements(TRef<UIElement> element)
     {
         if (element && element->IsVisible())
             element->OnRender();

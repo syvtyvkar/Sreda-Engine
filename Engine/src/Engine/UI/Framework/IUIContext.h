@@ -22,12 +22,12 @@ namespace Engine::UI
         virtual void InitContext(Window* window) = 0;
 
         // UI Element Management
-        void RegisterWidget(std::shared_ptr<UIElement> widget);
-        void RemoveWidget(const std::shared_ptr<UIElement>& widget);
+        void RegisterWidget(TRef<UIElement> widget);
+        void RemoveWidget(const TRef<UIElement>& widget);
     
         // Root element management
-        void SetRootWidget(std::shared_ptr<UIElement> root);
-        std::shared_ptr<UIElement> GetRootWidget() const { return m_rootWidget; }
+        void SetRootWidget(TRef<UIElement> root);
+        TRef<UIElement> GetRootWidget() const { return m_rootWidget; }
         
         // Visibility
         virtual void Show() = 0;
@@ -40,10 +40,10 @@ namespace Engine::UI
 	    virtual void EndFrame()= 0;
 
     protected:
-        void RenderUIElements(std::shared_ptr<UIElement> element);
+        void RenderUIElements(TRef<UIElement> element);
 
-        std::shared_ptr<UIElement> m_rootWidget;
-        std::vector<std::shared_ptr<UIElement>> m_widgets;
+        TRef<UIElement> m_rootWidget;
+        std::vector<TRef<UIElement>> m_widgets;
     };
 
 

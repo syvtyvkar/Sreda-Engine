@@ -20,7 +20,7 @@ namespace Engine
     TUniquePtr<Window> WindowAPIFactory::create() 
     {
         #ifdef ENGINE_WINDOW_GLFW
-        return std::make_unique<WindowGLFW>();  // Create window for GLFW
+        return CreateUniquePtr<WindowGLFW>();  // Create window for GLFW
         #endif
         return nullptr;
     }

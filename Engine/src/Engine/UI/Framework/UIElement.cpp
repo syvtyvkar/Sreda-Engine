@@ -101,7 +101,7 @@ namespace Engine::UI
         return size;
     }
 
-    void UIElement::AddChild(std::shared_ptr<UIElement> child)
+    void UIElement::AddChild(TRef<UIElement> child)
     {
         if (child)
         {
@@ -110,7 +110,7 @@ namespace Engine::UI
         }
     }
 
-    void UIElement::RemoveChild(const std::shared_ptr<UIElement> &child)
+    void UIElement::RemoveChild(const TRef<UIElement> &child)
     {
         if (!child) return;
 

@@ -92,6 +92,18 @@ namespace Engine
         return file.good();
     }
 
+    TRef<Engine::Render::Texture2D> FileIO::ReadImageFile(const std::string &InPath)
+    {
+        return Engine::Render::Texture2D::Create(PlatformUtils::GetProjectDirectory() + "/" + InPath);
+    }
+
+    bool FileIO::WriteImageFile(const std::string &InPath, const TRef<Engine::Render::Texture2D>&InData, bool InCreateDirs)
+    {
+        ENGINE_ASSERT(false, "This functionality is not yet supported =(");
+
+        return false;
+    }
+
     bool FileIO::IsFileExist(const std::string& InPath) 
     {
         return std::filesystem::exists(InPath);

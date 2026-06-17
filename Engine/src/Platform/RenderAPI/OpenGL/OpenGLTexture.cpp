@@ -7,6 +7,9 @@
 #include <stb_image.h>
 #include <GLFW/glfw3.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 namespace Engine::Render
 {
     namespace Utils {
@@ -36,11 +39,7 @@ namespace Engine::Render
 			case ImageFormat::RGBA32F: 		return GL_RGBA32F;
 			default: ENGINE_ASSERT(false, "Unknown ImageFormat"); return 0;
 			}
-
-			//ENGINE_ASSERT(false,"Load no valid image format!");
-			//return 0;
 		}
-
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& specification)
@@ -157,8 +156,22 @@ namespace Engine::Render
 		glDeleteTextures(1, &m_RendererID);
 	}
 
-	void OpenGLTexture2D::SetData(void* data, uint32_t size)
-	{
+    uint32_t OpenGLTexture2D::GetSize() const
+    {
+        uint32_t bpp = 0;
+    	switch (m_Specification.Format) 
+		{
+			case ImageFormat::R8:      bpp = 1; break;
+        	case ImageFormat::RGB8:    bpp = 3; break;
+        	case ImageFormat::RGBA8:   bpp = 4; break;
+        	case ImageFormat::RGBA32F: bpp = 16; break;
+        	default: ENGINE_ASSERT(false, "Unknown format in Data");
+    	}
+		return m_Width * m_Height * bpp;
+    }
+
+    void OpenGLTexture2D::SetData(void *data, uint32_t size)
+    {
 		uint32_t bpp = 0;
     	switch (m_Specification.Format) 
 		{
@@ -175,10 +188,108 @@ namespace Engine::Render
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	}
 
-	void OpenGLTexture2D::Bind(uint32_t slot) const
+    void *OpenGLTexture2D::GetData() const
+    {
+        uint32_t size = GetSize();
+		void* data = malloc(size);
+		if (!data) return nullptr;
+
+		GLenum type = (m_Specification.Format == ImageFormat::RGBA32F) ? GL_FLOAT : GL_UNSIGNED_BYTE;
+
+		glGetTextureImage(m_RendererID, 0, m_DataFormat, type, size, data);
+		return data;
+    }
+
+    std::vector<unsigned char> OpenGLTexture2D::GetDataRGBA8() const
+    {
+        size_t pixelSize = 4; // RGBA
+		size_t rowSize = m_Width * pixelSize;
+
+		std::vector<unsigned char> result(m_Width * m_Height * 4);
+
+
+		size_t paddedRowSize = (rowSize + 3) & ~3;
+		std::vector<unsigned char> tempData(paddedRowSize * m_Height);
+
+		glPixelStorei(GL_PACK_ALIGNMENT, 4);
+		glGetTextureImage(m_RendererID, 0, GL_RGBA, GL_UNSIGNED_BYTE, tempData.size(), tempData.data());
+
+		for (int y = 0; y < m_Height; ++y)
+		{
+			int srcY = m_Height - 1 - y; // инвертируем Y
+			memcpy(result.data() + y * rowSize,
+				tempData.data() + srcY * paddedRowSize,
+				rowSize);
+		}
+
+		return result;
+    }
+
+    void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
 		glBindTextureUnit(slot, m_RendererID);
 	}
 
+    bool OpenGLTexture2D::Save(const std::string &path, TextureFileType Type) const
+    {
+        void* data = GetData();
+		if (!data) return false;
 
+		int channels = 0;
+
+		// Определяем количество каналов
+		switch (m_DataFormat)
+		{
+			case GL_RED:   channels = 1; break;
+			case GL_RGB:   channels = 3; break;
+			case GL_RGBA:  channels = 4; break;
+			default: free(data); return false;
+		}
+
+		bool success = false;
+
+		// Преобразуем float → uchar при необходимости
+		unsigned char* byteData = nullptr;
+		if (m_Specification.Format == ImageFormat::RGBA32F)
+		{
+			byteData = new unsigned char[m_Width * m_Height * channels];
+			float* floatData = (float*)data;
+			for (uint32_t i = 0; i < m_Width * m_Height * channels; ++i)
+				byteData[i] = (unsigned char)(floatData[i] * 255.0f);
+		}
+		else
+		{
+			byteData = (unsigned char*)data;
+		}
+
+		switch (Type)
+		{
+		case TextureFileType::PNG:
+			success = stbi_write_png(path.c_str(), m_Width, m_Height, channels, byteData, m_Width * channels);
+			break;
+		case TextureFileType::JPG:
+			success = stbi_write_jpg(path.c_str(), m_Width, m_Height, channels, byteData, 90);
+			break;
+		case TextureFileType::JPEG:
+			success = stbi_write_jpg(path.c_str(), m_Width, m_Height, channels, byteData, 90);
+			break;
+		case TextureFileType::BMP:
+			success = stbi_write_bmp(path.c_str(), m_Width, m_Height, channels, byteData);
+			break;
+		default:
+			ENGINE_ASSERT(false, "Unsupported image format for saving!");
+			break;
+		}
+
+		if (m_Specification.Format == ImageFormat::RGBA32F)
+			delete[] byteData;
+
+		free(data);
+		if (success)
+			ENGINE_LOG_INFO("Texture saved to: {}", path);
+		else
+			ENGINE_LOG_ERROR("Failed to save texture to: {}", path);
+
+		return success;
+    }
 }

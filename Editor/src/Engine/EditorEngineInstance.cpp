@@ -50,7 +50,7 @@ void EditorAppInstance::OnStart()
 
 
     __super::OnStart();
-    m_EditorInputHotKey = std::make_unique<EditorInputComponent>();
+    m_EditorInputHotKey = CreateUniquePtr<EditorInputComponent>();
     m_EditorInputHotKey.get()->Init();
 
 	m_VertexArray = VertexArray::Create();
@@ -178,6 +178,8 @@ void EditorAppInstance::OnStart()
 		ENGINE_ASSERT(false, "Failed to load font!!!");
 	}
 	ENGINE_LOG_INFO("Font loaded, atlas texture ID={}", m_Font->GetAtlasTexture()->GetRendererID());
+
+	GetOwnerApp()->GetWindow()->LoadIconFromFile();
 }
 
 void EditorAppInstance::OnEnd()

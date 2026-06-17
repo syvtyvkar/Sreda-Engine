@@ -19,14 +19,19 @@ namespace Engine::Render
 		virtual uint32_t GetWidth() const override { return m_Width;  }
 		virtual uint32_t GetHeight() const override { return m_Height; }
 		virtual uint32_t GetRendererID() const override { return m_RendererID; }
+		virtual uint32_t GetSize() const override;
 
 		virtual const std::string& GetPath() const override { return m_Path; }
 		
 		virtual void SetData(void* data, uint32_t size) override;
+		virtual void* GetData() const override;
+		virtual std::vector<unsigned char> GetDataRGBA8() const override;
 
 		virtual void Bind(uint32_t slot = 0) const override;
 
 		virtual bool IsLoaded() const override { return m_IsLoaded; }
+
+		virtual bool Save(const std::string& path, TextureFileType Type) const override;
 
 		virtual bool operator==(const Texture& other) const override
 		{
@@ -38,7 +43,7 @@ namespace Engine::Render
 		std::string m_Path;
 		bool m_IsLoaded = false;
 		uint32_t m_Width, m_Height;
-		uint32_t m_RendererID;
+		uint32_t m_RendererID = 0;
 		GLenum m_InternalFormat, m_DataFormat;
 	};
 }
