@@ -19,7 +19,7 @@ namespace Engine::UI
         virtual ~UIContext() = default; 
         
 
-        virtual void InitContext(Window* window) = 0;
+        virtual void InitContext() = 0;
 
         // UI Element Management
         void RegisterWidget(TRef<UIElement> widget);
@@ -34,7 +34,7 @@ namespace Engine::UI
         virtual void Hide() = 0;
         virtual bool IsVisible() const = 0;
 
-        virtual void Update() = 0;
+        virtual void Update(float DeltaTime) = 0;
         virtual void Render() = 0;
         virtual void BeginFrame()= 0;
 	    virtual void EndFrame()= 0;

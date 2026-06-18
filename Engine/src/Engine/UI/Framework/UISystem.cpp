@@ -10,13 +10,13 @@ namespace Engine::UI
 
     }
 
-    bool UISystem::Initialize(Window *window)
+    bool UISystem::Initialize()
     {
-        if (!CreateContext(window))
+        if (!CreateContext())
         {
             return false;
         }
-        GetContext()->SetRootWidget(UIBuilder::CreateWidget());
+        //GetContext()->SetRootWidget(UIBuilder::CreateWidget());
         return true;
     }
 
@@ -25,11 +25,11 @@ namespace Engine::UI
         DestroyContext();
     }
     
-    void UISystem::Update()
+    void UISystem::Update(float DeltaTime)
     {
         if (m_context.get())
         {
-            m_context.get()->Update();
+            m_context.get()->Update(DeltaTime);
         }
     }
 
@@ -57,16 +57,36 @@ namespace Engine::UI
         }
     }
 
-    UIContext *UISystem::CreateContext(Window *window)
+    UIContext *UISystem::CreateContext()
     {
         m_context = UIContextFactory::create();
         ENGINE_ASSERT(m_context, "No UI context! The UI System cannot be initialized!");
-        m_context.get()->InitContext(window);
+        m_context.get()->InitContext();
         return m_context.get();
     }
 
     void UISystem::DestroyContext()
     {
         m_context.reset();
+    }
+
+    void UISystem::RegisterWidget(TRef<UIElement> widget)
+    {
+        if (widget.get() == nullptr) return;
+
+        if (m_context.get() != nullptr)
+        {
+            m_context.get()->RegisterWidget(widget);
+        }
+    }
+
+    void UISystem::RemoveWidget(const TRef<UIElement> &widget)
+    {
+        if (widget.get() == nullptr) return;
+        
+        if (m_context.get() != nullptr)
+        {
+            m_context.get()->RemoveWidget(widget);
+        }
     }
 }

@@ -18,9 +18,18 @@ namespace Engine::UI
     {
         if (widget)
             m_widgets.push_back(widget);
+
+        if (GetRootWidget() == nullptr)
+        {
+            SetRootWidget(widget);
+        }
     }
     void UIContext::RemoveWidget(const TRef<UIElement> &widget)
     {
+        if (GetRootWidget() == widget)
+        {
+            m_rootWidget = nullptr;
+        }
         auto it = std::find(m_widgets.begin(), m_widgets.end(), widget);
         if (it != m_widgets.end())
             m_widgets.erase(it);

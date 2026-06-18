@@ -17,19 +17,23 @@ namespace Engine::UI
         UISystem() = default;
         virtual ~UISystem() = default; 
 
-        bool Initialize(Window* window);
+        bool Initialize();
         void Shutdown();
         
         // Update and render (call in main loop)
-        void Update();
+        void Update(float DeltaTime);
         void Render();
         void BeginFrame();
 	    void EndFrame();
         
         // Context management
-        UIContext* CreateContext(Window *window);
+        UIContext* CreateContext();
         UIContext* GetContext() {return m_context.get();}
         void DestroyContext();
+
+        // UI Element Management
+        void RegisterWidget(TRef<UIElement> widget);
+        void RemoveWidget(const TRef<UIElement>& widget);
         
         // Debug
         void ToggleDebugger();

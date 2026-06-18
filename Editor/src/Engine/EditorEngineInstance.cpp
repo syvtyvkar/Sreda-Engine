@@ -1,5 +1,7 @@
 #include "EditorEngineInstance.h"
 
+#include "../Editor/Widgets/EditorMainWidget.h"
+
 #include "Engine/Render/RenderCommand.h"
 #include "Engine/Render/Renderer2D.h"
 #include "Engine/Render/Renderer.h"
@@ -180,6 +182,8 @@ void EditorAppInstance::OnStart()
 	ENGINE_LOG_INFO("Font loaded, atlas texture ID={}", m_Font->GetAtlasTexture()->GetRendererID());
 
 	GetOwnerApp()->GetWindow()->LoadIconFromFile();
+	GetUISystem()->RegisterWidget(std::make_shared<EditorMainWidget>());
+	GetUISystem()->GetContext()->GetRootWidget()->OnInit();
 }
 
 void EditorAppInstance::OnEnd()
@@ -191,6 +195,7 @@ void EditorAppInstance::OnEnd()
 
 void EditorAppInstance::Update(float DeltaTime)
 {
+	__super::Update(DeltaTime);
     // Update
 	m_CameraController.OnUpdate(DeltaTime);
 
@@ -260,7 +265,7 @@ void EditorAppInstance::Update(float DeltaTime)
 	Renderer2D::RenderDrawText(L"Hello, world!", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 100.0f, 1.0f, TColor::White);
 	Renderer2D::RenderDrawText(L"Big text test", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 200.0f, 2.0f, TColor::Orange);
 
-	Renderer2D::DrawQuad(Vector2(0,500), Vector2(1500,100), m_Font->GetAtlasTexture());
+	//Renderer2D::DrawQuad(Vector2(0,500), Vector2(1500,100), m_Font->GetAtlasTexture());
 
 	Renderer2D::EndScene();
 
@@ -270,10 +275,12 @@ void EditorAppInstance::Update(float DeltaTime)
 
 void EditorAppInstance::OnRender()
 {
+	__super::OnRender();
 }
 
 void EditorAppInstance::OnRenderUI()
 {
+	__super::OnRenderUI();
 	//Renderer2D::BeginScene(m_CameraController.GetCamera());
 
 	//Renderer2D::DrawCircle(glm::scale(glm::mat4(1.0f), Vector3(1.f)),{0.f,0.8f,0.6f,1.f},1.f);

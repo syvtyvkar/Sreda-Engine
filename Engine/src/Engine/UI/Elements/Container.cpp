@@ -4,9 +4,11 @@ namespace Engine::UI
 {
     void UIContainer::OnRender()
     {
+        __super::OnRender();
     }
     void UIContainer::OnUpdate(float deltaTime)
     {
+        __super::OnUpdate(deltaTime);
     }
     void VerticalBox::ArrangeChildren()
     {

@@ -90,8 +90,8 @@ namespace Engine
         //m_currentScene = CreateUniquePtr<Scene>("MainScene");              // Создаём главную сцену с именем "MainScene" и сохраняем её в unique_ptr
         //m_currentScene->SetParentRender(m_render.get());                                            // Устанавливаем для сцены указатель на рендерер (чтобы сцена могла отрисовывать объекты)
 
-       // m_uiSystem = CreateUniquePtr<UISystem>();                         // Создаем систему обработки UI
-       // m_uiSystem.get()->Initialize(this);                                // Инициализируем
+        //m_uiSystem = CreateUniquePtr<UISystem>();                         // Создаем систему обработки UI
+        //m_uiSystem.get()->Initialize(this);                                // Инициализируем
 
         // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
         glfwSetWindowUserPointer(GetHandle(), this);
@@ -146,10 +146,10 @@ namespace Engine
         ss >> ret;
         UpdateWindowName(ret);
 
-        if (m_uiSystem.get())
-        {
-            m_uiSystem->Update();
-        }
+        //if (m_uiSystem.get())
+        //{
+        //    m_uiSystem->Update();
+        //}
 
         //m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
     }
@@ -165,11 +165,11 @@ namespace Engine
             glfwDestroyWindow(GetHandle());            // Уничтожаем окно GLFW
             m_window = nullptr;
         }
-        if (m_uiSystem)
-        {
-            m_uiSystem.get()->Shutdown();
-        }
-        m_uiSystem.reset();
+        //if (m_uiSystem)
+        //{
+        //    m_uiSystem.get()->Shutdown();
+        //}
+        //m_uiSystem.reset();
         glfwTerminate();                            // Завершаем GLFW (вызывается даже если окно уже было уничтожено)
     }
 

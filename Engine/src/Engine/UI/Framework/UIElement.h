@@ -48,6 +48,8 @@ namespace Engine::UI
     public:
         virtual ~UIElement() = default;
         
+        virtual void OnInit(){};
+
         virtual void OnRender();
         virtual void OnUpdate(float deltaTime);
 
