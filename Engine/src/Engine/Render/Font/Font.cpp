@@ -9,6 +9,8 @@
 
 #include "Engine/Platform/PlatformUtils.h"
 
+#define DEFAULT_FONT_NAME "Cuprum"
+
 namespace Engine::Render
 {
     struct RawGlyph
@@ -30,13 +32,7 @@ namespace Engine::Render
         int remainingX;
     };
 
-    static void PackGlyphs(
-        std::vector<std::pair<uint32_t, RawGlyph>>& glyphs,
-        std::vector<unsigned char>& outPixels,
-        int& outWidth,
-        int& outHeight,
-        std::unordered_map<uint32_t, GlyphMetrics>& outMetrics,
-        int padding)
+    static void PackGlyphs(std::vector<std::pair<uint32_t, RawGlyph>>& glyphs,std::vector<unsigned char>& outPixels,int& outWidth,int& outHeight,std::unordered_map<uint32_t, GlyphMetrics>& outMetrics,int padding)
     {
         std::vector<std::pair<uint32_t, RawGlyph>> toPack;
         for (auto& pair : glyphs)
@@ -61,11 +57,7 @@ namespace Engine::Render
             return;
         }
 
-        std::sort(toPack.begin(), toPack.end(),
-            [](const auto& a, const auto& b)
-            {
-                return a.second.height > b.second.height;
-            });
+        std::sort(toPack.begin(), toPack.end(),[](const auto& a, const auto& b){return a.second.height > b.second.height;});
 
         int totalArea = 0;
         int maxGlyphWidth = 0;
@@ -77,7 +69,9 @@ namespace Engine::Render
 
         int atlasW = 256;
         while (atlasW * atlasW < totalArea && atlasW < 4096)
+        {
             atlasW *= 2;
+        }
         atlasW = std::max(atlasW, maxGlyphWidth + padding);
 
         std::vector<Shelf> shelves;
@@ -125,18 +119,40 @@ namespace Engine::Render
                 memcpy(&outPixels[destOffset], &rg.buffer[srcOffset], rg.width);
             }
 
-            outMetrics[cp].uvMin = Vector2(float(rg.texX) / outWidth, float(rg.texY + rg.height) / outHeight);
-            outMetrics[cp].uvMax = Vector2(float(rg.texX + rg.width) / outWidth, float(rg.texY) / outHeight);
+            outMetrics[cp].uvMin = Vector2(float(rg.texX) / outWidth, float(rg.texY) / outHeight);
+            outMetrics[cp].uvMax = Vector2(float(rg.texX + rg.width) / outWidth, float(rg.texY + rg.height) / outHeight);
         }
     }
 
-    Font::Font(const std::string& filepath, int fontSize) : m_FontSize(fontSize)
+    Font::Font(const std::string& filepath) : m_FontSize(48)
     {
         auto codepoints = GetDefaultCodepoints();
         GenerateAtlas(filepath, codepoints);
     }
 
-    void Font::GenerateAtlas(const std::string& filepath, const std::vector<uint32_t>& codepoints)
+    Vector2 Font::CalculateTextSize(const std::wstring &InText, const Font* InFont, int InFontSize)
+    {
+        if (InFont==nullptr)
+        {
+            ENGINE_LOG_WARN("Font::CalculateTextSize NO VALID FONT!");
+            return Vector2(50.f);
+        }
+        float scale = (float)InFontSize / 48.0f;
+        float width = 0.0f;
+        float height = 0.0f;
+        for (wchar_t ch : InText) 
+        {
+            auto it = InFont->GetGlyphs().find((uint32_t)ch);
+            if (it == InFont->GetGlyphs().end()) continue;
+            const GlyphMetrics& gm = it->second;
+            width += (gm.advance >> 6) * scale; // advance в 1/64 пикселя
+            float glyphHeight = (gm.size.y + gm.bearing.y) * scale;
+            if (glyphHeight > height) height = glyphHeight;
+        }
+        return { width, height };
+    }
+
+    void Font::GenerateAtlas(const std::string &filepath, const std::vector<uint32_t> &codepoints)
     {
         FT_Library ft;
         if (FT_Init_FreeType(&ft))
@@ -211,14 +227,6 @@ namespace Engine::Render
         FT_Done_FreeType(ft);
     }
 
-    TRef<Font> Font::GetDefault()
-    {
-        static TRef<Font> s_DefaultFont;
-        if (!s_DefaultFont)
-            s_DefaultFont = CreateRef<Font>("Resources/Fonts/Cuprum.ttf", 48);
-        return s_DefaultFont;
-    }
-
     std::vector<uint32_t> GetDefaultCodepoints()
     {
         std::vector<uint32_t> codepoints;
@@ -236,5 +244,87 @@ namespace Engine::Render
         codepoints.push_back(0x0451);
 
         return codepoints;
+    }
+
+    TUniquePtr<FontManager> FontManager::s_Instance=nullptr;                           // Static pointer to the single (singleton)
+
+    Render::FontManager::FontManager()
+    {
+        ENGINE_LOG_TRACE("Start Font Manager...");
+    }
+
+    Render::FontManager::~FontManager()
+    {
+        ENGINE_LOG_TRACE("Stop Font Manager...");
+        m_FontDataBase.clear();
+    }
+
+    FontManager &Render::FontManager::GetFontManager()
+    {
+        if (s_Instance)
+        {
+            return *s_Instance;
+        }
+
+        s_Instance = CreateUniquePtr<FontManager>();
+
+        return *s_Instance;
+        // TODO: insert return statement here
+    }
+
+    bool Render::FontManager::IsFontContain(const std::string &InNameFont)
+    {
+        std::string LFontName = InNameFont;
+        auto LInt = m_FontDataBase.find(LFontName);
+        if (LInt != m_FontDataBase.end())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    TRef<Font> Render::FontManager::GetFont(const std::string &InNameFont)
+    {
+        std::string LFontName = InNameFont;
+        auto LInt = m_FontDataBase.find(LFontName);
+        if (LInt != m_FontDataBase.end())
+        {
+            return LInt->second;
+        }
+        return AddFont(InNameFont);
+    }
+
+    TRef<Font> Render::FontManager::GetFontDefault()
+    {
+        return GetFont(DEFAULT_FONT_NAME);
+    }
+
+    TRef<Font> Render::FontManager::AddFont(const std::string &InNameFont)
+    {
+        std::string LFontName = InNameFont;
+        TRef<Font> LNewFont = CreateRef<Font>("Resources/Fonts/" + InNameFont + ".ttf");
+        if (!LNewFont)
+        {
+            return nullptr;
+        }
+        m_FontDataBase.insert({LFontName,LNewFont});
+
+        ENGINE_LOG_TRACE("Load new font: {1}", LFontName);
+
+        return LNewFont;
+    }
+
+    bool Render::FontManager::RemoveFont(const std::string& InNameFont)
+    {
+        std::string LFontName = InNameFont;
+        auto LInt = m_FontDataBase.find(LFontName);
+        if (LInt != m_FontDataBase.end())
+        {
+            m_FontDataBase.erase(LFontName);
+
+            ENGINE_LOG_TRACE("Remove font: {1}", LFontName);
+            return true;
+        }
+        return false;
     }
 }

@@ -47,7 +47,9 @@ namespace Engine::UI
         void SetEnabled(bool enabled);
 
         bool IsHovered() const { return m_hovered; }
+        void SetHovered(bool hovered) { m_hovered = hovered; }
         bool IsPressed() const { return m_pressed; }
+        void SetPressed(bool pressed) { m_pressed = pressed; }
         bool IsFocused() const { return m_focused; }
 
         void SetFocusable(bool focusable) { m_focusable = focusable; }
@@ -69,7 +71,6 @@ namespace Engine::UI
         virtual void DrawContent();
 
         TColor GetCurrentBackgroundColor() const;
-        TColor GetCurrentTextColor() const;
         TColor GetCurrentBorderColor() const;
 
         bool m_enabled = true;

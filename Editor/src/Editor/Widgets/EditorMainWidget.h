@@ -1,12 +1,8 @@
-
 #pragma once
 
 #include <Engine.h>
 #include "Engine/UI/Framework/UIWidget.h"
-
-
-using namespace Engine::UI;
-
+#include "Engine/UI/Widgets/Editor/EditorTabContainer.h"
 
 class EditorMainWidget : public UIWidget
 {
@@ -15,4 +11,9 @@ public:
     virtual ~EditorMainWidget() = default;
 
     virtual void OnInit() override;
+    virtual void OnRender() override;
+
+private:
+    TRef<EditorTabContainer> m_mainTabs;
+    TRef<UIButton> m_mainButton;
 };

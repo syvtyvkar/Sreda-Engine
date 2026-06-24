@@ -101,6 +101,15 @@ namespace Engine::UI
         return size;
     }
 
+    bool UIElement::ContainsPoint(const Vector2 &point) const
+    {
+        if (!IsVisible()) return false;
+        Vector2 pos = GetComputedPosition();
+        Vector2 size = GetComputedSize();
+        return point.x >= pos.x && point.x <= pos.x + size.x &&
+               point.y >= pos.y && point.y <= pos.y + size.y;
+    }
+
     void UIElement::AddChild(TRef<UIElement> child)
     {
         if (child)

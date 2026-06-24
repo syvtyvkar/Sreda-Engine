@@ -30,14 +30,14 @@ namespace Engine::UI
             return CreateRef<HorizontalBox>();
         }
 
-        static TRef<UIButton> CreateButton(const std::string& text)
+        static TRef<UIButton> CreateButton(const std::string& text = "", const std::string& InFont = "")
         {
-            return CreateRef<UIButton>(text);
+            return CreateRef<UIButton>(text, InFont);
         }
 
-        static TRef<UITextBlock> CreateTextBlock(const std::string& text)
+        static TRef<UITextBlock> CreateTextBlock(const std::string& InText = "", const std::string& InFont = "")
         {
-            return CreateRef<UITextBlock>(text);
+            return CreateRef<UITextBlock>(InText,InFont);
         }
 
         template<typename TElement>

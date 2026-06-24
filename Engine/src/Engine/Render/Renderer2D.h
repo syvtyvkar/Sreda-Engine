@@ -47,7 +47,7 @@ namespace Engine::Render
 		static void DrawRect(const Vector3& position, const Vector2& size, const TColor& color, int entityID = -1);
 		static void DrawRect(const glm::mat4& transform, const TColor& color, int entityID = -1);
 
-		static void RenderDrawText(const std::wstring& text, const TRef<Texture2D>& fontAtlas,const std::unordered_map<uint32_t, GlyphMetrics>& glyphs,float x, float y, float scale, const TColor& color,int entityID = -1);
+		static void RenderDrawText(const std::wstring& text, const TRef<Texture2D>& fontAtlas,const std::unordered_map<uint32_t, GlyphMetrics>& glyphs,float x, float y, int FontSize, const TColor& color,int entityID = -1);
 
 		static float GetLineWidth();
 		static void SetLineWidth(float width);

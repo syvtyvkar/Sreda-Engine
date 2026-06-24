@@ -14,8 +14,8 @@ namespace Engine::UI
     {
         if (!IsVisible()) return;
 
-        DrawBackground();
-        DrawBorder();
+        //DrawBackground();
+        //DrawBorder();
         DrawContent();
 
         UIElement::OnRender();
@@ -47,7 +47,7 @@ namespace Engine::UI
         Vector2 size = GetComputedSize();
         TColor color = GetCurrentBackgroundColor();
 
-        Renderer2D::DrawQuad(pos, size, color);
+        Renderer2D::DrawQuad(pos + size * 0.5f, size, color);
     }
 
     void UIWidget::DrawBorder()
@@ -75,13 +75,6 @@ namespace Engine::UI
         if (m_hovered)
             return m_style.hoveredBackgroundColor;
         return m_style.backgroundColor;
-    }
-
-    TColor UIWidget::GetCurrentTextColor() const
-    {
-        if (!m_enabled)
-            return m_style.disabledTextColor;
-        return m_style.textColor;
     }
 
     TColor UIWidget::GetCurrentBorderColor() const

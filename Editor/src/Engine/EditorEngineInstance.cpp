@@ -11,7 +11,7 @@
 
 using namespace Engine::Render;
 
-EditorAppInstance::EditorAppInstance() : ApplicationInstance(), m_CameraController(1280.0f / 720.0f), m_ui_camera(0.f,12800.f,0.,720.f)
+EditorAppInstance::EditorAppInstance() : ApplicationInstance(), m_CameraController(1280.0f / 720.0f), m_ui_camera(0.f,12800.f,720.f,0.f)
 {
 }
 
@@ -24,13 +24,13 @@ void EditorAppInstance::OnInit(Application *InOwnerApp)
 		InOwnerApp->GetWindow()->OnWindowReSize().Subscribe([&,this](int x, int y) 
 		{
 			m_CameraController.OnResize(x,y);
-			m_ui_camera.SetProjection(0.0f, (float)x, 0.0f, (float)y);
+			m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);
 		});
 		m_CameraController.OnResize(InOwnerApp->GetWindow()->GetWidth(),InOwnerApp->GetWindow()->GetHeight());
 
 		int w = InOwnerApp->GetWindow()->GetWidth();
 		int h = InOwnerApp->GetWindow()->GetHeight();
-		m_ui_camera.SetProjection(0.0f, (float)w, 0.0f, (float)h);
+		m_ui_camera.SetProjection(0.0f, (float)w, (float)h, 0.0f);
 		m_ui_camera.SetPosition(Vector3(0.0f));
 		m_ui_camera.SetRotation(0.0f);
 	}
@@ -174,12 +174,11 @@ void EditorAppInstance::OnStart()
 	textureShader->Bind();
 	textureShader->SetInt("u_Texture", 0);
 
-	m_Font = CreateRef<Font>("Resources/Fonts/Cuprum.ttf", 48);
+	m_Font = FontManager::GetFontManager().GetFontDefault(); 
 	if (!m_Font->GetAtlasTexture())
 	{
 		ENGINE_ASSERT(false, "Failed to load font!!!");
 	}
-	ENGINE_LOG_INFO("Font loaded, atlas texture ID={}", m_Font->GetAtlasTexture()->GetRendererID());
 
 	GetOwnerApp()->GetWindow()->LoadIconFromFile();
 	GetUISystem()->RegisterWidget(std::make_shared<EditorMainWidget>());
@@ -205,8 +204,8 @@ void EditorAppInstance::Update(float DeltaTime)
 
 	Renderer::BeginScene(m_CameraController.GetCamera());
 
-	//Renderer2D::RenderDrawText(L"Привет, мир!", m_FontTexture, m_AtlasFont.glyphs, 0.0f, 0.0f, 0.1f, glm::vec4(1.0f));
-	//Renderer2D::RenderDrawText(L"Scale 2x", m_FontTexture, m_AtlasFont.glyphs, 0.0f, 0.0f, 0.1f, glm::vec4(1.0f));
+	//Renderer2D::RenderDrawText(L"Привет, мир!", m_FontTexture, m_AtlasFont.glyphs, 0.0f, 0.0f, 16, glm::vec4(1.0f));
+	//Renderer2D::RenderDrawText(L"Scale 2x", m_FontTexture, m_AtlasFont.glyphs, 0.0f, 0.0f, 16, glm::vec4(1.0f));
 
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -236,10 +235,10 @@ void EditorAppInstance::Update(float DeltaTime)
 	
 	auto textureShader = m_ShaderLibrary.Get("SimpleTexture");
 
-	m_Texture->Bind();
-	Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(-100.0f), glm::vec3(0.2f)));
-	m_CheckerboardTexture->Bind();
-	Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(100.f), glm::vec3(0.5f)));
+	//m_Texture->Bind();
+	//Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(-100.0f), glm::vec3(0.2f)));
+ 	//m_CheckerboardTexture->Bind();
+	//Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(100.f), glm::vec3(0.2f)));
 
 	// Triangle
 	//Renderer::Submit(m_Shader, m_VertexArray);
@@ -262,8 +261,9 @@ void EditorAppInstance::Update(float DeltaTime)
 	Renderer::EndScene();
 
 	Renderer2D::BeginScene(m_ui_camera);
-	Renderer2D::RenderDrawText(L"Hello, world!", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 100.0f, 1.0f, TColor::White);
-	Renderer2D::RenderDrawText(L"Big text test", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 200.0f, 2.0f, TColor::Orange);
+
+	//Renderer2D::RenderDrawText(L"Hello, world!", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 100.0f, 48, TColor::White);
+	//Renderer2D::RenderDrawText(L"Big text test", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 200.0f, 94, TColor::Orange);
 
 	//Renderer2D::DrawQuad(Vector2(0,500), Vector2(1500,100), m_Font->GetAtlasTexture());
 
@@ -276,17 +276,4 @@ void EditorAppInstance::Update(float DeltaTime)
 void EditorAppInstance::OnRender()
 {
 	__super::OnRender();
-}
-
-void EditorAppInstance::OnRenderUI()
-{
-	__super::OnRenderUI();
-	//Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-	//Renderer2D::DrawCircle(glm::scale(glm::mat4(1.0f), Vector3(1.f)),{0.f,0.8f,0.6f,1.f},1.f);
-
-	//Renderer2D::DrawText(L"Привет, мир!", m_FontTexture, m_AtlasFont.glyphs, 100.0f, 100.0f, 1.0f, glm::vec4(1.0f));
-	//Renderer2D::DrawText(L"Scale 2x", m_FontTexture, m_AtlasFont.glyphs, 100.0f, 200.0f, 2.0f, glm::vec4(1.0f, 0.5f, 0.2f, 1.0f));
-
-	//Renderer2D::EndScene();
 }

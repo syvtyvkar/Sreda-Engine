@@ -513,7 +513,7 @@ namespace Engine::Render
 		DrawLine(lineVertices[3], lineVertices[0], color, entityID);
 	}
 
-    void Renderer2D::RenderDrawText(const std::wstring &text, const TRef<Texture2D> &fontAtlas, const std::unordered_map<uint32_t, GlyphMetrics> &glyphs, float x, float y, float scale, const TColor &color, int entityID)
+    void Renderer2D::RenderDrawText(const std::wstring &text, const TRef<Texture2D> &fontAtlas, const std::unordered_map<uint32_t, GlyphMetrics> &glyphs, float x, float y, int FontSize, const TColor &color, int entityID)
     {
 		if (text.empty() || !fontAtlas) return;
 
@@ -547,8 +547,10 @@ namespace Engine::Render
 			if (it == glyphs.end()) continue;
 			const GlyphMetrics& gm = it->second;
 
+			float scale = (float)FontSize / 48,f;
+
 			float xpos = originX + gm.bearing.x * scale;
-			float ypos = originY - (gm.size.y - gm.bearing.y) * scale;
+			float ypos = originY - gm.bearing.y * scale;
 			float w = gm.size.x * scale;
 			float h = gm.size.y * scale;
 

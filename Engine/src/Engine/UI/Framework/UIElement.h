@@ -11,38 +11,6 @@ namespace Engine::UI
 {
     using namespace Engine;
 
-    struct UIMargins
-    {
-        float left = 0.0f;
-        float top = 0.0f;
-        float right = 0.0f;
-        float bottom = 0.0f;
-    };
-
-    struct UIPadding
-    {
-        float left = 0.0f;
-        float top = 0.0f;
-        float right = 0.0f;
-        float bottom = 0.0f;
-    };
-
-    enum class UIHorizontalAlignment
-    {
-        Left,
-        Center,
-        Right,
-        Stretch
-    };
-
-    enum class UIVerticalAlignment
-    {
-        Top,
-        Center,
-        Bottom,
-        Stretch
-    };
-
     class UIElement : public std::enable_shared_from_this<UIElement>
     {
     public:
@@ -59,8 +27,8 @@ namespace Engine::UI
         virtual void SetSize(const Vector2& size) { m_size = size; }
         virtual Vector2 GetSize() const { return m_size; }
 
-        Vector2 GetComputedPosition() const;
-        Vector2 GetComputedSize() const;
+        virtual Vector2 GetComputedPosition() const;
+        virtual Vector2 GetComputedSize() const;
 
         void SetMargins(const UIMargins& margins) { m_margins = margins; }
         UIMargins GetMargins() const { return m_margins; }
@@ -83,18 +51,22 @@ namespace Engine::UI
         void AddChild(TRef<UIElement> child);
         void RemoveChild(const TRef<UIElement>& child);
         const std::vector<TRef<UIElement>>& GetChildren() const { return m_children; }
+        std::vector<TRef<UIElement>>& GetChildren() { return m_children; }
 
-        bool IsVisible() const { return m_visible; }
-        void SetVisible(bool visible) { m_visible = visible; }
+        bool IsVisible() const { return m_visible == UIVisibleMode::Visible || m_visible == UIVisibleMode::VisibleNoHit; }
+        void SetVisible(UIVisibleMode visible) { m_visible = visible; }
+
+        bool ContainsPoint(const Vector2& point) const;
+        Vector2 GetAbsolutePosition() const { return GetComputedPosition(); }
 
         TRef<UIElement> GetParent() const { return m_parent.lock(); }
 
     protected:
         std::vector<TRef<UIElement>> m_children;
         TWeak<UIElement> m_parent;
-        bool m_visible = true;
+        UIVisibleMode m_visible = UIVisibleMode::Visible;
         Vector2 m_position = { 0.0f, 0.0f };
-        Vector2 m_size = { 100.0f, 30.0f };
+        Vector2 m_size = { 30.0f, 30.0f };
         Vector2 m_minSize = { 0.0f, 0.0f };
         Vector2 m_maxSize = { FLT_MAX, FLT_MAX };
 

@@ -39,8 +39,6 @@ public:
 
     virtual void Update(float DeltaTime) override;
     virtual void OnRender() override;
-    virtual void OnRenderUI() override;
-
 private:
 
     TUniquePtr<EditorInputComponent> m_EditorInputHotKey;

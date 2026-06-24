@@ -268,9 +268,9 @@ namespace Engine
         {
             if (win->GetWindowMode() == WindowMode::Window) 
             {
-            win->m_width = width;
-            win->m_height = height;
-            win->m_dirt_width_height = true;
+                win->m_width = width;
+                win->m_height = height;
+                win->m_dirt_width_height = true;
             }
             
             // Устанавливаем область вывода OpenGL на весь новый размер окна

@@ -1,10 +1,11 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once    // Защита от множественного включения
+#pragma once
 
 #include "Engine/UI/Framework/IUIContext.h"
 #include "Engine/UI/Framework/UIWidget.h"
 #include "Engine/Render/OrthographicCamera.h"
+#include "Engine/Core/Utilities/Event.h"
 
 
 namespace Engine::UI
@@ -13,7 +14,7 @@ namespace Engine::UI
     {
     public:
         UISredaContext();
-        virtual ~UISredaContext() = default;
+        virtual ~UISredaContext();
 
         bool Initialized = false;
 
@@ -24,14 +25,24 @@ namespace Engine::UI
 
         virtual void InitContext() override;
 
-        // UIContext
         virtual void Show() override;
         virtual void Hide() override;
         virtual bool IsVisible() const override;
 
         virtual void Update(float DeltaTime) override;
+
     private:
+        TRef<UIWidget> HitTest(TRef<UIElement> root, const Vector2& point);
+        void HandleInput();
+
         OrthographicCamera m_ui_camera;
         bool m_bIsVisible = true;
+
+        TRef<UIWidget> m_hoveredWidget;
+        TRef<UIWidget> m_pressedWidget;
+        Vector2 m_lastMousePos;
+
+        Engine::DelegateHandle m_mousePressedHandle;
+        Engine::DelegateHandle m_mouseReleasedHandle;
     };
 }

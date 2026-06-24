@@ -13,9 +13,13 @@ namespace Engine::UI
         void OnUpdate(float deltaTime) override;
         
         // Layout management
-        virtual void ArrangeChildren() = 0;  // Pure virtual for different layout types
+        virtual void ArrangeChildren() = 0;
+
+        void SetSpacing(float spacing) { m_spacing = spacing; }
+        float GetSpacing() const { return m_spacing; }
         
     protected:
+        float m_spacing = 0.0f;
     };
 
     // Specific container implementations
