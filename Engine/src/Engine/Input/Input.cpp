@@ -31,6 +31,7 @@ namespace Engine
         s_InputInstance->m_InputListen.get()->OnMouseButtonPressed().Subscribe([&](InputKey button, int mods,InputState state) {s_InputInstance->CallOnMouseButtonPressed(button,mods,state);});
         s_InputInstance->m_InputListen.get()->OnMouseMoved().Subscribe([&](float x, float y) {s_InputInstance->CallOnMouseMoved(x,y);});
         s_InputInstance->m_InputListen.get()->OnMouseScrolled().Subscribe([&](float x, float y) {s_InputInstance->CallOnMouseScrolled(x,y);});
+        s_InputInstance->m_InputListen.get()->OnCharInput().Subscribe([&](uint32_t codepoint) {s_InputInstance->OnCharInput().Broadcast(codepoint);});
 
         ENGINE_LOG_TRACE("Input system start!");
     }

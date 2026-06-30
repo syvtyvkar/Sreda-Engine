@@ -194,6 +194,7 @@ namespace Engine
         static void OnGLFWMouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
         static void OnGLFWCursorPosCallback(GLFWwindow* window, double xpos, double ypos);
         static void OnGLFWScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+        static void OnGLFWCharCallback(GLFWwindow* window, unsigned int codepoint);
 
         // Класс Window объявлен другом, чтобы иметь доступ к приватным членам
         friend class Window;

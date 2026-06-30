@@ -43,6 +43,7 @@ namespace Engine::Render
 	void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	{
 		glViewport(x, y, width, height);
+		m_viewportHeight = height;
 	}
 
 	void OpenGLRendererAPI::SetClearColor(const TColor& color)
@@ -84,5 +85,18 @@ namespace Engine::Render
 	void OpenGLRendererAPI::SetDepthWrite(bool enabled)
 	{
 		glDepthMask(enabled ? GL_TRUE : GL_FALSE);
+	}
+
+	void OpenGLRendererAPI::EnableScissor(bool enabled)
+	{
+		if (enabled)
+			glEnable(GL_SCISSOR_TEST);
+		else
+			glDisable(GL_SCISSOR_TEST);
+	}
+
+	void OpenGLRendererAPI::SetScissor(int x, int y, int width, int height)
+	{
+		glScissor(x, m_viewportHeight - y - height, width, height);
 	}
 }

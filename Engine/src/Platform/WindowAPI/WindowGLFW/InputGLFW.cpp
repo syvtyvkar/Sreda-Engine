@@ -33,6 +33,7 @@ namespace Engine
         glfwSetMouseButtonCallback(glfwWindow, OnGLFWMouseButtonCallback);
         glfwSetCursorPosCallback(glfwWindow, OnGLFWCursorPosCallback);
         glfwSetScrollCallback(glfwWindow, OnGLFWScrollCallback);
+        glfwSetCharCallback(glfwWindow, OnGLFWCharCallback);
 
         m_windowHandle = glfwWindow;                                    // Сохраняем native handle для дальнейшего использования
         DelegateChangeWindowHandle = WindowGL->OnUpdateWindowHandle().Subscribe([&,this](GLFWwindow* OutWindow)
@@ -56,6 +57,7 @@ namespace Engine
                 glfwSetMouseButtonCallback(OutWindow, OnGLFWMouseButtonCallback);
                 glfwSetCursorPosCallback(OutWindow, OnGLFWCursorPosCallback);
                 glfwSetScrollCallback(OutWindow, OnGLFWScrollCallback);
+                glfwSetCharCallback(OutWindow, OnGLFWCharCallback);
 
                 m_windowHandle = OutWindow;
             }
@@ -73,6 +75,7 @@ namespace Engine
         OnMouseButtonPressed().Clear();
         OnMouseMoved().Clear();
         OnMouseScrolled().Clear();
+        OnCharInput().Clear();
 
         if (m_window)
         {
@@ -91,6 +94,7 @@ namespace Engine
                 glfwSetMouseButtonCallback(glfwWindow, nullptr);
                 glfwSetCursorPosCallback(glfwWindow, nullptr);
                 glfwSetScrollCallback(glfwWindow, nullptr);
+                glfwSetCharCallback(glfwWindow, nullptr);
             }
         }
         m_windowHandle = nullptr;
@@ -257,6 +261,12 @@ namespace Engine
         if (!Engine::InputSystem::GetInstance().GetInputListen()) return nullptr;
         return static_cast<InputListenGLFWSystem*>(Engine::InputSystem::GetInstance().GetInputListen());
     };
+
+    void InputListenGLFWSystem::OnGLFWCharCallback(GLFWwindow* window, unsigned int codepoint)
+    {
+        if (!GetInputListen(window)) return;
+        GetInputListen(window)->OnCharInput().Broadcast(codepoint);
+    }
 
     InputListenGLFWSystem::~InputListenGLFWSystem() // Деструктор: автоматически вызывает DeInit для очистки.
     {

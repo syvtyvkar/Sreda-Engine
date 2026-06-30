@@ -18,6 +18,7 @@ namespace Engine
     ADD_DELEGATE_TWO_PARAMS(DOnMouseScrolled,float,float)           // Scroll wheel event (xOffset, yOffset)
     ADD_DELEGATE_TWO_PARAMS(DOnMouseButtonPressed,InputKey,int)          // Mouse button press event (button, mods)
     ADD_DELEGATE_TWO_PARAMS(DOnMouseButtonReleased,InputKey,int)         // Mouse button release event (button, mods)
+    ADD_DELEGATE_ONE_PARAM(DOnCharInput, uint32_t)                      // Char input (unicode codepoint)
     
     class Window;
 
@@ -72,6 +73,7 @@ namespace Engine
         DOnMouseScrolled& OnMouseScrolled() {return s_OnMouseScrolled;}
         DOnMouseButtonPressed& OnMouseButtonPressed() {return s_OnMouseButtonPressed;}
         DOnMouseButtonReleased& OnMouseButtonReleased() {return s_OnMouseButtonReleased;}
+        DOnCharInput& OnCharInput() {return s_OnCharInput;}
 
     protected:
         TUniquePtr<IInputListen> m_InputListen=nullptr;                 // Input listener
@@ -105,6 +107,7 @@ namespace Engine
         DOnMouseScrolled s_OnMouseScrolled;                 // xOffset, yOffset
         DOnMouseButtonPressed s_OnMouseButtonPressed;       // button, mods
         DOnMouseButtonReleased s_OnMouseButtonReleased;     // button, mods
+        DOnCharInput s_OnCharInput;                         // char input
 
     protected:
         void CallOnKeyPressed(InputKey key, int scancode, int mods, InputState State);

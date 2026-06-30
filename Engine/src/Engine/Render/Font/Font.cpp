@@ -9,8 +9,6 @@
 
 #include "Engine/Platform/PlatformUtils.h"
 
-#define DEFAULT_FONT_NAME "Cuprum"
-
 namespace Engine::Render
 {
     struct RawGlyph

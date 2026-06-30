@@ -29,11 +29,14 @@ namespace Engine::Render
 		
 		virtual void SetLineWidth(float width) = 0;
 
-		virtual void SetDepthTest(bool enabled) = 0;
-		virtual void SetDepthWrite(bool enabled) = 0;
+        virtual void SetDepthTest(bool enabled) = 0;
+        virtual void SetDepthWrite(bool enabled) = 0;
 
-		static API GetAPI() { return s_API; }
-		static TUniquePtr<RendererAPI> Create();
+        virtual void EnableScissor(bool enabled) = 0;
+        virtual void SetScissor(int x, int y, int width, int height) = 0;
+
+        static API GetAPI() { return s_API; }
+        static TUniquePtr<RendererAPI> Create();
 	private:
 		static API s_API;
 	};

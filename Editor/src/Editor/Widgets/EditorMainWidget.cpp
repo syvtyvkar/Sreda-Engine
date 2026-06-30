@@ -5,6 +5,7 @@
 
 #include "Engine/Render/Renderer2D.h"
 
+
 EditorMainWidget::EditorMainWidget()
 {
     SetSize({ 1280, 720 });
@@ -27,23 +28,8 @@ void EditorMainWidget::OnInit()
 
     SetVerticalAlignment(UIVerticalAlignment::Stretch);
     SetHorizontalAlignment(UIHorizontalAlignment::Stretch);
-    //SetPosition(Vector2(Application::Get().GetWindow()->GetWidth()/2.f,Application::Get().GetWindow()->GetHeight()/2.f));
 
-
-    /*m_mainTabs = CreateRef<EditorTabContainer>();
-    m_mainTabs->OnInit();
-    m_mainTabs->SetHorizontalAlignment(UIHorizontalAlignment::Center);
-    m_mainTabs->SetVerticalAlignment(UIVerticalAlignment::Center);
-    AddChild(m_mainTabs);
-
-    auto sceneContent = UIBuilder::CreateTextBlock("Scene View Content");
-    sceneContent->SetHorizontalAlignment(UIHorizontalAlignment::Center);
-    sceneContent->SetVerticalAlignment(UIVerticalAlignment::Center);
-    sceneContent->SetText("Scene View");
-    m_mainTabs->AddTab("Scene", sceneContent);*/
-
-
-    m_mainButton = UIBuilder::CreateButton("Test button", "Cuprum");
+    m_mainButton = UIBuilder::CreateButton("Test button");
     m_mainButton->OnInit();
     m_mainButton->SetText("Test button 435354");
     //m_mainButton->SetFontSize(48);
@@ -74,7 +60,9 @@ void EditorMainWidget::OnInit()
 
     AddChild(m_EditorMainMenuBar);
 
-    TRef<UITextBlock> LText = UIBuilder::CreateTextBlock("Debug mode", "Cuprum");
+    //TRef<VerticalBox> LVecrticalBox = UIBuilder::CreateVerticalBox();
+
+    TRef<UITextBlock> LText = UIBuilder::CreateTextBlock("Debug mode");
     LText->OnInit();
     LText->SetText("Text block");
     LText->SetSize(45);
@@ -82,31 +70,23 @@ void EditorMainWidget::OnInit()
     LText->SetVerticalAlignment(UIVerticalAlignment::Bottom);
     AddChild(LText);
 
-    /*auto gameContent = UIBuilder::CreateTextBlock("Game View Content");
-    gameContent->SetHorizontalAlignment(UIHorizontalAlignment::Center);
-    gameContent->SetVerticalAlignment(UIVerticalAlignment::Center);
-    gameContent->SetText("Game View");
-    m_mainTabs->AddTab("Game", gameContent);
+    TRef<UITextBlock> LTextEditLine = UIBuilder::CreateTextBlock("EditLine Text block:");
+    LTextEditLine->OnInit();
+    LTextEditLine->SetSize(16);
+    LTextEditLine->SetHorizontalAlignment(UIHorizontalAlignment::Left);
+    LTextEditLine->SetVerticalAlignment(UIVerticalAlignment::Center);
+    LTextEditLine->SetPosition(Vector2(50,-20));
+    AddChild(LTextEditLine);
 
-    auto assetsContent = UIBuilder::CreateTextBlock("Assets Content");
-    assetsContent->SetHorizontalAlignment(UIHorizontalAlignment::Center);
-    assetsContent->SetVerticalAlignment(UIVerticalAlignment::Center);
-    assetsContent->SetText("Assets Browser");
-    m_mainTabs->AddTab("Assets", assetsContent);
-
-    auto consoleContent = UIBuilder::CreateTextBlock("Console Content");
-    consoleContent->SetHorizontalAlignment(UIHorizontalAlignment::Center);
-    consoleContent->SetVerticalAlignment(UIVerticalAlignment::Center);
-    consoleContent->SetText("Console");
-    m_mainTabs->AddTab("Console", consoleContent);
-
-    auto settingsContent = UIBuilder::CreateTextBlock("Settings Content");
-    settingsContent->SetHorizontalAlignment(UIHorizontalAlignment::Center);
-    settingsContent->SetVerticalAlignment(UIVerticalAlignment::Center);
-    settingsContent->SetText("Settings");
-    m_mainTabs->AddTab("Settings", settingsContent, false);*/
-
-    //m_mainTabs->SelectTab(0);
+    AddChild(
+    UIBuilder::WithProperties<UILineEdit>(UIBuilder::CreateLineEdit(),[](UILineEdit* widget)
+    {
+        widget->OnInit();
+        widget->SetHorizontalAlignment(UIHorizontalAlignment::Left);
+        widget->SetVerticalAlignment(UIVerticalAlignment::Center);
+        widget->SetSize(Vector2(300.f,20.f));
+        widget->SetPosition(Vector2(50,0));  
+    }));
 }
 
 void EditorMainWidget::OnRender()

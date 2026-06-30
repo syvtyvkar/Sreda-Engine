@@ -13,6 +13,7 @@ namespace Engine
     ADD_DELEGATE_TWO_PARAMS(DOnMouseMovedListen,float,float)            // x, y
     ADD_DELEGATE_TWO_PARAMS(DOnMouseScrolledListen,float,float)         // xOffset, yOffset
     ADD_DELEGATE_THREE_PARAMS(DOnMouseButtonPressedListen,InputKey,int,InputState)        // button, mods
+    ADD_DELEGATE_ONE_PARAM(DOnCharInputListen, uint32_t)               // char input (unicode codepoint)
 
     /**
      * @class InputListen
@@ -40,6 +41,7 @@ namespace Engine
         DOnMouseMovedListen& OnMouseMoved() {return s_OnMouseMovedListen;}
         DOnMouseScrolledListen& OnMouseScrolled() {return s_OnMouseScrolledListen;}
         DOnMouseButtonPressedListen& OnMouseButtonPressed() {return s_OnMouseButtonPressedListen;}
+        DOnCharInputListen& OnCharInput() {return s_OnCharInputListen;}
 
         virtual bool GetCursorVisible() = 0;                    
         virtual int GetCursorMode() = 0;
@@ -53,6 +55,7 @@ namespace Engine
         DOnMouseMovedListen s_OnMouseMovedListen;
         DOnMouseScrolledListen s_OnMouseScrolledListen;
         DOnMouseButtonPressedListen s_OnMouseButtonPressedListen;
+        DOnCharInputListen s_OnCharInputListen;
     };
 
     /**

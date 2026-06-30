@@ -51,11 +51,21 @@ namespace Engine::Render
 			s_RendererAPI->SetDepthTest(enabled);
 		}
 
-		static void SetDepthWrite(bool enabled)
-		{
-			s_RendererAPI->SetDepthWrite(enabled);
-		}
-	private:
+        static void SetDepthWrite(bool enabled)
+        {
+            s_RendererAPI->SetDepthWrite(enabled);
+        }
+
+        static void EnableScissor(bool enabled)
+        {
+            s_RendererAPI->EnableScissor(enabled);
+        }
+
+        static void SetScissor(int x, int y, int width, int height)
+        {
+            s_RendererAPI->SetScissor(x, y, width, height);
+        }
+    private:
 		static TUniquePtr<RendererAPI> s_RendererAPI;
 	};
 }

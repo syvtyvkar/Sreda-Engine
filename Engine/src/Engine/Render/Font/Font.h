@@ -11,6 +11,8 @@
 #include "BaseEngine.h"
 #include "Engine/Render/Texture.h"
 
+#define DEFAULT_FONT_NAME "Inter_18pt-Regular" // "Inter_18pt-Regular" "Cuprum"
+
 namespace Engine::Render
 {
     struct GlyphMetrics

@@ -96,6 +96,7 @@ namespace Engine
         glm::vec2 GetGlmVec2() const { return glm::vec2(x, y); }
 
         Vector2 operator+(const Vector2& other) const {return Vector2(x + other.x, y + other.y);}
+        Vector2 operator-(const Vector2& other) const {return Vector2(x - other.x, y - other.y);}
         Vector2 operator*(float scalar) const {return Vector2(x * scalar, y * scalar);}
     };
 

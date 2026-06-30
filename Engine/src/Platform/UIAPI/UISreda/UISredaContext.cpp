@@ -25,11 +25,33 @@ namespace Engine::UI
                 if (button != InputKey::MouseLeft) return;
                 Vector2 mousePos = InputSystem::GetMousePosition();
                 TRef<UIWidget> hit = HitTest(GetRootWidget(), mousePos);
+
+                if (m_FocusWidget && m_FocusWidget != hit)
+                {
+                    m_FocusWidget->SetPressed(false);
+                    m_FocusWidget->SetHovered(false);
+                    if (m_hoveredWidget == m_FocusWidget)
+                        m_hoveredWidget.reset();
+                    if (hit)
+                    {
+                        hit->OnClick().Broadcast();
+                    }
+                }
+
                 if (hit)
                 {
                     hit->SetPressed(true);
                     m_LastPressWidget = hit;
                     hit->OnPressBegin().Broadcast();
+
+                    if (hit->IsFocusable() && m_FocusWidget != hit)
+                    {
+                        m_FocusWidget = hit;
+                    }
+                }
+                else if (m_FocusWidget)
+                {
+                    m_FocusWidget.reset();
                 }
             });
 

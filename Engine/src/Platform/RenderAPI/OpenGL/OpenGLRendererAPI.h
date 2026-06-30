@@ -18,7 +18,13 @@ namespace Engine::Render
 		
 		virtual void SetLineWidth(float width) override;
 
-		virtual void SetDepthTest(bool enabled) override;
-		virtual void SetDepthWrite(bool enabled) override;
-	};
+        virtual void SetDepthTest(bool enabled) override;
+        virtual void SetDepthWrite(bool enabled) override;
+
+        virtual void EnableScissor(bool enabled) override;
+        virtual void SetScissor(int x, int y, int width, int height) override;
+
+    private:
+        int m_viewportHeight = 0;
+    };
 }

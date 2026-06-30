@@ -7,7 +7,7 @@
 #include "Engine/UI/Elements/BaseElement/Container.h"
 #include "Engine/UI/Elements/BaseElement/Element.h"
 
-#define DEFAULT_FONT "Cuprum"
+#include "Engine/Render/Font/Font.h"
 
 namespace Engine::UI 
 {
@@ -32,12 +32,12 @@ namespace Engine::UI
             return CreateRef<HorizontalBox>();
         }
 
-        static TRef<UIButton> CreateButton(const std::string& text = "", const std::string& InFont = DEFAULT_FONT)
+        static TRef<UIButton> CreateButton(const std::string& text = "", const std::string& InFont = DEFAULT_FONT_NAME)
         {
             return CreateRef<UIButton>(text, InFont);
         }
 
-        static TRef<UITextBlock> CreateTextBlock(const std::string& InText = "", const std::string& InFont = DEFAULT_FONT)
+        static TRef<UITextBlock> CreateTextBlock(const std::string& InText = "", const std::string& InFont = DEFAULT_FONT_NAME)
         {
             return CreateRef<UITextBlock>(InText,InFont);
         }
@@ -47,16 +47,25 @@ namespace Engine::UI
             return CreateRef<UIImage>(InTexture);
         }
 
+        static TRef<UILineEdit> CreateLineEdit(const std::string& InFont = DEFAULT_FONT_NAME)
+        {
+            return CreateRef<UILineEdit>(InFont);
+        }
+
+        static TRef<UITextEdit> CreateTextEdit(const std::string& InFont = DEFAULT_FONT_NAME)
+        {
+            return CreateRef<UITextEdit>(InFont);
+        }
+
         template<typename TElement>
-        static TRef<TElement> WithProperties(
-            TRef<TElement> element,
-            std::function<void(TElement*)> propertiesSetter)
+        static TRef<TElement> WithProperties(TRef<TElement> element, std::function<void(TElement*)> propertiesSetter)
         {
             propertiesSetter(element.get());
             return element;
         }
 
-        template<typename TElement>
+        // TODO: DEPRICATE!!!!!
+        /*   template<typename TElement>
         static TRef<TElement> WithStyle(
             TRef<TElement> element,
             std::function<void(UIWidgetStyle&)> styleSetter)
@@ -66,6 +75,6 @@ namespace Engine::UI
                 styleSetter(element->GetStyle());
             }
             return element;
-        }
+        }*/
     };
 }
