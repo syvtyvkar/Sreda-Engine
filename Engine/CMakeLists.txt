@@ -23,6 +23,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Engine/lib)
 
 # Поиск пакетов
 find_package(OpenGL REQUIRED)
+find_package(msdfgen CONFIG REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
@@ -52,6 +53,9 @@ if(MSVC)
 endif()
 
 #### msdfgen
+
+target_link_libraries(Engine PRIVATE msdfgen::msdfgen freetype)
+target_compile_definitions(Engine PRIVATE MSDFGEN_STATIC)
 
 ######
 

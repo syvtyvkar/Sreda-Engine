@@ -39,8 +39,10 @@ namespace Engine::UI
         bool m_bIsVisible = true;
 
         TRef<UIWidget> m_hoveredWidget;
-        TRef<UIWidget> m_pressedWidget;
         Vector2 m_lastMousePos;
+
+        TRef<UIWidget> m_FocusWidget;
+        TRef<UIWidget> m_LastPressWidget;
 
         Engine::DelegateHandle m_mousePressedHandle;
         Engine::DelegateHandle m_mouseReleasedHandle;

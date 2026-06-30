@@ -7,6 +7,9 @@ vcpkg_installed/*
 # external
 Engine/external/*
 
+#Test game
+IDUGame/*
+
 # .VSStudio
 .vscode/*
 

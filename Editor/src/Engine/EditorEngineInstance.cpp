@@ -166,13 +166,13 @@ void EditorAppInstance::OnStart()
 
 	m_FlatColorShader = Shader::Create("FlatColor", flatColorShaderVertexSrc, flatColorShaderFragmentSrc);
 
-	auto textureShader = m_ShaderLibrary.Load("/Resources/Shaders/SimpleTexture.glsl");
+	//auto textureShader = m_ShaderLibrary.Load("/Resources/Shaders/SimpleTexture.glsl");
 
-	m_Texture = Texture2D::Create("/Resources/Textures/t_test_texture_black.png");
-	m_CheckerboardTexture = Texture2D::Create("/Resources/Textures/SredaLogo.png");
+	//m_Texture = Texture2D::Create("/Resources/Textures/t_test_texture_black.png");
+	//m_CheckerboardTexture = Texture2D::Create("/Resources/Textures/SredaLogo.png");
 
-	textureShader->Bind();
-	textureShader->SetInt("u_Texture", 0);
+	//textureShader->Bind();
+	//textureShader->SetInt("u_Texture", 0);
 
 	m_Font = FontManager::GetFontManager().GetFontDefault(); 
 	if (!m_Font->GetAtlasTexture())
@@ -233,7 +233,7 @@ void EditorAppInstance::Update(float DeltaTime)
 		}
 	}*/
 	
-	auto textureShader = m_ShaderLibrary.Get("SimpleTexture");
+	//auto textureShader = m_ShaderLibrary.Get("SimpleTexture");
 
 	//m_Texture->Bind();
 	//Renderer::Submit(textureShader, m_SquareVA, glm::scale(glm::mat4(-100.0f), glm::vec3(0.2f)));

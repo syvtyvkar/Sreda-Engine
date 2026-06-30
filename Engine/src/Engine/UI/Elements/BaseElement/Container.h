@@ -3,10 +3,11 @@
 #pragma once    // Multiple inclusion guard
 
 #include "Engine/UI/Framework/UIElement.h"
+#include "Engine/UI/Framework/UIWidget.h"
 
 namespace Engine::UI 
 {
-    class UIContainer : public UIElement
+    class UIContainer : public UIWidget
     {
     public:
         void OnRender() override;
@@ -17,6 +18,8 @@ namespace Engine::UI
 
         void SetSpacing(float spacing) { m_spacing = spacing; }
         float GetSpacing() const { return m_spacing; }
+
+        virtual Vector2 GetSize() const override;
         
     protected:
         float m_spacing = 0.0f;

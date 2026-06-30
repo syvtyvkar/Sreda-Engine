@@ -146,12 +146,14 @@ namespace Engine
     void InputListenGLFWSystem::OnGLFWMouseButtonCallback(GLFWwindow* window, int button, int action, int mods) 
     {
         if (!GetInputListen(window)) return;
-        InputKey engineButton = FromGLFWKey(button + 1000);  // Сдвиг для мыши
+        InputKey engineButton = FromGLFWKey(button /*+ 1000*/);  // Сдвиг для мыши
         if (engineButton == InputKey::Unknown) return;
 
         InputState state = (action == GLFW_PRESS) ? InputState::Pressed : (action == GLFW_RELEASE) ? InputState::Released : InputState::Unknown;
-
+        
         GetInputListen(window)->OnMouseButtonPressed().Broadcast(engineButton,mods,state);
+
+
     }
 
     /**

@@ -33,38 +33,38 @@ namespace Engine::UI
         Vector2 parentPos = parent->GetComputedPosition();
         Vector2 parentSize = parent->GetComputedSize();
 
-        float x = parentPos.x + m_margins.left;
-        float y = parentPos.y + m_margins.top;
+        float x = parentPos.x + m_margins.left + m_position.x;
+        float y = parentPos.y + m_margins.top + m_position.y;
 
         switch (m_hAlignment)
         {
             case UIHorizontalAlignment::Center:
-                x = parentPos.x + (parentSize.x - m_size.x) * 0.5f;
+                x = parentPos.x + (parentSize.x - m_size.x) * 0.5f + m_position.x;
                 break;
             case UIHorizontalAlignment::Right:
-                x = parentPos.x + parentSize.x - m_size.x - m_margins.right;
+                x = parentPos.x + parentSize.x - m_size.x - m_margins.right + m_position.x;
                 break;
             case UIHorizontalAlignment::Stretch:
-                x = parentPos.x + m_margins.left;
+                x = parentPos.x + m_margins.left + m_position.x;
                 break;
             default:
-                x = parentPos.x + m_margins.left;
+                x = parentPos.x + m_margins.left + m_position.x;
                 break;
         }
 
         switch (m_vAlignment)
         {
             case UIVerticalAlignment::Center:
-                y = parentPos.y + (parentSize.y - m_size.y) * 0.5f;
+                y = parentPos.y + (parentSize.y - m_size.y) * 0.5f + m_position.y;
                 break;
             case UIVerticalAlignment::Bottom:
-                y = parentPos.y + parentSize.y - m_size.y - m_margins.bottom;
+                y = parentPos.y + parentSize.y - m_size.y - m_margins.bottom + m_position.y;
                 break;
             case UIVerticalAlignment::Stretch:
-                y = parentPos.y + m_margins.top;
+                y = parentPos.y + m_margins.top + m_position.y;
                 break;
             default:
-                y = parentPos.y + m_margins.top;
+                y = parentPos.y + m_margins.top + m_position.y;
                 break;
         }
 

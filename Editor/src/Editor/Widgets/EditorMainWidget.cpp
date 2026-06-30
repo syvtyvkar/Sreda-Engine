@@ -1,6 +1,6 @@
 #include "EditorMainWidget.h"
 #include "Engine/UI/Framework/UIBuilder.h"
-#include "Engine/UI/Elements/Element.h"
+#include "Engine/UI/Elements/BaseElement/Element.h"
 #include "Engine/Core/Application.h"
 
 #include "Engine/Render/Renderer2D.h"
@@ -18,10 +18,13 @@ void EditorMainWidget::OnInit()
     __super::OnInit();
 
     Application::Get().GetWindow()->OnWindowReSize().Subscribe([&,this](int x, int y) {
-        SetSize(Vector2(Application::Get().GetWindow()->GetWidth(), Application::Get().GetWindow()->GetHeight()));
-        //SetPosition(Vector2(Application::Get().GetWindow()->GetWidth()/2.f,Application::Get().GetWindow()->GetHeight()/2.f));
+        Vector2 FullSize = Vector2(Application::Get().GetWindow()->GetWidth(), Application::Get().GetWindow()->GetHeight());
+        SetSize(FullSize);
+        m_EditorMainMenuBar->SetSize(Vector2(FullSize.x,m_EditorMainMenuBar->GetSize().y));
     });
-    SetSize(Vector2(Application::Get().GetWindow()->GetWidth(), Application::Get().GetWindow()->GetHeight()));
+    Vector2 FullSize = Vector2(Application::Get().GetWindow()->GetWidth(), Application::Get().GetWindow()->GetHeight());
+    SetSize(FullSize);
+
     SetVerticalAlignment(UIVerticalAlignment::Stretch);
     SetHorizontalAlignment(UIHorizontalAlignment::Stretch);
     //SetPosition(Vector2(Application::Get().GetWindow()->GetWidth()/2.f,Application::Get().GetWindow()->GetHeight()/2.f));
@@ -43,21 +46,40 @@ void EditorMainWidget::OnInit()
     m_mainButton = UIBuilder::CreateButton("Test button", "Cuprum");
     m_mainButton->OnInit();
     m_mainButton->SetText("Test button 435354");
-    m_mainButton->SetFontSize(10);
+    //m_mainButton->SetFontSize(48);
     m_mainButton->SetSize({80,30});
     m_mainButton->SetHorizontalAlignment(UIHorizontalAlignment::Center);
     m_mainButton->SetVerticalAlignment(UIVerticalAlignment::Center);
 
+    m_mainButton->OnClick().Subscribe([&]()
+    {
+        ENGINE_LOG_WARN("CLICK BUTTON! YES!");
+    });
     AddChild(m_mainButton);
 
-    TRef<UITextBlock> LText = UIBuilder::CreateTextBlock("Text block", "Cuprum");
+    TRef<UIImage> LImage = UIBuilder::CreateImage("t_test_texture.png");
+    LImage->OnInit();
+    LImage->SetHorizontalAlignment(UIHorizontalAlignment::Center);
+    LImage->SetVerticalAlignment(UIVerticalAlignment::Center);
+
+
+    AddChild(LImage);
+
+
+    m_EditorMainMenuBar = CreateRef<EditorMainMenuBar>();
+    m_EditorMainMenuBar->OnInit();
+    m_EditorMainMenuBar->SetHorizontalAlignment(UIHorizontalAlignment::Stretch);
+    m_EditorMainMenuBar->SetVerticalAlignment(UIVerticalAlignment::Top);
+    m_EditorMainMenuBar->SetSize(Vector2(FullSize.x,m_EditorMainMenuBar->GetSize().y));
+
+    AddChild(m_EditorMainMenuBar);
+
+    TRef<UITextBlock> LText = UIBuilder::CreateTextBlock("Debug mode", "Cuprum");
     LText->OnInit();
     LText->SetText("Text block");
     LText->SetSize(45);
-    LText->SetHorizontalAlignment(UIHorizontalAlignment::Right);
+    LText->SetHorizontalAlignment(UIHorizontalAlignment::Left);
     LText->SetVerticalAlignment(UIVerticalAlignment::Bottom);
-
-
     AddChild(LText);
 
     /*auto gameContent = UIBuilder::CreateTextBlock("Game View Content");

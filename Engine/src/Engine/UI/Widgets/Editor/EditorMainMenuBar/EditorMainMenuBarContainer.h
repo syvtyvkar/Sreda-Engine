@@ -6,12 +6,15 @@
 #include "Engine/UI/Framework/UIWidget.h"
 #include "Engine/UI/Widgets/Editor/EditorTabContainer.h"
 
-class EditorMainMenuBar : public HorizontalBox
+class EditorMainMenuBarContainer : public UIWidget
 {
 public:
-    EditorMainMenuBar();
-    virtual ~EditorMainMenuBar() = default;
+    EditorMainMenuBarContainer();
+    virtual ~EditorMainMenuBarContainer() = default;
 
     virtual void OnInit() override;
     virtual void OnRender() override;
+
+private:
+    TRef<VerticalBox> m_ContentBox;
 };

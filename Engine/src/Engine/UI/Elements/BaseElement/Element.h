@@ -5,6 +5,12 @@
 #include "Engine/UI/Framework/UIWidget.h"
 #include "Engine/Render/Font/Font.h"
 
+#include "Engine/Render/Vertex.h"
+#include "Engine/Render/Shader.h"
+#include "Engine/Render/Texture.h"
+
+using namespace Engine::Render;
+
 namespace Engine::UI 
 {
     class UIButton : public UIWidget
@@ -18,19 +24,16 @@ namespace Engine::UI
         void SetText(const std::string& InText) { m_text = InText; }
         void SetFontSize(int size);
         int GetFontSize() const { return m_FontSize; }
-
     private:
         std::string m_text;
         std::string m_FontName;
         TColor TextColor = TColor::White;
-        TColor NormalButtonColor= TColor(20,20,20,255);
+        TColor NormalButtonColor= TColor::DarkGray;
         TColor HoverButtonColor= TColor::Gray;
         TColor PressButtonColor = TColor::Orange;
         int m_FontSize = 16.0f;
         TRef<Engine::Render::Font> m_font;
         bool m_AutoSize = true;
-        float m_paddingX = 8.0f;
-        float m_paddingY = 4.0f;
     };
 
     class UITextBlock : public UIWidget
@@ -45,6 +48,32 @@ namespace Engine::UI
 
         void SetFontSize(int size);
         int GetFontSize() const { return m_FontSize; }
+
+    private:
+        std::string m_text;
+        std::string m_FontName;
+        TColor TextColor = TColor::White;
+        int m_FontSize = 16;
+        TRef<Engine::Render::Font> m_font;
+    };
+
+    class UIImage : public UIWidget
+    {
+    public:
+        UIImage(const std::string& InImageAsset);
+        void OnRender() override;
+        void OnUpdate(float deltaTime) override;
+
+    private:
+        TRef<Texture2D> m_Texture;
+    };
+
+    class UIEditText : public UIWidget
+    {
+    public:
+        UIEditText();
+        void OnRender() override;
+        void OnUpdate(float deltaTime) override;
 
     private:
         std::string m_text;

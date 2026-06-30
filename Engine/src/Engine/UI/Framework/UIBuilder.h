@@ -4,8 +4,10 @@
 
 #include <functional>
 #include "Engine/UI/Framework/UIWidget.h"
-#include "Engine/UI/Elements/Container.h"
-#include "Engine/UI/Elements/Element.h"
+#include "Engine/UI/Elements/BaseElement/Container.h"
+#include "Engine/UI/Elements/BaseElement/Element.h"
+
+#define DEFAULT_FONT "Cuprum"
 
 namespace Engine::UI 
 {
@@ -30,14 +32,19 @@ namespace Engine::UI
             return CreateRef<HorizontalBox>();
         }
 
-        static TRef<UIButton> CreateButton(const std::string& text = "", const std::string& InFont = "")
+        static TRef<UIButton> CreateButton(const std::string& text = "", const std::string& InFont = DEFAULT_FONT)
         {
             return CreateRef<UIButton>(text, InFont);
         }
 
-        static TRef<UITextBlock> CreateTextBlock(const std::string& InText = "", const std::string& InFont = "")
+        static TRef<UITextBlock> CreateTextBlock(const std::string& InText = "", const std::string& InFont = DEFAULT_FONT)
         {
             return CreateRef<UITextBlock>(InText,InFont);
+        }
+
+        static TRef<UIImage> CreateImage(const std::string& InTexture = "")
+        {
+            return CreateRef<UIImage>(InTexture);
         }
 
         template<typename TElement>

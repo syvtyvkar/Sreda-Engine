@@ -11,4 +11,5 @@ namespace Engine
     const TColor TColor::Blue = TColor(0,0,255,255);
     const TColor TColor::Magenta = TColor(255,0,255,255);
     const TColor TColor::Gray = TColor(128,128,128,255);
+    const TColor TColor::DarkGray = TColor(20,20,20,255);
 }

@@ -28,7 +28,7 @@ namespace Engine::UI
                 if (hit)
                 {
                     hit->SetPressed(true);
-                    m_pressedWidget = hit;
+                    m_LastPressWidget = hit;
                     hit->OnPressBegin().Broadcast();
                 }
             });
@@ -37,15 +37,15 @@ namespace Engine::UI
             [this](InputKey button, int mods)
             {
                 if (button != InputKey::MouseLeft) return;
-                if (m_pressedWidget)
+                if (m_LastPressWidget)
                 {
-                    m_pressedWidget->SetPressed(false);
-                    m_pressedWidget->OnPressEnd().Broadcast();
-                    if (m_pressedWidget == m_hoveredWidget)
+                    m_LastPressWidget->SetPressed(false);
+                    m_LastPressWidget->OnPressEnd().Broadcast();
+                    if (m_LastPressWidget == m_hoveredWidget)
                     {
-                        m_pressedWidget->OnClick().Broadcast();
+                        m_hoveredWidget->OnClick().Broadcast();
                     }
-                    m_pressedWidget = nullptr;
+                    m_LastPressWidget.reset();
                 }
             });
     }

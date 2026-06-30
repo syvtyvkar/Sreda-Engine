@@ -15,6 +15,25 @@ namespace Engine::UI
         __super::OnUpdate(deltaTime);
     }
 
+    Vector2 UIContainer::GetSize() const
+    {
+        if (GetParent().get() == nullptr) return m_size;
+
+        Vector2 LSize = m_size;
+
+        if (GetHorizontalAlignment() == UIHorizontalAlignment::Stretch)
+        {
+            LSize.x = GetParent().get()->GetSize().x;
+        }
+
+        if (GetVerticalAlignment() == UIVerticalAlignment::Stretch)
+        {
+            LSize.y = GetParent().get()->GetSize().y;
+        }
+
+        return LSize;
+    }
+
     void VerticalBox::ArrangeChildren()
     {
         if (m_children.empty()) return;
@@ -93,7 +112,9 @@ namespace Engine::UI
                 child->SetSize({ child->GetSize().x, availableHeight });
             }
 
-            x += child->GetComputedSize().x + m_spacing;
+            float LX = child->GetComputedSize().x;
+
+            x += LX + m_spacing;
         }
     }
 

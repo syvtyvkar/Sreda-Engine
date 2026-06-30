@@ -218,6 +218,7 @@ namespace Engine
         static const TColor Blue;
         static const TColor Magenta;
         static const TColor Gray;
+        static const TColor DarkGray;
 
        /* TColor& operator=(TColor&& InOther) noexcept
         {

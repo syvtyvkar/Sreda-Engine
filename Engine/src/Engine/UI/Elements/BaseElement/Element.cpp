@@ -3,6 +3,14 @@
 #include "Engine/Core/Log.h"
 #include "Engine/Render/Renderer2D.h"
 #include "Engine/Render/Font/Font.h"
+#include "Engine/Render/Renderer.h"
+
+#include "Engine/Render/RenderCommand.h"
+/*
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <memory>
+#include <functional>*/
 
 namespace Engine::UI 
 {
@@ -22,7 +30,7 @@ namespace Engine::UI
         {
             std::wstring wtext(m_text.begin(), m_text.end());
             Vector2 textSize = Font::CalculateTextSize(wtext, m_font.get(), m_FontSize);
-            return { textSize.x + 2 * m_paddingX, textSize.y + 2 * m_paddingY };
+            return { textSize.x + (GetPadding().left + GetPadding().right), textSize.y + (GetPadding().bottom + GetPadding().top) };
         }
         return UIWidget::GetComputedSize();
     }
@@ -38,11 +46,11 @@ namespace Engine::UI
 
         if (m_font)
         {
-            float textX = pos.x + 4.0f;
+            float textX = pos.x /*+ size.x * 0.5f*/ /*+ 4.0f*/;
             float textY = pos.y + size.y * 0.5f + 6.0f;
 
-            Renderer2D::DrawQuad({pos.x + (size.x/2.f) - (m_paddingX/2.f), pos.y + (size.y/2.f)}, size, IsHovered() ? HoverButtonColor : (IsPressed() ? PressButtonColor : NormalButtonColor));
-            Renderer2D::DrawRect({ pos.x + (size.x/2.f) - (m_paddingX/2.f), pos.y + (size.y/2.f), 0.0f }, size, TColor(120,120,120,255));
+            Renderer2D::DrawQuad({pos.x + (size.x*0.5f) - ((GetPadding().left + GetPadding().right)/2.f), pos.y + (size.y/2.f)}, size, IsPressed() ? PressButtonColor : (IsHovered() ? HoverButtonColor : NormalButtonColor));
+            Renderer2D::DrawRect({ pos.x + (size.x*0.5f) - ((GetPadding().left + GetPadding().right)/2.f), pos.y + (size.y/2.f), 0.0f }, size, TColor(120,120,120,255));
 
             Renderer2D::RenderDrawText(
                 std::wstring(m_text.begin(), m_text.end()),
@@ -113,5 +121,35 @@ namespace Engine::UI
     void UITextBlock::SetFontSize(int size)
     {
         m_FontSize = size;
+    }
+    UIImage::UIImage(const std::string &InImageAsset)
+    {
+        m_Texture = Texture2D::Create("/Resources/Textures/" + InImageAsset);
+    }
+
+    void UIImage::OnRender()
+    {
+         if (!IsVisible() || !m_Texture) return;
+
+        UIWidget::OnRender();
+
+        const Vector2 pos = GetComputedPosition();
+        const Vector2 size = GetComputedSize();
+
+        //const TRef<Texture2D> LTexture = m_Texture;
+        Renderer2D::DrawQuad(pos,size, m_Texture,1.f,TColor::White);
+    }
+
+    void UIImage::OnUpdate(float deltaTime)
+    {
+    }
+    UIEditText::UIEditText()
+    {
+    }
+    void UIEditText::OnRender()
+    {
+    }
+    void UIEditText::OnUpdate(float deltaTime)
+    {
     }
 }

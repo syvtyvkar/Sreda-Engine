@@ -195,6 +195,25 @@ void Engine::InputSystem::CallOnKeyPressed(InputKey key, int scancode, int mods,
 {
     if (!s_InputInstance) return;
     s_InputInstance->SetKeyState(key, State);
+
+    /*switch (State)
+    {
+            case InputState::Pressed:
+                s_InputInstance->OnKeyPressed().Broadcast(key, scancode, mods);
+                break;
+            case InputState::Released:
+                s_InputInstance->OnKeyReleased().Broadcast(key, scancode);
+                break;
+            case InputState::Repeated:
+                //s_InputInstance->OnKeyPressed().Broadcast(key, scancode, mods);
+                break;
+            case InputState::Unknown:
+                break;
+            
+            default:
+                break;
+    }*/
+
     s_InputInstance->OnKeyPressed().Broadcast(key, scancode, mods);
 }
 
@@ -222,5 +241,18 @@ void Engine::InputSystem::CallOnMouseButtonPressed(InputKey button, int mods, In
 {
     if (!s_InputInstance) return;
     s_InputInstance->SetKeyState(button, State);
-    s_InputInstance->OnMouseButtonPressed().Broadcast(button, mods);
+
+    switch (State)
+    {
+            case InputState::Pressed:
+                s_InputInstance->OnMouseButtonPressed().Broadcast(button, mods);
+                break;
+            case InputState::Released:
+                s_InputInstance->OnMouseButtonReleased().Broadcast(button, mods);
+                break;
+            default:
+                break;
+    }
+
+    //s_InputInstance->OnMouseButtonPressed().Broadcast(button, mods);
 }

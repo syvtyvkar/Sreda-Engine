@@ -145,7 +145,7 @@ namespace Engine::Render
             auto it = InFont->GetGlyphs().find((uint32_t)ch);
             if (it == InFont->GetGlyphs().end()) continue;
             const GlyphMetrics& gm = it->second;
-            width += (gm.advance >> 6) * scale; // advance в 1/64 пикселя
+            width += (gm.advance >> 6) * scale; // advance in 1/64 pixel
             float glyphHeight = (gm.size.y + gm.bearing.y) * scale;
             if (glyphHeight > height) height = glyphHeight;
         }
