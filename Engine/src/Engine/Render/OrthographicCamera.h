@@ -2,8 +2,7 @@
 
 #pragma once // Multiple inclusion guard
 
-#include "../../Engine/Core/Log.h"
-#include "../../Engine/Core/Utilities/Types.h"
+#include "BaseEngine.h"
 #include "Camera.h"
 #include <string>
 #include <glm/glm.hpp>

@@ -1,7 +1,7 @@
 // (c) Nikita Rogalev. All rights reserved.
 
 #include "IUIContext.h"
-#include "Engine/Core/Log.h"
+#include "BaseEngine.h"
 #include "Platform/UIAPI/UISreda/UISredaContext.h"
 #include <algorithm>
 

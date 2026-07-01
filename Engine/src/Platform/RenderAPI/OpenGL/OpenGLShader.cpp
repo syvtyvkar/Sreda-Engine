@@ -1,10 +1,10 @@
 #include <glad/glad.h>
 
-#include "Engine/Core/Time.h"
+#include "Engine/Core/Utilities/Time.h"
 #include "Engine/Core/FileSystem/FileIO.h"
 
 #include "OpenGLShader.h"
-#include "Engine/Core/Log.h"
+#include "BaseEngine.h"
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Engine::Render

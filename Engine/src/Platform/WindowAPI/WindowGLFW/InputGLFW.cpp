@@ -3,7 +3,7 @@
 #ifdef ENGINE_WINDOW_GLFW
 
 #include "InputGLFW.h"                                              // Заголовок класса 
-#include "Engine/Core/Log.h"                                        // Логирование
+#include "BaseEngine.h"
 #include "Engine/Input/Input.h"                                     // TODO: убрать!!! Основной класс InputSystem (для GetInstance) 
 
 #include <GLFW/glfw3.h>                                             // Заголовок GLFW (колбэки, константы)

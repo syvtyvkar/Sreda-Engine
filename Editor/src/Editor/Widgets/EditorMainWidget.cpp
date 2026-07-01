@@ -1,7 +1,7 @@
 #include "EditorMainWidget.h"
 #include "Engine/UI/Framework/UIBuilder.h"
 #include "Engine/UI/Elements/BaseElement/Element.h"
-#include "Engine/Core/Application.h"
+#include "Engine/Core/App/Application.h"
 
 #include "Engine/Render/Renderer2D.h"
 

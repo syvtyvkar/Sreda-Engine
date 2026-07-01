@@ -3,7 +3,7 @@
 #pragma once
 
 #include <string>
-#include "Engine/Core/Log.h"
+#include "BaseEngine.h"
 
 namespace Engine::Time
 {

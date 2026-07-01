@@ -2,7 +2,7 @@
 
 #include "ResourceManager.h"
 #include <iostream>
-#include "Engine/Core/Log.h"
+#include "BaseEngine.h"
 
 #ifdef _WIN32                                   // Platform-specific headers for path information
     #include <windows.h>                        // For Windows API (may be needed for path operations)

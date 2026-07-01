@@ -2,7 +2,7 @@
 
 #include "Shader.h"
 
-#include "Engine/Core/Log.h"
+#include "BaseEngine.h"
 
 #include "RendererAPI.h"
 

@@ -8,6 +8,7 @@
 #include "Engine/Core/Utilities/Types.h"
 #include "Engine/Platform/IWindow.h"
 #include "Engine/UI/Framework/UIElement.h"
+#include "Engine/UI/Framework/UIWidget.h"
 
 namespace Engine::UI 
 {
@@ -28,6 +29,13 @@ namespace Engine::UI
         // Root element management
         void SetRootWidget(TRef<UIElement> root);
         TRef<UIElement> GetRootWidget() const { return m_rootWidget; }
+
+        //Focus widget
+
+        virtual UIWidget* GetFocusWidget() = 0;
+        virtual void SetFocusWidget(TRef<UIWidget> InNewFocus) = 0;
+        virtual UIWidget* GetHoverWidget() = 0;
+        virtual void SetHoverWidget(TRef<UIWidget> InNewHover) = 0;
         
         // Visibility
         virtual void Show() = 0;

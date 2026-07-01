@@ -1,7 +1,7 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#include "Engine/Core/Time.h"
-#include "Engine/Core/Log.h"
+#include "Time.h"
+#include "BaseEngine.h"
 #include <chrono>
 #include <algorithm>
 

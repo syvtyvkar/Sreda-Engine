@@ -3,10 +3,10 @@
 #include "Application.h"                            // Application class header
 #include "Engine/Platform/PlatformUtils.h"          // Platform utilities (paths, etc.)
 #include "Engine/Core/FileSystem/ResourceManager.h"            // Resource manager (textures, shaders, etc.)
-#include "Engine/Core/Log.h"                        // Logging system
+#include "BaseEngine.h"
 #include "Engine/Platform/IWindow.h"                // Window interface
 #include "Engine/Input/Input.h"                     // Input system
-#include "Engine/Core/Time.h"                       // Time system (timers, delta time)
+#include "Engine/Core/Utilities/Time.h"                       // Time system (timers, delta time)
 #include "Engine/Core/EngineConfig.h"               // Config file support
 
 #include "Engine/Core/Integration/CustomGenerationInstance.h"               // Custom generation instance support
@@ -124,7 +124,12 @@ namespace Engine
         }
     }
 
-    void Application::CloseApp()                                                                            // Close application and free all resources
+    class Engine::UI::UISystem& Application::GetUISystem()
+    {
+        return *Engine::Application::Get().m_AppInstance.get()->GetUISystem();
+    }
+
+    void Application::CloseApp() // Close application and free all resources
     {
         if (m_AppInstance)
         {

@@ -52,10 +52,10 @@ namespace Engine::UI
             return CreateRef<UILineEdit>(InFont);
         }
 
-        static TRef<UITextEdit> CreateTextEdit(const std::string& InFont = DEFAULT_FONT_NAME)
+        /*static TRef<UITextEdit> CreateTextEdit(const std::string& InFont = DEFAULT_FONT_NAME)
         {
             return CreateRef<UITextEdit>(InFont);
-        }
+        }*/
 
         template<typename TElement>
         static TRef<TElement> WithProperties(TRef<TElement> element, std::function<void(TElement*)> propertiesSetter)

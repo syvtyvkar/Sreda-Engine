@@ -2,8 +2,9 @@
 
 #pragma once // Multiple inclusion guard
 
-#include "../../Engine/Core/Log.h"
+#include "../../Engine/Core/Utilities/Log.h"
 #include "../../Engine/Core/Utilities/Types.h"
+//#include "BaseEngine.h"
 #include <string>
 
 namespace Engine::Render

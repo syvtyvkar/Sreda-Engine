@@ -4,7 +4,7 @@
 
 #include <Engine.h>
 #include "Engine/UI/Framework/UIWidget.h"
-#include "Engine/UI/Widgets/Editor/EditorTabContainer.h"
+#include "Engine/UI/Elements/WidgetBaseElement/UIContextMenu.h"
 
 class EditorMainMenuBar : public HorizontalBox
 {

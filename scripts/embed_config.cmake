@@ -19,7 +19,6 @@ file(MAKE_DIRECTORY "${OUTPUT_DIR}")
 # Читаем файл
 file(READ "${INPUT_FILE}" CONFIG_CONTENT)
 
-# ✅ ПРАВИЛЬНЫЙ ПОРЯДОК экранирования для C++ строки:
 # 1. Сначала обратные слеши (иначе сломаются экранированные кавычки)
 string(REPLACE "\\" "\\\\" CONFIG_CONTENT "${CONFIG_CONTENT}")
 
@@ -31,7 +30,7 @@ string(REPLACE "\n" "\\n" CONFIG_CONTENT "${CONFIG_CONTENT}")
 string(REPLACE "\r" "\\r" CONFIG_CONTENT "${CONFIG_CONTENT}")
 string(REPLACE "\t" "\\t" CONFIG_CONTENT "${CONFIG_CONTENT}")
 
-# ✅ Генерируем header с правильным синтаксисом
+# Генерируем header с правильным синтаксисом
 file(WRITE "${OUTPUT_FILE}"
 "#pragma once\n"
 "// Auto-generated: DO NOT EDIT\n"

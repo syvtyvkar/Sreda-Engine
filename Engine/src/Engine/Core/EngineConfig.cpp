@@ -1,7 +1,5 @@
 #include "EngineConfig.h"
-#include "Engine/Core/Log.h"
-#include "Engine/Core/FileSystem/ResourceManager.h"
-#include "Engine/Core/FileSystem/FileIO.h"
+#include "BaseEngine.h"
 //#include <fstream>
 //#include <filesystem>
 

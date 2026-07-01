@@ -2,9 +2,7 @@
 
 #pragma once // Multiple inclusion guard
 
-#include "../../Engine/Core/Log.h"
-#include "../../Engine/Core/Utilities/Types.h"
-#include "../../Engine/Core/Time.h"
+#include "BaseEngine.h"
 #include "OrthographicCamera.h"
 #include <string>
 

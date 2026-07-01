@@ -6,8 +6,7 @@
 
 #include "Engine/Input/IInputListen.h"      // Базовый абстрактный класс для слушателей ввода
 #include "Engine/Input/KeyCodes.h"          // Коды клавиш (InputKey)
-#include "Engine/Core/Log.h"                // Логирование
-#include "Engine/Core/Utilities/Event.h"    // Базовые события (для делегатов)
+#include "BaseEngine.h"
 #include "Engine/Platform/IWindow.h"        // Интерфейс окна
 #include <glm/glm.hpp>                      // Математическая библиотека (векторы)
 #include <unordered_map>                    // Для мапы инпутов

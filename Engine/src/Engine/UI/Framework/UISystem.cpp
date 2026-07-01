@@ -10,6 +10,32 @@ namespace Engine::UI
 
     }
 
+    bool UISystem::AddButtonContext(std::string InNameButton, DOnUIWidgetClick& Handle)
+    {
+        if (m_contextMenu)
+        {
+            //Handle = m_contextMenu.get()->AddButtonContext(InNameButton);
+            return true;
+        }
+        return false;
+    }
+
+    void UISystem::RemoveButtonContext(std::string InNameButton)
+    {
+        if (m_contextMenu)
+        {
+            return m_contextMenu.get()->RemoveButtonContext(InNameButton);
+        }
+    }
+
+    void UISystem::ClearAllButton()
+    {
+        if (m_contextMenu)
+        {
+            return m_contextMenu.get()->ClearAllButton();
+        }
+    }
+
     bool UISystem::Initialize()
     {
         if (!CreateContext())
@@ -17,11 +43,18 @@ namespace Engine::UI
             return false;
         }
         //GetContext()->SetRootWidget(UIBuilder::CreateWidget());
+
+        m_contextMenu = CreateUniquePtr<UIContextMenu>();
         return true;
     }
 
     void UISystem::Shutdown()
     {
+        if (m_contextMenu)
+        {
+            m_contextMenu.get()->ClearAllButton();
+            m_contextMenu.reset();
+        }
         DestroyContext();
     }
     
@@ -31,6 +64,10 @@ namespace Engine::UI
         {
             m_context.get()->Update(DeltaTime);
         }
+        if (m_contextMenu.get())
+        {
+            m_contextMenu.get()->OnUpdate(DeltaTime);
+        }
     }
 
     void UISystem::Render()
@@ -38,6 +75,10 @@ namespace Engine::UI
         if (m_context.get())
         {
             m_context.get()->Render();
+        }
+        if (m_contextMenu.get())
+        {
+            m_contextMenu.get()->OnRender();
         }
     }
 
@@ -87,6 +128,39 @@ namespace Engine::UI
         if (m_context.get() != nullptr)
         {
             m_context.get()->RemoveWidget(widget);
+        }
+    }
+    UIWidget *UISystem::GetFocusWidget()
+    {
+        if (GetContext())
+        {
+            return m_context.get()->GetFocusWidget();
+        }
+        return nullptr;
+    }
+
+    void UISystem::SetFocusWidget(TRef<UIWidget> InNewFocus)
+    {
+        if (GetContext())
+        {
+            return m_context.get()->SetFocusWidget(InNewFocus);
+        }
+    }
+
+    UIWidget *UISystem::GetHoverWidget()
+    {
+        if (GetContext())
+        {
+            return m_context.get()->GetHoverWidget();
+        }
+        return nullptr;
+    }
+
+    void UISystem::SetHoverWidget(TRef<UIWidget> InNewHover)
+    {
+        if (GetContext())
+        {
+            return m_context.get()->SetHoverWidget(InNewHover);
         }
     }
 }

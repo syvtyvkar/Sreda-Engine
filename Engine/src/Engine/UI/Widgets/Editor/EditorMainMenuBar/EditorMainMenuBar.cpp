@@ -24,6 +24,8 @@ void EditorMainMenuBar::OnInit()
     LNewButtonHelp->SetPadding(LPadding);
     AddChild(LNewButtonHelp);
     //SetSpacing(5.f);
+
+    //Application::GetUISystem().AddButtonContext();
 }
 
 void EditorMainMenuBar::OnRender()

@@ -1,6 +1,6 @@
 #include "UISredaContext.h"
 #include "Engine/Render/Renderer2D.h"
-#include "Engine/Core/Application.h"
+#include "Engine/Core/App/Application.h"
 #include "Engine/Input/Input.h"
 
 using namespace Engine;
@@ -113,7 +113,7 @@ namespace Engine::UI
         return m_bIsVisible;
     }
 
-    TRef<UIWidget> UISredaContext::HitTest(TRef<UIElement> root, const Vector2& point)
+    TRef<UIWidget> UISredaContext::HitTest(TRef<UIElement> root, const Vector2 &point)
     {
         if (!root || !root->IsVisible()) return nullptr;
 

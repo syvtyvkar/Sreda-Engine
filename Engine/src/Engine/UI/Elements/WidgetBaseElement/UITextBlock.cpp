@@ -1,6 +1,6 @@
 #include "UITextBlock.h"
 
-#include "Engine/Core/Log.h"
+#include "BaseEngine.h"
 #include "Engine/Render/Renderer2D.h"
 #include "Engine/Render/Font/Font.h"
 #include "Engine/Render/Renderer.h"

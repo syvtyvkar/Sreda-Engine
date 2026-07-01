@@ -53,7 +53,7 @@ namespace Engine::UI
         const std::vector<TRef<UIElement>>& GetChildren() const { return m_children; }
         std::vector<TRef<UIElement>>& GetChildren() { return m_children; }
 
-        bool IsVisible() const { return m_visible == UIVisibleMode::Visible || m_visible == UIVisibleMode::VisibleNoHit; }
+        virtual bool IsVisible() const { return m_visible == UIVisibleMode::Visible || m_visible == UIVisibleMode::VisibleNoHit; }
         void SetVisible(UIVisibleMode visible) { m_visible = visible; }
 
         bool ContainsPoint(const Vector2& point) const;

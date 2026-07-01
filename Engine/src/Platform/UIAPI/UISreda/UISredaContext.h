@@ -31,6 +31,14 @@ namespace Engine::UI
 
         virtual void Update(float DeltaTime) override;
 
+    protected:
+
+    //Focus widget
+        virtual UIWidget* GetFocusWidget() override {return m_FocusWidget.get();};
+        virtual void SetFocusWidget(TRef<UIWidget> InNewFocus) override {m_FocusWidget = InNewFocus; };
+        virtual UIWidget* GetHoverWidget() override {return m_hoveredWidget.get();};
+        virtual void SetHoverWidget(TRef<UIWidget> InNewHover)override {m_hoveredWidget = InNewHover;};
+
     private:
         TRef<UIWidget> HitTest(TRef<UIElement> root, const Vector2& point);
         void HandleInput();
@@ -38,9 +46,9 @@ namespace Engine::UI
         OrthographicCamera m_ui_camera;
         bool m_bIsVisible = true;
 
-        TRef<UIWidget> m_hoveredWidget;
         Vector2 m_lastMousePos;
 
+        TRef<UIWidget> m_hoveredWidget;
         TRef<UIWidget> m_FocusWidget;
         TRef<UIWidget> m_LastPressWidget;
 

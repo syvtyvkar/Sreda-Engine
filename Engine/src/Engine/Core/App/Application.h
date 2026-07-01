@@ -4,7 +4,7 @@
 
 #include <string>
 #include "Engine/Platform/IWindow.h"        // Window interface
-#include "Engine/Core/EngineInstance.h"     // Instances
+#include "Engine/Core/App/EngineInstance.h"     // Instances
 #include <vector>
 
 namespace Engine
@@ -21,6 +21,8 @@ namespace Engine
         void ExitApp();                                         // Request application exit (close window)
         void AddInstance(TUniquePtr<ApplicationInstance> InInstance);
         Window* GetWindow() const {return m_AppWindow.get();};
+
+        static class Engine::UI::UISystem& GetUISystem();
     private:
         void CloseApp();                                        // Internal method to free resources on close
 

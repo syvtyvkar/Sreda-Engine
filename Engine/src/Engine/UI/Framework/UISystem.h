@@ -4,6 +4,9 @@
 
 #include "Engine/Platform/IWindow.h"
 #include "Engine/UI/Framework/IUIContext.h"
+
+#include "Engine/UI/Elements/WidgetBaseElement/UIContextMenu.h"
+
 #include "Engine/Core/Utilities/Types.h"
 #include <memory>
 #include <unordered_map>
@@ -34,11 +37,24 @@ namespace Engine::UI
         // UI Element Management
         void RegisterWidget(TRef<UIElement> widget);
         void RemoveWidget(const TRef<UIElement>& widget);
+
+        //Focus system
+        UIWidget* GetFocusWidget();
+        void SetFocusWidget(TRef<UIWidget> InNewFocus);
+        UIWidget* GetHoverWidget();
+        void SetHoverWidget(TRef<UIWidget> InNewHover);
         
         // Debug
         void ToggleDebugger();
+
+        // ContextMenu
+        bool AddButtonContext(std::string InNameButton, DOnUIWidgetClick& Handle);
+        void RemoveButtonContext(std::string InNameButton);
+        void ClearAllButton();
     private:
         TUniquePtr<UIContext> m_context;
+
+        TUniquePtr<UIContextMenu> m_contextMenu;
     };
 
 }

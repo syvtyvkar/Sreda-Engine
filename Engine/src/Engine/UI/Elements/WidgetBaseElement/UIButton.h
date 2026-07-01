@@ -31,7 +31,7 @@ namespace Engine::UI
         TColor NormalButtonColor= TColor::DarkGray;
         TColor HoverButtonColor= TColor::Gray;
         TColor PressButtonColor = TColor::Orange;
-        int m_FontSize = 16.0f;
+        int m_FontSize = 12.0f;
         TRef<Engine::Render::Font> m_font;
         bool m_AutoSize = true;
     };

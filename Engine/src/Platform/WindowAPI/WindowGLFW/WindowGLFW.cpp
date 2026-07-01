@@ -5,8 +5,7 @@
 // Window Class
 #include "WindowGLFW.h"                         // Заголовок класса
 #include <iostream>
-#include "Engine/Core/Log.h"                    // Логирование
-#include "Engine/Core/Time.h"                   // Система времени (таймеры, дельта-тайм)
+#include "BaseEngine.h"
 #include <string>
 #include <sstream>
 #include <vector>

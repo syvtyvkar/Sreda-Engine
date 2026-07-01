@@ -3,7 +3,7 @@
 #pragma once // Multiple inclusion guard for header file
 
 #include <string>
-#include "Engine/Core/Log.h"                    // Logging system include
+#include "Engine/Core/Utilities/Log.h"                    // Logging system include
 #include <cstdint>                              // For fixed-width integer types
 #include <functional>                           // For std::function
 #include <memory>                               // For smart pointers
@@ -106,6 +106,20 @@ namespace Engine
         void operator()(Args... args) { Broadcast(args...); }                               // Call as function
         DelegateHandle operator+=(CallbackType callback) { return Subscribe(callback); }    // Add subscriber via +=
         void operator-=(DelegateHandle handle) { Unsubscribe(handle); }                     // Remove via -=
+
+
+        template<typename T>
+        DelegateHandle Subscribe(T* object, void (T::*method)(Args...))
+        {
+            return Subscribe([object, method](Args... args) { (object->*method)(args...); });
+        }
+
+        // Подписка на константный метод-член с сигнатурой void(Args...) const
+        template<typename T>
+        DelegateHandle Subscribe(const T* object, void (T::*method)(Args...) const)
+        {
+            return Subscribe([object, method](Args... args) { (object->*method)(args...); });
+        }
 
     private:
         void SortByPriority() // Helper method to sort m_Callbacks according to priorities
