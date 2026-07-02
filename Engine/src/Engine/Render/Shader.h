@@ -7,9 +7,11 @@
 #include <unordered_map>
 #include <glm/glm.hpp>
 
+#include "Engine/Core/FileSystem/AssetManager.h"
+
 namespace Engine::Render
 {
-    class Shader
+    class Shader : public IAsset
 	{
 	public:
 		virtual ~Shader() = default;

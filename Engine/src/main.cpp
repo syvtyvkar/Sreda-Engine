@@ -1,8 +1,9 @@
 // (c) Nikita Rogalev. All rights reserved.
 
 #include "Engine/Core/App/Application.h"    // Заголовочный файл приложения
-#include "BaseEngine.h"                 // Базовые зависимости движка
-#include <string>                       // Для работы с строками
+//#include "Engine/Core/Base/EngineInit.h"    // Инициализация движка
+#include "BaseEngine.h"                     // Базовые зависимости движка
+#include <string>                           // Для работы с строками
 /* 
 * Точка входа
 */

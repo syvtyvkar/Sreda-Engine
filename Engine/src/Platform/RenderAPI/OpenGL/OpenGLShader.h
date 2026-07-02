@@ -38,9 +38,10 @@ namespace Engine::Render
 
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
+	protected:
+		static std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 	private:
 		std::string ReadFile(const std::string& filepath);
-		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 
 		unsigned int CompileShader(unsigned int type, const std::string& source);
 
@@ -52,4 +53,27 @@ namespace Engine::Render
 
 		std::unordered_map<GLenum, std::string> m_OpenGLSourceCode;
 	};
+
+	/**
+     * @brief IAssetLoader
+     * 
+     * 
+     */
+    class IAssetGLSLLoader : public IAssetLoader
+    {
+    public:
+        IAssetGLSLLoader()
+        {
+            m_typeLoader = {"glsl"};
+        };
+        virtual ~IAssetGLSLLoader() = default;
+
+
+        /**
+        *   Load Asset */
+        virtual TRef<IAsset> LoadStatic(const std::string& InPath, TUniquePtr<IFile> File) override;
+
+	protected:
+		static std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
+    };
 }
