@@ -9,7 +9,7 @@
     {
         "width": 1600,
         "height": 1200,
-        "DefaultWindowName": "Render OpenGL"
+        "DefaultWindowName": "Render"
     },
     "render":
     {

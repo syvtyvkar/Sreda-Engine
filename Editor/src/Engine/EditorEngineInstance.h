@@ -35,7 +35,7 @@ public:
 
     void OnStart() override;
     void OnEnd() override;
-    virtual std::string GetNameApp() override {return "Sreda Engine View";}
+    virtual std::string GetNameApp() override {return "Editor Render";}
 
     virtual void Update(float DeltaTime) override;
     virtual void OnRender() override;

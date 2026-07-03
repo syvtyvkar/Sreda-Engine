@@ -11,6 +11,7 @@
 #include <vector>
 //#include "Engine/Render/Camera.h"   
 #include "Engine/Core/EngineConfig.h"   
+#include "Engine/Render/RendererAPI.h"
 
 #include "Platform/RenderAPI/OpenGL/OpenGLContext.h"   
 
@@ -36,28 +37,40 @@ namespace Engine
             ENGINE_LOG_ERROR("Failed to initialize GLFW");
         }
         NameWindow=config.title;                                // Сохраняем базовое имя окна (используется в UpdateWindowName)
-        // Настройка версии OpenGL (3.3 Core Profile)
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-#ifdef DEBUG
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#endif
+        bool isVulkan = Engine::Render::RendererAPI::GetAPI() == Engine::Render::RendererAPI::API::Vulkan;
 
-        // Включение MSAA (многократная выборка)
-        glfwWindowHint(GLFW_SAMPLES, 4);
+        switch (Engine::Render::RendererAPI::GetAPI())
+        {
+        case Engine::Render::RendererAPI::API::Vulkan:
+            glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+            break;
+        case Engine::Render::RendererAPI::API::OpenGL:
+            // OpenGL (4.5 Core Profile)
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-
-        #ifdef __APPLE__
-        // Для macOS требуется указать совместимость с форвард-компиляцией
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        #ifdef DEBUG
+            glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
         #endif
 
-         m_window = glfwCreateWindow(config.wight,config.height,config.title.c_str(),nullptr,nullptr);  // Создание окна GLFW
+            // Включение MSAA (многократная выборка)
+            glfwWindowHint(GLFW_SAMPLES, 4);
 
-         if (!m_window) {
+        #ifdef __APPLE__
+            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        #endif
+            break;
+        default:
+            ENGINE_ASSERT(false, "No valid Render API!");
+            break;
+        }
+
+        m_window = glfwCreateWindow(config.wight,config.height,config.title.c_str(),nullptr,nullptr);  // Создание окна GLFW
+
+        if (!m_window) 
+        {
             ENGINE_LOG_CRITICAL("Failed to create GLFW window");
             glfwTerminate();                                        // Завершаем GLFW, если окно не создано
             return false;
@@ -68,11 +81,14 @@ namespace Engine
         m_height = config.height;
         glfwGetWindowPos(GetHandle(),&m_windowedX,&m_windowedY);
 
-        // Делаем контекст OpenGL текущим для этого окна
-        glfwMakeContextCurrent(GetHandle());
+        if (!isVulkan)
+        {
+            // Делаем контекст OpenGL текущим для этого окна
+            glfwMakeContextCurrent(GetHandle());
 
-        // Включение/выключение вертикальной синхронизации
-        glfwSwapInterval(config.vsync ? 1 : 0); //VSync!!!
+            // Включение/выключение вертикальной синхронизации
+            glfwSwapInterval(config.vsync ? 1 : 0); //VSync!!!
+        }
 
         // Устанавливаем колбэк изменения
         glfwSetFramebufferSizeCallback(GetHandle(), FramebufferResizeCallback);
@@ -85,12 +101,6 @@ namespace Engine
 
         m_context = Engine::Render::GraphicsContext::Create(GetHandle());     // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
 		m_context->Init();                                                 // Инициализация
-
-        //m_currentScene = CreateUniquePtr<Scene>("MainScene");              // Создаём главную сцену с именем "MainScene" и сохраняем её в unique_ptr
-        //m_currentScene->SetParentRender(m_render.get());                                            // Устанавливаем для сцены указатель на рендерер (чтобы сцена могла отрисовывать объекты)
-
-        //m_uiSystem = CreateUniquePtr<UISystem>();                         // Создаем систему обработки UI
-        //m_uiSystem.get()->Initialize(this);                                // Инициализируем
 
         // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
         glfwSetWindowUserPointer(GetHandle(), this);
@@ -107,7 +117,8 @@ namespace Engine
         //glfwSetWindowTitle(m_window,Empty.c_str());
         std::string NewNameResult;
         NewNameResult.append(NameWindow + " ");
-        NewNameResult.append(NewName + " FPS");
+        NewNameResult.append(RendererAPI::GetNameAPI() + " ");
+        NewNameResult.append("[" + NewName + " FPS]");
         glfwSetWindowTitle(GetHandle(),NewNameResult.c_str());
     }
 
@@ -238,7 +249,8 @@ namespace Engine
 
         int fbW, fbH;
         glfwGetFramebufferSize(GetHandle(), &fbW, &fbH);
-        glViewport(0, 0, fbW, fbH);
+        if (Engine::Render::RendererAPI::GetAPI() != Engine::Render::RendererAPI::API::Vulkan)
+            glViewport(0, 0, fbW, fbH);
     
         // Возвращаем фокус окну
         glfwFocusWindow(GetHandle());
@@ -272,8 +284,9 @@ namespace Engine
                 win->m_dirt_width_height = true;
             }
             
-            // Устанавливаем область вывода OpenGL на весь новый размер окна
-            glViewport(0, 0, width, height);
+            // Устанавливаем область вывода на весь новый размер окна
+            if (Engine::Render::RendererAPI::GetAPI() != Engine::Render::RendererAPI::API::Vulkan)
+                glViewport(0, 0, width, height);
             win->OnUpdateWindowSize().Broadcast(window, width, height);
             win->OnWindowReSize().Broadcast(width,height);
             if (win->GetWindowMode() == WindowMode::Window) 

@@ -48,6 +48,8 @@ namespace Engine::Render
 
 		static void RenderDrawText(const std::wstring& text, const TRef<Texture2D>& fontAtlas,const std::unordered_map<uint32_t, GlyphMetrics>& glyphs,float x, float y, int FontSize, const TColor& color,int entityID = -1);
 
+		//static void DrawString(const std::string& InString, TRef<FontAsset> InFont, const glm::mat4& InTransform, const TextParams& InTextParams, int InEntityID = -1);
+
 		static float GetLineWidth();
 		static void SetLineWidth(float width);
 

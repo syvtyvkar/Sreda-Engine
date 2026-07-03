@@ -29,6 +29,8 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(Vulkan REQUIRED)
+find_package(unofficial-shaderc CONFIG QUIET)
 
 # Исполняемый файл
 file(GLOB_RECURSE MY_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
@@ -72,7 +74,13 @@ target_link_libraries(Engine PRIVATE
     glfw
     glm::glm
     Freetype::Freetype
+    Vulkan::Vulkan
 )
+
+if(unofficial-shaderc_FOUND)
+    target_link_libraries(Engine PRIVATE unofficial::shaderc::shaderc)
+    target_compile_definitions(Engine PRIVATE ENGINE_HAS_SHADERC)
+endif()
 
 add_library(glad STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/glad.c
@@ -100,6 +108,9 @@ target_compile_definitions(Engine PRIVATE
 )
 target_compile_definitions(Engine PRIVATE
     ENGINE_RENDER_OPENGL
+)
+target_compile_definitions(Engine PRIVATE
+    ENGINE_RENDER_VULKAN
 )
 
 

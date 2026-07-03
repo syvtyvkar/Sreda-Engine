@@ -12,7 +12,8 @@
 #include "Engine/Core/Integration/CustomGenerationInstance.h"               // Custom generation instance support
 
 #include "Engine/Render/Camera.h"      
-#include "Engine/Render/Renderer.h"                    
+#include "Engine/Render/Renderer.h"    
+#include "Engine/Render/RendererAPI.h"
 
 #include <string>
 #include <sstream>
@@ -53,7 +54,7 @@ namespace Engine
         Engine::WindowConfig WindowConfig;                                                          // TODO: MOVE TO CONFIGS!!! Window parameter setup 
         WindowConfig.wight = config.Get<int>("window.width", 800);
         WindowConfig.height = config.Get<int>("window.height", 600);
-        WindowConfig.title = "Init Sreda Engine...";
+        WindowConfig.title = "Init Engine...";
         WindowConfig.vsync = config.Get<bool>("render.vsync",false);
         config.Set<int>("window.width", 800);
         config.Set<int>("window.height", 600);

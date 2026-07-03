@@ -4,6 +4,7 @@
 #include "RendererAPI.h"
 
 #include "Platform/RenderAPI/OpenGL/OpenGLBuffer.h"
+#include "Platform/RenderAPI/Vulkan/VulkanBuffer.h"
 
 namespace Engine::Render
 {
@@ -13,6 +14,7 @@ namespace Engine::Render
 		{
 			case RendererAPI::API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size);
+			case RendererAPI::API::Vulkan:  return CreateRef<VulkanVertexBuffer>(size);
 		}
 
 		ENGINE_ASSERT(false, "Unknown RendererAPI!");
@@ -25,6 +27,7 @@ namespace Engine::Render
 		{
 			case RendererAPI::API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size);
+			case RendererAPI::API::Vulkan:  return CreateRef<VulkanVertexBuffer>(vertices, size);
 		}
 
 		ENGINE_ASSERT(false, "Unknown RendererAPI!");
@@ -37,6 +40,7 @@ namespace Engine::Render
 		{
 			case RendererAPI::API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, size);
+			case RendererAPI::API::Vulkan:  return CreateRef<VulkanIndexBuffer>(indices, size);
 		}
 
 		ENGINE_ASSERT(false, "Unknown RendererAPI!");

@@ -2,12 +2,14 @@
 
 #pragma once // Preprocessor directive for multiple inclusion guard
 
+#include "Engine/Core/Utilities/Types.h"
+
 namespace Engine
 {
-    class BaseEngine
+    class EngineCore
     {
-        BaseEngine() = delete;
-        ~BaseEngine() = delete;
+        EngineCore() = default;
+        ~EngineCore() = default;
 
     protected:
 
@@ -23,5 +25,11 @@ namespace Engine
         {
 
         };
+    };
+
+
+    struct EngineContext
+    {
+        TUniquePtr<Vector2> m_LogSystem;
     };
 }

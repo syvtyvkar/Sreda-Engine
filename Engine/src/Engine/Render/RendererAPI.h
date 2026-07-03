@@ -13,7 +13,7 @@ namespace Engine::Render
 	public:
 		enum class API
 		{
-			None = 0, OpenGL = 1
+			None = 0, OpenGL = 1, Vulkan = 2
 		};
 	public:
 		virtual ~RendererAPI() = default;
@@ -35,7 +35,25 @@ namespace Engine::Render
         virtual void SetScissor(int x, int y, int width, int height) = 0;
 
         static API GetAPI() { return s_API; }
+        static void SetAPI(API api) { s_API = api; }
         static TUniquePtr<RendererAPI> Create();
+
+		static std::string GetNameAPI()
+		{
+			API LAPI = RendererAPI::GetAPI();
+			switch (LAPI)
+			{
+			case API::OpenGL:
+				return "OpenGL";
+				break;
+			case API::Vulkan:
+				return "Vulkan";
+				break;
+			default:
+				return "No Render API";
+			}
+		return "No Render API";
+		}
 	private:
 		static API s_API;
 	};
