@@ -17,7 +17,7 @@ namespace Engine
      * @return TUniquePtr<Window> Unique pointer to the created window,
      *         or nullptr if the platform is not supported.
      */
-    TUniquePtr<Window> WindowAPIFactory::create() 
+    TUniquePtr<IWindow> WindowAPIFactory::create() 
     {
         #ifdef ENGINE_WINDOW_GLFW
         return CreateUniquePtr<WindowGLFW>();  // Create window for GLFW

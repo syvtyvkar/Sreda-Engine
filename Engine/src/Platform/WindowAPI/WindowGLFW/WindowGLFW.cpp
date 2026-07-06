@@ -18,7 +18,8 @@
 
 namespace Engine
 {
-    WindowGLFW::WindowGLFW() = default;         // Конструктор по умолчанию
+    WindowGLFW::WindowGLFW() =default;          // Конструктор по умолчанию
+
     WindowGLFW::~WindowGLFW()                   // Деструктор: автоматически закрывает окно при уничтожении объекта
     {
         Close();
@@ -37,12 +38,14 @@ namespace Engine
             ENGINE_LOG_ERROR("Failed to initialize GLFW");
         }
         NameWindow=config.title;                                // Сохраняем базовое имя окна (используется в UpdateWindowName)
+        m_WindowContext = config.cntx;
 
-        bool isVulkan = Engine::Render::RendererAPI::GetAPI() == Engine::Render::RendererAPI::API::Vulkan;
-
+        bool isVulkan = false;
+        
         switch (Engine::Render::RendererAPI::GetAPI())
         {
         case Engine::Render::RendererAPI::API::Vulkan:
+            isVulkan = true;
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
             break;
         case Engine::Render::RendererAPI::API::OpenGL:
@@ -251,6 +254,8 @@ namespace Engine
         glfwGetFramebufferSize(GetHandle(), &fbW, &fbH);
         if (Engine::Render::RendererAPI::GetAPI() != Engine::Render::RendererAPI::API::Vulkan)
             glViewport(0, 0, fbW, fbH);
+
+        FramebufferResizeCallback(GetHandle(), fbW, fbH);
     
         // Возвращаем фокус окну
         glfwFocusWindow(GetHandle());
@@ -288,7 +293,7 @@ namespace Engine
             if (Engine::Render::RendererAPI::GetAPI() != Engine::Render::RendererAPI::API::Vulkan)
                 glViewport(0, 0, width, height);
             win->OnUpdateWindowSize().Broadcast(window, width, height);
-            win->OnWindowReSize().Broadcast(width,height);
+            win->OnWindowReSize().Broadcast(win->GetWindowContext(),width,height);
             if (win->GetWindowMode() == WindowMode::Window) 
             {
                 glfwGetWindowPos(window, &win->m_windowedX, &win->m_windowedY);
@@ -302,7 +307,7 @@ namespace Engine
         if (win) 
         {
             win->m_WindowHasFocus = (focused == GLFW_TRUE);
-            win->OnHasFocusChange().Broadcast(win->m_WindowHasFocus);
+            win->OnHasFocusChange().Broadcast(win->GetWindowContext(), win->m_WindowHasFocus);
         }
     }
 
@@ -312,7 +317,7 @@ namespace Engine
         if (win) 
         {
             win->m_WindowIsMinimized = (iconified == GLFW_TRUE);
-            win->OnMinimizedChange().Broadcast(win->m_WindowIsMinimized);
+            win->OnMinimizedChange().Broadcast(win->GetWindowContext(),win->m_WindowIsMinimized);
         }
     }
 

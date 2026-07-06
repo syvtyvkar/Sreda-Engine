@@ -18,7 +18,7 @@ void EditorMainWidget::OnInit()
 {
     __super::OnInit();
 
-    Application::Get().GetWindow()->OnWindowReSize().Subscribe([&,this](int x, int y) {
+    Application::Get().GetWindow()->OnWindowReSize().Subscribe([&,this](WindowContext cntxt, int x, int y) {
         Vector2 FullSize = Vector2(Application::Get().GetWindow()->GetWidth(), Application::Get().GetWindow()->GetHeight());
         SetSize(FullSize);
         m_EditorMainMenuBar->SetSize(Vector2(FullSize.x,m_EditorMainMenuBar->GetSize().y));

@@ -10,21 +10,20 @@
 #include <fstream>
 #include <algorithm>
 
+#include "Engine/Core/Base/EngineCore.h"
+
 namespace EngineConfig 
 {
-    ConfigSystem* ConfigSystem::s_instance = nullptr;
+    //ConfigSystem* ConfigSystem::s_instance = nullptr;
     using namespace Engine;
 
     /**
      * @brief Get singleton
      */
-    ConfigSystem& ConfigSystem::Get() 
+    ConfigSystem* ConfigSystem::Get() 
     {
-        if (!s_instance) 
-        {
-            s_instance = new ConfigSystem();
-        }
-        return *s_instance;
+        auto& ctx = EngineCore::GetEngineContext();
+        return ctx.GetConfigSystem();
     }
 
     bool ConfigSystem::Init(std::string InTypeConfig)  // Initialize our configs
@@ -33,17 +32,17 @@ namespace EngineConfig
         if (!m_embeddedLoaded)   // Have we already tried to load the generated config file?
         {
 #ifdef ENGINE_CONFIG_EMBEDDED
-            std::lock_guard<std::mutex> lock(ConfigSystem::Get().m_mutex);              // Nobody can touch the file while we're working with it!
+            std::lock_guard<std::mutex> lock(m_mutex);              // Nobody can touch the file while we're working with it!
             try 
             {
                 // Parse embedded JSON string
-                ConfigSystem::Get().m_data = json::parse(ConfigEmbed::DefaultConfigJSON);                               // Parse data
-                ConfigSystem::Get().m_embeddedLoaded = true;                                                            // Signal that no more default data loading is needed
+                m_data = json::parse(ConfigEmbed::DefaultConfigJSON);                               // Parse data
+                m_embeddedLoaded = true;                                                            // Signal that no more default data loading is needed
                 ENGINE_LOG_INFO("Embedded config loaded ({} bytes)", strlen(ConfigEmbed::DefaultConfigJSON));           // Log
             } 
             catch (const json::parse_error& e)                                                                          // Oops, something went wrong!
             {
-                ENGINE_LOG_ERROR("Failed to parse embedded config: {}", e.what()); ConfigSystem::Get().m_data = json::object();  // Empty object as fallback
+                ENGINE_LOG_ERROR("Failed to parse embedded config: {}", e.what()); m_data = json::object();  // Empty object as fallback
             }
 #else
             ENGINE_LOG_ERROR("Embedded config not available (ENGINE_CONFIG_EMBEDDED not defined)");  // If we got here - there's a problem with file generation. Maybe CMake?
@@ -84,7 +83,7 @@ namespace EngineConfig
     {
         m_overriddenKeys.clear();
         m_data = nullptr;
-        s_instance = nullptr;
+        //s_instance = nullptr;
         ENGINE_LOG_INFO("Stop configurate system"); 
         return true;
     }

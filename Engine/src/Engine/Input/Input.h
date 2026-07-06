@@ -4,6 +4,7 @@
 #include "BaseEngine.h"                         // Base engine dependencies
 #include "Engine/Input/IInputListen.h"          // Input listener class
 #include "Engine/Platform/IWindow.h"            // Window interface
+#include "Engine/Platform/WindowManager.h"      // Window manager
 #include <glm/glm.hpp>                          // Math library for vectors
 
 
@@ -34,9 +35,12 @@ namespace Engine
     class InputSystem
     {
     public:
-        static void Init(Engine::Window* windowHandle);                     // Initialize input system.
+        static void Init();                     // Initialize input system.
         static void Shutdown();                                             // Shutdown input system, free resources.
         static void Update();                                               // Update input state (should be called every frame).
+
+        void InitNewWindow(Engine::IWindow* InWinHandle, Engine::WindowContext InWinContext);
+        void DeInitWindow(Engine::IWindow* InWinHandle, Engine::WindowContext InWinContext);
 
         // Keyboard
         static bool IsKeyPressed(InputKey Key);                             // Checks if a key is held in the current frame.
@@ -64,7 +68,8 @@ namespace Engine
 
         static void* GetWindowHandle();                                     // Returns pointer to native window handle (e.g., GLFWwindow*).
 
-        IInputListen* GetInputListen() {return m_InputListen.get();};        // Returns pointer to InputListen object (used for extended processing).
+        IInputListen* GetInputListenFromWinContext(Engine::WindowContext InContext); 
+        IInputListen* GetInputListenFromActivWin();
 
         // Delegate access for subscription
         DOnKeyPressed& OnKeyPressed() {return s_OnKeyPressed;}
@@ -76,7 +81,8 @@ namespace Engine
         DOnCharInput& OnCharInput() {return s_OnCharInput;}
 
     protected:
-        TUniquePtr<IInputListen> m_InputListen=nullptr;                 // Input listener
+        //TUniquePtr<IInputListen> m_InputListen=nullptr;                 // Input listener
+        unordered_map<Engine::WindowContext, TUniquePtr<IInputListen>,Engine::WindowContextHash> m_InputListenList;
     private:
         InputSystem() = default;
         ~InputSystem() =default;
@@ -109,10 +115,19 @@ namespace Engine
         DOnMouseButtonReleased s_OnMouseButtonReleased;     // button, mods
         DOnCharInput s_OnCharInput;                         // char input
 
+        //Delegate
+        Engine::DelegateHandle m_DH_OnHasFocusChange;
+        Engine::DelegateHandle m_DH_OnWinCreate;
+        Engine::DelegateHandle m_DH_OnWinDestroy;
+
     protected:
         void CallOnKeyPressed(InputKey key, int scancode, int mods, InputState State);
         void CallOnMouseMoved(float x, float y);
         void CallOnMouseScrolled(float x, float mods);
         void CallOnMouseButtonPressed(InputKey button, int mods, InputState State);
+    public:
+        void CallOnHasFocusChange(WindowContext InWinContext);
+        void CallOnWinCreate(IWindow* InWin, WindowContext InWinContext);
+        void CallOnWinDestroy(IWindow* InWin, WindowContext InWinContext);
     };
 }

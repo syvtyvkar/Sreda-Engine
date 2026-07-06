@@ -41,7 +41,7 @@ namespace EngineConfig
     class ConfigSystem 
     {
     public:
-        static ConfigSystem& Get();                                                     // Singleton
+        static ConfigSystem* Get();                                                     // Singleton
 
         // Template functions
         template<typename T>
@@ -55,18 +55,17 @@ namespace EngineConfig
 
         void MarkOverridden(const std::string& key);                                    // Mark key as overridden
         bool SaveConfig(const std::string& InTypeConfig);
-    private: 
         ConfigSystem()= default;                                                        // Constructor
         ~ConfigSystem() = default;                                                      // Default destructor
         ConfigSystem(const ConfigSystem&) = delete;                                     // Two systems cannot coexist, so copy is forbidden
         ConfigSystem& operator=(const ConfigSystem&) = delete;                          // Two systems cannot coexist, so copy is forbidden
-
+    private: 
         void MarkOverriddenKeys(const json& InConfig, const std::string& InPrefix);     // Mark file keys as overridden
         size_t CountKeys(const json& j, size_t depth = 0);                              // How many keys?
         const json* GetNestedValue(const std::string& path) const;                      // Get pointer to value
         static std::vector<std::string> SplitPath(const std::string& path);             // Split path "a/b/c" into parts ["a", "b", "c"]
 
-        static ConfigSystem* s_instance;                                                // Singleton
+        //static ConfigSystem* s_instance;                                                // Singleton
         bool m_embeddedLoaded = false;                                                  // Whether generated files have been loaded
         json m_data;                                                                    // Current JSON config with data
         std::unordered_set<std::string> m_overriddenKeys;                               // User keys overriding defaults

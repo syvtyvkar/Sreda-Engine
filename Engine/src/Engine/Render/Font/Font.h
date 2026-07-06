@@ -15,6 +15,7 @@
 
 namespace Engine::Render
 {
+    struct MSDFData;
     struct GlyphMetrics
     {
         Vector2 uvMin;
@@ -23,6 +24,13 @@ namespace Engine::Render
         glm::ivec2 bearing;
         uint32_t advance;
     };
+
+    struct TextParams
+	{
+		TColor Color = TColor::White;
+		float Kerning = 0.0f;
+		float LineSpacing = 0.0f;
+	};
 
     class Font
     {
@@ -43,6 +51,28 @@ namespace Engine::Render
         std::unordered_map<uint32_t, GlyphMetrics> m_Glyphs;
         int m_FontSize;
     };
+
+    /*class FontAsset
+    {
+    public:
+        FontAsset(const std::string& filepath);
+        ~FontAsset();
+
+        const MSDFData* GetMSDFData() const { return m_Data; }
+        TRef<Texture2D> GetAtlasTexture() const { return m_AtlasTexture; }
+        //const std::unordered_map<uint32_t, GlyphMetrics>& GetGlyphs() const { return m_Glyphs; }
+        int GetFontSize() const { return m_FontSize; }
+
+        static Vector2 CalculateTextSize(const std::wstring& InText, const Font* InFont, int InFontSize);
+
+    private:
+        void GenerateAtlas(const std::string& filepath, const std::vector<uint32_t>& codepoints);
+
+        MSDFData* m_Data;
+        TRef<Texture2D> m_AtlasTexture;
+        //std::unordered_map<uint32_t, GlyphMetrics> m_Glyphs;
+        int m_FontSize;
+    };*/
 
     std::vector<uint32_t> GetDefaultCodepoints();
 

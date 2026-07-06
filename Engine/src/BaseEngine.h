@@ -8,6 +8,7 @@
 
 #include "Engine/Core/Utilities/Log.h"                    // Поддержка логирования
 #include "Engine/Core/Utilities/Types.h"        // Базовые типы движка
+#include "Engine/Platform/PlatformTypes.h"
 #include "Engine/Core/Utilities/EngineUtils.h"        
 #include "Engine/Core/Utilities/TypeLib.h"      // Операции с типами
 //#include "Engine/Core/Utilities/Math.h"       // Своя математика (пока без нее)

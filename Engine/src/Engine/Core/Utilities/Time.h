@@ -49,21 +49,21 @@ namespace Engine::Time
     {
     public:
         /** @brief Initialization */
-        static void Init();
-        static void Shutdown();
+        void Init();
+        void Shutdown();
 
         /** @brief Update (call every frame) */
         static void Update();
 
         /** @brief Time Scale (slow/fast motion) */
-        static float GetTime();                    // Time since application start (sec)
-        static float GetTimeSeconds();             // Alias for GetTime()
-        static double GetTimeDouble();             // More precise version
+        static float GetTime();                                         // Time since application start (sec)
+        static float GetTimeSeconds() {return GetTime();};              // Alias for GetTime()
+        static double GetTimeDouble();                                  // More precise version
 
         /** @brief Time Scale (slow/fast motion) */
         static Timestep GetDeltaTime();            // Last frame time
-        static float GetDeltaTimeSeconds();        // Delta time in seconds
-        static float GetDeltaTimeMilliseconds();   // Delta time in milliseconds
+        float GetDeltaTimeSeconds() const {return static_cast<float>(m_DeltaTime * m_TimeScale);}       // Delta time in seconds
+        static float GetDeltaTimeMilliseconds() {return GetDeltaTime().GetMilliseconds();};             // Delta time in milliseconds
 
         /** @brief Time Scale (slow/fast motion) */
         static uint32_t GetFPS();                  // Frames per second
@@ -82,15 +82,12 @@ namespace Engine::Time
         static void FixedUpdate();                     // Call on physics update
 
         /** @brief Singleton */
-        static TimeSystem& GetInstance();
+        //static TimeSystem& GetInstance();
 
-    private:
         TimeSystem() = default;
         ~TimeSystem() = default;
 
-        /** @brief Internal data */
-        static TimeSystem* s_Instance;
-
+    private:
         double m_StartTime = 0.0;        // Application start time
         double m_CurrentTime = 0.0;      // Current time
         double m_LastTime = 0.0;         // Last frame time

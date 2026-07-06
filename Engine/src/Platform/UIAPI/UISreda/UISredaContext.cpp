@@ -9,7 +9,7 @@ namespace Engine::UI
 {
     UISredaContext::UISredaContext() : m_ui_camera(0.f,12800.f,720.f,0.f)
     {
-        Application::Get().GetWindow()->OnWindowReSize().Subscribe([&,this](int x, int y) 
+        Application::Get().GetWindow()->OnWindowReSize().Subscribe([&,this](WindowContext cntxt, int x, int y) 
 		{
 			m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);
 		});

@@ -14,7 +14,7 @@ void EditorInputComponent::Init()
     {
         if (key == InputKey::F11 && Engine::InputSystem::GetInstance().GetKeyState(key) == InputState::Released)
         {
-            Window* LWindow = Application::Get().GetWindow();
+            IWindow* LWindow = Application::Get().GetWindow();
             if (LWindow)
             {
                 LWindow->SetWindowMode((LWindow->GetWindowMode() == WindowMode::Window) ? WindowMode::Borderless :  WindowMode::Window);

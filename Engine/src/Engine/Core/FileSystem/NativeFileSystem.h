@@ -120,7 +120,7 @@ namespace Engine
             std::sort(m_mountPoints.begin(),m_mountPoints.end(), [](const MountEntry& a, const MountEntry& b) {return a.Priority > b.Priority;});
         };  
                                           
-        virtual void UnMount(std::string& InMountPoint) 
+        virtual void UnMount(const std::string& InMountPoint) 
         {
             std::lock_guard<std::mutex> lock(m_mutex);
             std::string LNormal = NormalizeVirtualPath(InMountPoint);
@@ -142,7 +142,7 @@ namespace Engine
         static std::string NormalizeVirtualPath(const std::string& InPath)
         {
             std::string LResult = InPath;
-            std::replace(LResult.begin(), LResult.end(), "\\", "/");
+            std::replace(LResult.begin(), LResult.end(), '\\', '/');
         #ifdef _WIN32
             // Set lowercase
             std::transform(LResult.begin(), LResult.end(),LResult.begin(), ::tolower);

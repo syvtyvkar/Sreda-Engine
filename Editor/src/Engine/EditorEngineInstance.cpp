@@ -21,7 +21,7 @@ void EditorAppInstance::OnInit(Application *InOwnerApp)
 
 	if (InOwnerApp->GetWindow() != nullptr)
 	{
-		InOwnerApp->GetWindow()->OnWindowReSize().Subscribe([&,this](int x, int y) 
+		InOwnerApp->GetWindow()->OnWindowReSize().Subscribe([&,this](WindowContext cntxt, int x, int y) 
 		{
 			m_CameraController.OnResize(x,y);
 			m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);

@@ -1,7 +1,7 @@
 // (c) Nikita Rogalev. All rights reserved.
 
 #include "Engine/Core/App/Application.h"    // Заголовочный файл приложения
-//#include "Engine/Core/Base/EngineInit.h"    // Инициализация движка
+#include "Engine/Core/Base/EngineCore.h"    // Инициализация движка
 #include "BaseEngine.h"                     // Базовые зависимости движка
 #include <string>                           // Для работы с строками
 /* 
@@ -12,16 +12,15 @@ int main(int argc, char **argv)
 {
     try
     {
-    Engine::Log::LogSystem::Init();                                                        // Инициализируем систему логирования
-    Engine::Application* App = Engine::Application::CreateNewApplication();     // Создаем приложение
-    ENGINE_LOG_INFO("Read arguments program:");
-    for (int i = 0; i < argc; ++i) 
-    {
-        ENGINE_LOG_INFO("- Parameter argument: id: {} arg: {}", i, argv[i]);
-    }
-    App->RunApp("[OpenGL] Render");                                             // Запуск приложения
-    delete App;                                                                 // Закрытие приложения
-    ENGINE_LOG_INFO("Process close.");                                          // Оповещаем, что приложение завершено
+        TRef<Engine::EngineCore> Engine = CreateRef<EngineCore>();
+        if (!Engine) return -1;
+        Engine.get()->PreInit(argc, argv);
+        Engine.get()->Init();
+        Engine::Application* App = Engine::Application::CreateNewApplication();     // Создаем приложение
+        App->RunApp(Engine);                                             // Запуск приложения
+        delete App;                                                                 // Закрытие приложения
+        Engine.get()->Shotdown();
+        ENGINE_LOG_INFO("Process close.");                                          // Оповещаем, что приложение завершено
     }
     catch (const std::exception& e)
     {

@@ -5,13 +5,15 @@
 #include "Platform/RenderAPI/OpenGL/OpenGLRendererAPI.h"
 #include "Platform/RenderAPI/Vulkan/VulkanRendererAPI.h"
 
+#include "Engine/Core/EngineConfig.h"
+
 namespace Engine::Render
 {
     RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
 
 	TUniquePtr<RendererAPI> RendererAPI::Create()
 	{
-        std::string renderAPIStr = EngineConfig::ConfigSystem::Get().Get<std::string>("Engine.RenderAPI", "OpenGL");
+        std::string renderAPIStr = EngineConfig::ConfigSystem::Get()->Get<std::string>("Engine.RenderAPI", "OpenGL");
         if (renderAPIStr == "Vulkan")
 		{
 			s_API = RendererAPI::API::Vulkan;

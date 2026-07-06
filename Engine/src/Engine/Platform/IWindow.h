@@ -13,36 +13,10 @@
 namespace Engine
 {
 
-    ADD_DELEGATE_TWO_PARAMS(DOnWindowReSize, int,int)         // On window resize
-    ADD_DELEGATE_ONE_PARAM(DOnWindowFocusChange, bool)        // On focus/minimize change
+    ADD_DELEGATE_THREE_PARAMS(DOnWindowReSize,WindowContext, int,int)         // On window resize
+    ADD_DELEGATE_TWO_PARAMS(DOnWindowFocusChange,WindowContext, bool)        // On focus/minimize change
 
     using namespace Engine::Render;
-    /**
-     * @struct WindowConfig
-     * @brief Structure containing window configuration parameters.
-     * 
-     * TODO: MOVE TO CONFIGS!
-     */
-    struct WindowConfig
-    {
-        int wight = 800;                        // Window width in pixels
-        int height = 600;                       // Window height in pixels
-        std::string title = "Render Window";    // Window title
-        bool resizable = true;                  // Flag allowing the user to resize the window
-        bool vsync = false;                     // Vertical synchronization
-    };
-
-    /**
-     * @struct WindowMode
-     * @brief Window modes
-     * 
-     */
-    enum class WindowMode : uint8_t 
-    {
-        Window = 0,
-        Borderless = 1,
-        Fullscreen = 2
-    };
 
     /**
      * @class Window
@@ -52,10 +26,10 @@ namespace Engine
      * event handling, title changes, getting dimensions, etc.
      * Concrete implementations (e.g., for GLFW, SDL, WinAPI) should inherit this class.
      */
-    class Window
+    class IWindow
     {
     public:
-        virtual ~Window()  = default;                                               // Virtual destructor for correct deletion of derived classes
+        virtual ~IWindow()  = default;                                               // Virtual destructor for correct deletion of derived classes
         /**
          * @brief Initializes the window with the given configuration.
          * @param config Window parameters (width, height, title, etc.)
@@ -124,6 +98,7 @@ namespace Engine
 
         virtual bool IsWindowHasFocus() = 0;
         virtual bool IsWindowMinimized() = 0;
+        virtual Engine::WindowContext GetWindowContext() = 0;
     private:
         DOnWindowReSize s_OnWindowReSize;
         DOnWindowFocusChange s_OnHasFocusChange;
@@ -147,6 +122,6 @@ namespace Engine
          * Window descendant (e.g., WindowGLF3). If no platform is defined,
          * may return nullptr.
          */
-        static TUniquePtr<Window> create();
+        static TUniquePtr<IWindow> create();
     };
 }

@@ -17,7 +17,7 @@ namespace Engine
     /**
      * @brief Инициализация слушателя ввода для GLFW.
      */
-    void InputListenGLFWSystem::Init(class Window* InWindow)
+    void InputListenGLFWSystem::Init(class IWindow* InWindow)
     {
         if (!InWindow) 
         {
@@ -258,8 +258,8 @@ namespace Engine
 
     InputListenGLFWSystem *InputListenGLFWSystem::GetInputListen(GLFWwindow *window)
     {
-        if (!Engine::InputSystem::GetInstance().GetInputListen()) return nullptr;
-        return static_cast<InputListenGLFWSystem*>(Engine::InputSystem::GetInstance().GetInputListen());
+        if (!Engine::InputSystem::GetInstance().GetInputListenFromActivWin()) return nullptr;
+        return static_cast<InputListenGLFWSystem*>(Engine::InputSystem::GetInstance().GetInputListenFromActivWin());
     };
 
     void InputListenGLFWSystem::OnGLFWCharCallback(GLFWwindow* window, unsigned int codepoint)

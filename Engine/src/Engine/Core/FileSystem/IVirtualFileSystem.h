@@ -58,6 +58,6 @@ namespace Engine
         virtual void Mount(const std::string& InPhysPath,const std::string& InMountPoint,int InPriority = 0) = 0;  
         /**  
         *   Mounts the source (folder/archive/file) to the file system. Depending on the priority, it may override files */                                             
-        virtual void UnMount(std::string& InMountPoint) = 0;        
+        virtual void UnMount(const std::string& InMountPoint) = 0;        
     };
 }

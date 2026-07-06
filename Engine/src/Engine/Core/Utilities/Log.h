@@ -12,9 +12,11 @@
 #include <string>
 #include <stdexcept>
 
+#include "LogSystem.h"
+
 namespace Engine::Log
 {
-    enum LogType : int8_t
+    /*enum LogType : int8_t
     {
         Temp,
         Trace,
@@ -34,7 +36,7 @@ namespace Engine::Log
 
     /*  Log class handles initialization and provides a global spdlog logger.
         Implemented as a static class (all methods are static).*/
-    class LogSystem 
+    /*class LogSystem 
     {
     public:
         static void Init();                                         // Initialize logger (call once at app startup)
@@ -51,8 +53,8 @@ namespace Engine::Log
     private:
         /*  Static pointer to the main logger (initialized in Init)
             Used for all messages from game code*/
-        static std::shared_ptr<spdlog::logger> s_MainLogger;
-    };
+       /* static std::shared_ptr<spdlog::logger> s_MainLogger;
+    };*/
 }
 
 namespace Engine 

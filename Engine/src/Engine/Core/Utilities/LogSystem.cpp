@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-/*#include "Log.h"
+#include "LogSystem.h"
 #include <spdlog/fmt/ostr.h>  // For custom type support in logs
 
 // Headers for time operations
@@ -48,8 +48,10 @@ namespace Engine::Log
 
     void LogSystem::ShowMessageBox(uint8_t Type, const char* Tittle, const char* Message)
     {
+        std::string LT = Tittle;
+        std::string LM =Message;
         #ifdef WIN32
-        MessageBox(GetActiveWindow(), Message, Tittle, MB_ICONERROR);
+        MessageBox(GetActiveWindow(), LM.c_str(), LT.c_str(), MB_ICONERROR);
         #endif
     }
 
@@ -58,4 +60,3 @@ namespace Engine::Log
         s_MainLogger->set_level(level);
     }
 }
-*/

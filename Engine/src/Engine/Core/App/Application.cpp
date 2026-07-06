@@ -15,6 +15,8 @@
 #include "Engine/Render/Renderer.h"    
 #include "Engine/Render/RendererAPI.h"
 
+#include "Engine/Core/Base/EngineCore.h"
+
 #include <string>
 #include <sstream>
 #include <vector>
@@ -40,33 +42,29 @@ namespace Engine
         return s_Instance;                                                              // Return pointer to the created instance
     }
 
-    void Application::RunApp(std::string InNameApp)                         // Main application run method
+    void Application::RunApp(TRef<Engine::EngineCore> InEngine)                         // Main application run method
     {
         ENGINE_LOG_INFO("Running app...");                                                          // Log the start of execution
+
+        ENGINE_ASSERT(InEngine, "THE ENGINE FOR LAUNCHING THE APPLICATION WAS NOT FOUND!");
+
+        m_Engine = InEngine;
         
         Engine::ResourceManager::getInstance().init(Engine::PlatformUtils::GetExecutablePath());    // Initialize resource manager with path to executable
-        Time::TimeSystem::Init();                                                                   // Initialize time system
 
-        auto& config = EngineConfig::ConfigSystem::Get();                                           // Get config system
-        config.Init(ENINGE_CONFIG_FILE);                                                            // Initialize engine config
-
-        m_AppWindow = WindowAPIFactory::create();                                                     // Create window through factory (platform-dependent)
+        auto LConfig = EngineConfig::ConfigSystem::Get();                                           // Get config system
         Engine::WindowConfig WindowConfig;                                                          // TODO: MOVE TO CONFIGS!!! Window parameter setup 
-        WindowConfig.wight = config.Get<int>("window.width", 800);
-        WindowConfig.height = config.Get<int>("window.height", 600);
+        WindowConfig.wight = LConfig->Get<int>("window.width", 800);
+        WindowConfig.height = LConfig->Get<int>("window.height", 600);
         WindowConfig.title = "Init Engine...";
-        WindowConfig.vsync = config.Get<bool>("render.vsync",false);
-        config.Set<int>("window.width", 800);
-        config.Set<int>("window.height", 600);
-        config.SaveConfig(ENINGE_CONFIG_FILE);
+        WindowConfig.vsync = LConfig->Get<bool>("render.vsync",false);
+        LConfig->Set<int>("window.width", 800);
+        LConfig->Set<int>("window.height", 600);
+        LConfig->SaveConfig(ENINGE_CONFIG_FILE);
 
-        if (!m_AppWindow->Init(WindowConfig))                                                         // Attempt to initialize window with given parameters
-        {                                                       
-            ENGINE_LOG_CRITICAL("Failed to create window!");                                        // Window creation error
-            return;
-        }
+        Engine::InputSystem::Init();   // Initialize input system with window pointer
 
-        Engine::InputSystem::Init(m_AppWindow.get());                                                  // Initialize input system with window pointer
+        m_Engine.get()->GetEngineContext().GetWindowManager()->CreateEngineWindow(WindowConfig);
 
         ENGINE_LOG_TRACE("Working Directory: {}", Engine::PlatformUtils::GetProjectDirectory());
 
@@ -80,40 +78,39 @@ namespace Engine
             return;
         }
 
-        m_AppWindow->SetTittle(m_AppInstance->GetNameApp());
-        m_AppWindow->UpdateWindowName("");
+        GetWindow()->SetTittle(m_AppInstance->GetNameApp());
+        GetWindow()->UpdateWindowName("");
     
         m_AppInstance.get()->OnStart();
 
-        while (!m_AppWindow->ShouldClose())                                                                   // MAIN GAME LOOP While window hasn't requested close
+        while (!GetWindow()->ShouldClose())                                                                 // MAIN GAME LOOP While window hasn't requested close
         {
-            //if (!m_AppWindow->GetCurrentRender()) return;                                                     // If renderer is lost, exit (abnormal)
+            //if (!GetWindow()->GetCurrentRender()) return;                                                 // If renderer is lost, exit (abnormal)
             Time::TimeSystem::Update();                                                                     // Update time system
-            m_AppWindow->Update();
+
+            GetWindow()->Update();
             if (m_AppInstance)
             {
                 m_AppInstance->Update(Time::TimeSystem::GetDeltaTime());
             }  
-            m_AppWindow->BeginRender();    
-            //m_AppWindow->Render(); 
+            GetWindow()->BeginRender();    
+            //GetWindow()->Render(); 
             if (m_AppInstance)
             {
                 m_AppInstance->Update(Time::TimeSystem::GetDeltaTime());
                 m_AppInstance->OnRender();
                 m_AppInstance->OnRenderUI();
             }  
-            m_AppWindow->EndRender();  
+            GetWindow()->EndRender();  
         }
         Engine::InputSystem::Shutdown();                                                                     // Shutdown input system
-        Time::TimeSystem::Shutdown();                                                                       // Shutdown time system
-        config.DeInit();
     }
 
     Application &Application::Get(){ return *s_Instance;}                                                   // Returns reference to the single application instance
 
     void Application::ExitApp()                                                                             // Request application exit (close window)
     {
-        Engine::Application::Get().m_AppWindow->ExitApp();
+        Engine::Application::Get().GetWindow()->ExitApp();
     }
 
     void Application::AddInstance(TUniquePtr<ApplicationInstance> InInstance)
@@ -123,6 +120,11 @@ namespace Engine
         {
             m_AppInstance.get()->OnInit(this);
         }
+    }
+
+    IWindow *Application::GetWindow() const
+    {
+        return EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(EngineCore::GetEngineContext().GetWindowManager()->GetActivIWin());
     }
 
     class Engine::UI::UISystem& Application::GetUISystem()
@@ -137,7 +139,7 @@ namespace Engine
             m_AppInstance->DeInit();
             m_AppInstance.reset();
         }
-        m_AppWindow.reset();          // Destroy window (destructor call)
+        m_Engine.reset();
         s_Instance = nullptr;       // Reset instance pointer (singleton)
     }
 }

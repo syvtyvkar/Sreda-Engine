@@ -11,10 +11,10 @@ namespace Engine
 {
     class CommandLine
     {
+        std::unordered_map<std::string, std::string> m_args;
+    public:
         CommandLine() = default;
         ~CommandLine() = default;
-
-    public:
 
         void Parse(int argc, char **argv)
         {
@@ -46,7 +46,10 @@ namespace Engine
         {
             return m_args.find(InKey) != m_args.end();
         }
-    private:
-        std::unordered_map<std::string, std::string> m_args;
+
+        void DeInit()
+        {
+            return;
+        }
     };
 }

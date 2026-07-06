@@ -26,7 +26,7 @@ namespace Engine
      * для работы с GLFW: создание окна, обработка событий, изменение заголовка,
      * колбэки и т.д.
      */
-    class WindowGLFW : public Window
+    class WindowGLFW : public IWindow
     {
     public:
         WindowGLFW();
@@ -57,6 +57,7 @@ namespace Engine
         static void FocusCallback(GLFWwindow* window, int focused);
         static void IconifyCallback(GLFWwindow* window, int iconified);
         virtual bool LoadIconFromFile() override;
+        virtual Engine::WindowContext GetWindowContext() override {return m_WindowContext;}
 
     private:
         GLFWwindow* m_window = nullptr;                                          // Указатель на объект окна GLFW
@@ -78,6 +79,7 @@ namespace Engine
         //TUniquePtr<Scene> m_currentScene;                  // Текущая сцена
         TUniquePtr<UISystem> m_uiSystem;                  // Текущая система UI
         TUniquePtr<GraphicsContext> m_context;             // Графический контекст (OpenGL, Vulkan и т.д.)
+        Engine::WindowContext m_WindowContext = Engine::WindowContext(0);
     };
 }
 

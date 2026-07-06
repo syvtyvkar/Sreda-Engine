@@ -164,7 +164,7 @@ namespace Engine
         virtual ~InputListenGLFWSystem() override;
 
         // Переопределение виртуальных методов базового класса
-        virtual void Init(class Window* InWindow) override;
+        virtual void Init(class IWindow* InWindow) override;
         virtual void DeInit() override;
 
         // Управление курсором
