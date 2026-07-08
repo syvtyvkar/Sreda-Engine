@@ -13,7 +13,7 @@ namespace Engine::UI
 
     UIImage::UIImage(const std::string &InImageAsset)
     {
-        m_Texture = Texture2D::Create("/Resources/Textures/" + InImageAsset);
+        m_Texture = RenderAPIFactory::CreateTexture2DFromPath("/Resources/Textures/" + InImageAsset);
     }
 
     void UIImage::OnRender()

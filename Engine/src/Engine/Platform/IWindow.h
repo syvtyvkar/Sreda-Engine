@@ -15,6 +15,7 @@ namespace Engine
 
     ADD_DELEGATE_THREE_PARAMS(DOnWindowReSize,WindowContext, int,int)         // On window resize
     ADD_DELEGATE_TWO_PARAMS(DOnWindowFocusChange,WindowContext, bool)        // On focus/minimize change
+    ADD_DELEGATE_TWO_PARAMS(DOnWindowModeChange,WindowContext, WindowMode)         
 
     using namespace Engine::Render;
 
@@ -84,16 +85,16 @@ namespace Engine
          */
         virtual void Close()= 0;     
         /**
-         * @brief Immediately terminates the application (closes window and exits loop).
-         *        Differs from Close() by potentially initiating an exit.
-         */                                           
-        virtual void ExitApp()= 0;
+         * @brief Closes the window (sets ShouldClose flag to true).
+         */
+        virtual void WindowTerminate()= 0;     
         //virtual Scene* GetCurrentScene() = 0;
         virtual GraphicsContext* GetGraphicsContext() = 0;
         virtual void SetTittle(const std::string NewTittle) = 0;
         DOnWindowReSize& OnWindowReSize() {return s_OnWindowReSize;}
         DOnWindowFocusChange& OnHasFocusChange() {return s_OnHasFocusChange;}
         DOnWindowFocusChange& OnMinimizedChange() {return s_OnMinimizedChange;}
+        DOnWindowModeChange& OnWindowModeChange() {return s_OnWindowModeChange;}
         virtual bool LoadIconFromFile() = 0;
 
         virtual bool IsWindowHasFocus() = 0;
@@ -103,6 +104,7 @@ namespace Engine
         DOnWindowReSize s_OnWindowReSize;
         DOnWindowFocusChange s_OnHasFocusChange;
         DOnWindowFocusChange s_OnMinimizedChange;
+        DOnWindowModeChange s_OnWindowModeChange;
     };
 
     /**

@@ -65,7 +65,5 @@ namespace Engine::Render
 		virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
 
 		virtual const FramebufferSpecification& GetSpecification() const = 0;
-
-		static TRef<Framebuffer> Create(const FramebufferSpecification& spec);
 	};
 }

@@ -41,8 +41,8 @@ namespace Engine
         virtual int GetWidth() const override {return m_width;}                         // Получить длину и ширину
         virtual int GetHeight() const override {return m_height;}
         GLFWwindow* GetHandle() {return m_window;}                                // Получить окно
-        virtual void Close() override;                                                  // Закрываем окно
-        virtual void ExitApp() override;                                                // Закрываем окно
+        virtual void Close() override;                                            // Закрываем окно
+        virtual void WindowTerminate() override;
         virtual void SetTittle(const std::string NewTittle) override {NameWindow = NewTittle;};
         //virtual Scene* GetCurrentScene() override {return m_currentScene.get();}
         virtual GraphicsContext* GetGraphicsContext() override {return m_GraphicsContext.get();}

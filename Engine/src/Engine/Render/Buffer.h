@@ -215,9 +215,6 @@ namespace Engine::Render
 
 		virtual const BufferLayout& GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout) = 0;
-
-		static TRef<VertexBuffer> Create(uint32_t size);
-		static TRef<VertexBuffer> Create(float* vertices, uint32_t size);
 	};
 
 	// Currently only supports 32-bit index buffers
@@ -230,7 +227,5 @@ namespace Engine::Render
 		virtual void Unbind() const = 0;
 
 		virtual uint32_t GetCount() const = 0;
-
-		static TRef<IndexBuffer> Create(uint32_t* indices, uint32_t count);
 	};
 }

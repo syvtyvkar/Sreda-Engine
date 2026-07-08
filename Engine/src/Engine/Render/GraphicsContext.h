@@ -16,7 +16,5 @@ namespace Engine::Render
 		virtual void SwapBuffers() = 0;
 		virtual void BeginFrame() {}
 		virtual void EndFrame() {}
-
-		static TUniquePtr<GraphicsContext> Create(void* window);
 	};
 }

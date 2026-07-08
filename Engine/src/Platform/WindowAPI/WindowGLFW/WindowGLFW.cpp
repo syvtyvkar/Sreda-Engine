@@ -23,7 +23,7 @@ namespace Engine
 
     WindowGLFW::~WindowGLFW()                   // Деструктор: автоматически закрывает окно при уничтожении объекта
     {
-        Close();
+        //Close(false);
     }
 
     /**
@@ -102,8 +102,7 @@ namespace Engine
         ENGINE_LOG_INFO("Window ( {} ) has been created successfully", config.title);
         ///////////////////////////////////////////
 
-
-        m_GraphicsContext = Engine::Render::GraphicsContext::Create(GetHandle());     // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
+        m_GraphicsContext = RenderAPIFactory::CreateGraphicsContext(GetHandle());
 		m_GraphicsContext->Init();                                                 // Инициализация
 
         // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
@@ -173,27 +172,21 @@ namespace Engine
      */
     void WindowGLFW::Close() 
     {
-        if (m_window) 
-        {
-            ENGINE_LOG_INFO("The Window close");
-            glfwDestroyWindow(GetHandle());            // Уничтожаем окно GLFW
-            m_window = nullptr;
-        }
-        //if (m_uiSystem)
-        //{
-        //    m_uiSystem.get()->Shutdown();
-        //}
-        //m_uiSystem.reset();
-        glfwTerminate();                            // Завершаем GLFW (вызывается даже если окно уже было уничтожено)
+        ENGINE_CORE_ASSERT(m_window, "FATAL ERROR: NO VALID WINDOW!");
+
+        OnHasFocusChange().Clear();
+        OnMinimizedChange().Clear();
+        OnWindowReSize().Clear();
+
+        ENGINE_LOG_INFO("The Window close");
+        glfwSetWindowShouldClose(GetHandle(), true);
+        glfwDestroyWindow(GetHandle());            // Уничтожаем окно GLFW
+        m_window = nullptr;
     }
 
-    /**
-     * @brief Инициирует закрытие окна (устанавливает флаг ShouldClose).
-     */
-    void WindowGLFW::ExitApp()
+    void WindowGLFW::WindowTerminate()
     {
-        ENGINE_CORE_ASSERT(m_window, "FATAL ERROR: NO VALID APPLICATION!");
-        glfwSetWindowShouldClose(GetHandle(), true);
+        glfwTerminate();
     }
 
     void WindowGLFW::SetWindowMode(WindowMode NewMode)
@@ -267,6 +260,8 @@ namespace Engine
         {
             glfwSetWindowPos(GetHandle(),m_windowedX,m_windowedY);
         }
+
+        OnWindowModeChange().Broadcast(GetWindowContext(), m_windowMode);
     }
 
     /**
@@ -324,7 +319,7 @@ namespace Engine
 
     bool WindowGLFW::LoadIconFromFile()
     {
-        TRef<Texture2D> LIcon = Engine::Render::Texture2D::Create("/Resources/Textures/SredaIco.png");
+        TRef<Texture2D> LIcon = RenderAPIFactory::CreateTexture2DFromPath("/Resources/Textures/SredaIco.png");
         ENGINE_ASSERT(LIcon.get(), "Failed to load the icon at path!");
         
         GLFWimage images[1];

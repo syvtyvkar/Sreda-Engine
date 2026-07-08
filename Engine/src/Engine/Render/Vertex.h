@@ -22,8 +22,6 @@ namespace Engine::Render
 
 		virtual const std::vector<TRef<VertexBuffer>>& GetVertexBuffers() const = 0;
 		virtual const TRef<IndexBuffer>& GetIndexBuffer() const = 0;
-
-		static TRef<VertexArray> Create();
 	};
 
 }

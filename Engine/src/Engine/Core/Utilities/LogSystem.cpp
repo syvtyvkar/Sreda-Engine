@@ -3,6 +3,8 @@
 #include "LogSystem.h"
 #include <spdlog/fmt/ostr.h>  // For custom type support in logs
 
+#include "spdlog/sinks/rotating_file_sink.h"
+
 // Headers for time operations
 #include <chrono>
 #include <ctime>

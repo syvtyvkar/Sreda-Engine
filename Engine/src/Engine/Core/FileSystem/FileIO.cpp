@@ -4,6 +4,7 @@
 #include "Engine/Core/Utilities/Log.h"
 #include <fstream>
 #include <sstream>
+#include "Engine/Render/RenderAPIFactory.h"
 
 namespace Engine 
 {
@@ -94,7 +95,7 @@ namespace Engine
 
     TRef<Engine::Render::Texture2D> FileIO::ReadImageFile(const std::string &InPath)
     {
-        return Engine::Render::Texture2D::Create(PlatformUtils::GetProjectDirectory() + "/" + InPath);
+        return Engine::Render::RenderAPIFactory::CreateTexture2DFromPath(PlatformUtils::GetProjectDirectory() + "/" + InPath);
     }
 
     bool FileIO::WriteImageFile(const std::string &InPath, const TRef<Engine::Render::Texture2D>&InData, bool InCreateDirs)

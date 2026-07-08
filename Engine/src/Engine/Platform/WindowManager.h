@@ -22,7 +22,8 @@ namespace Engine
     {
     friend class EngineCore;
         std::unordered_map<WindowContext, TUniquePtr<IWindow>, WindowContextHash> m_windowList = {};
-        WindowContext                                          m_focusWindow = WindowContext(0);
+        WindowContext m_focusWindow = WindowContext(-1);
+        WindowContext m_mainWindow = WindowContext(-1);
     public:
         WindowManager() = default;
         ~WindowManager();
@@ -31,7 +32,7 @@ namespace Engine
         // Get and create
         IWindow* GetEngineWindow(WindowContext InContext = WindowContext(0));
         IWindow* GetEngineWindowActiv() {return GetEngineWindow(GetActivIWin());};
-        WindowContext CreateEngineWindow(const struct WindowConfig InConfigWindow);
+        WindowContext CreateEngineWindow(const struct WindowConfig InConfigWindow, bool InMainWindow = false);
         void CloseEngineWindow(WindowContext InContext = WindowContext(0));
         WindowContext GetActivIWin() {return m_focusWindow;};
 

@@ -8,6 +8,7 @@
 #include FT_FREETYPE_H
 
 #include "Engine/Platform/PlatformUtils.h"
+#include "Engine/Render/RenderAPIFactory.h"
 
 /*#undef INFINITE
 #include "msdf-atlas-gen.h"
@@ -225,10 +226,10 @@ namespace Engine::Render
 		spec.WrapS = TextureWrap::ClampToEdge;
 		spec.WrapT = TextureWrap::ClampToEdge;
 
-        m_AtlasTexture = Texture2D::Create(spec);
+        m_AtlasTexture = RenderAPIFactory::CreateTexture2D(spec);
         m_AtlasTexture->SetData(atlasPixels.data(), atlasW * atlasH);
 
-        ENGINE_LOG_INFO("Font atlas created: {}x{} ({} glyphs)", atlasW, atlasH, m_Glyphs.size());
+        ENGINE_LOG_INFO("Font atlas created: {}x{} ({} glyphs). Source: {}", atlasW, atlasH, m_Glyphs.size(),filepath);
 
         FT_Done_Face(face);
         FT_Done_FreeType(ft);
@@ -257,7 +258,7 @@ namespace Engine::Render
 		spec.Format = ImageFormat::RGB8;
 		spec.GenerateMips = false;
 
-		Ref<Texture2D> texture = Texture2D::Create(spec);
+		Ref<Texture2D> texture = RenderAPIFactory::CreateTexture2D(spec);
 		texture->SetData((void*)bitmap.pixels, bitmap.width * bitmap.height * 3);
 		return texture;
 	}

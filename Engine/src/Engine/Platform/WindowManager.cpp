@@ -25,7 +25,7 @@ namespace Engine
         return (it != m_windowList.end()) ? it->second.get() : nullptr;
     }
 
-    WindowContext WindowManager::CreateEngineWindow(const WindowConfig InConfigWindow)
+    WindowContext WindowManager::CreateEngineWindow(const WindowConfig InConfigWindow, bool InMainWindow)
     {
         WindowConfig LResultContext = InConfigWindow;
         LResultContext.cntx = WindowContext(0);
@@ -54,6 +54,8 @@ namespace Engine
 
         m_focusWindow=LResultContext.cntx;
 
+        if (InMainWindow) m_mainWindow = LResultContext.cntx;
+
         return LResultContext.cntx;
     }
 
@@ -62,13 +64,24 @@ namespace Engine
         auto& it = m_windowList.find(InContext);
         if (it == m_windowList.end()) return;
 
-        it->second.get()->OnHasFocusChange().Clear();
-        it->second.get()->OnMinimizedChange().Clear();
-        it->second.get()->OnWindowReSize().Clear();
-
         OnWinDestroy().Broadcast(it->second.get(), InContext);
         it->second->Close();
-        m_windowList.erase(it);
+        if (m_mainWindow == InContext)
+        {
+            /*if (m_windowList.empty()) return;
+
+            for (auto& [LKey,LVal] : m_windowList)
+            {
+                if (!LVal) continue;
+                CloseEngineWindow(LKey);
+            }*/
+            it->second->WindowTerminate();
+            m_windowList.clear();
+        }
+        else
+        {
+            m_windowList.erase(it);
+        }
     }
 
     bool WindowManager::ShouldClose() const

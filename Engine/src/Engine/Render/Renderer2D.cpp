@@ -10,6 +10,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "RenderAPIFactory.h"
+
 //#include "Engine/Render/Font/MSDFData.h"
 
 namespace Engine::Render
@@ -122,9 +124,9 @@ namespace Engine::Render
 
 	void Renderer2D::Init()
 	{
-		s_Data.QuadVertexArray = VertexArray::Create();
+		s_Data.QuadVertexArray = RenderAPIFactory::CreateVertexArray();
 
-		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
+		s_Data.QuadVertexBuffer = RenderAPIFactory::CreateVertexBuffer(s_Data.MaxVertices * sizeof(QuadVertex));
 		s_Data.QuadVertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "a_Position"     },
 			{ ShaderDataType::Float4, "a_Color"        },
@@ -153,14 +155,14 @@ namespace Engine::Render
 			offset += 4;
 		}
 
-		TRef<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
+		TRef<IndexBuffer> quadIB = RenderAPIFactory::CreateIndexBuffer(quadIndices, s_Data.MaxIndices);
 		s_Data.QuadVertexArray->SetIndexBuffer(quadIB);
 		delete[] quadIndices;
 
 		// Circles
-		s_Data.CircleVertexArray = VertexArray::Create();
+		s_Data.CircleVertexArray = RenderAPIFactory::CreateVertexArray();
 
-		s_Data.CircleVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(CircleVertex));
+		s_Data.CircleVertexBuffer = RenderAPIFactory::CreateVertexBuffer(s_Data.MaxVertices * sizeof(CircleVertex));
 		s_Data.CircleVertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "a_WorldPosition" },
 			{ ShaderDataType::Float3, "a_LocalPosition" },
@@ -174,9 +176,9 @@ namespace Engine::Render
 		s_Data.CircleVertexBufferBase = new CircleVertex[s_Data.MaxVertices];
 
 		// Lines
-		s_Data.LineVertexArray = VertexArray::Create();
+		s_Data.LineVertexArray = RenderAPIFactory::CreateVertexArray();
 
-		s_Data.LineVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(LineVertex));
+		s_Data.LineVertexBuffer = RenderAPIFactory::CreateVertexBuffer(s_Data.MaxVertices * sizeof(LineVertex));
 		s_Data.LineVertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color"    },
@@ -185,7 +187,7 @@ namespace Engine::Render
 		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer);
 		s_Data.LineVertexBufferBase = new LineVertex[s_Data.MaxVertices];
 
-		s_Data.WhiteTexture = Texture2D::Create(TextureSpecification());
+		s_Data.WhiteTexture = RenderAPIFactory::CreateTexture2D(TextureSpecification());
 		uint32_t whiteTextureData = 0xffffffff;
 		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
@@ -194,9 +196,9 @@ namespace Engine::Render
 			samplers[i] = i;
 
 		// Text
-		s_Data.TextVertexArray = VertexArray::Create();
+		s_Data.TextVertexArray = RenderAPIFactory::CreateVertexArray();
 
-		s_Data.TextVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(TextVertex));
+		s_Data.TextVertexBuffer = RenderAPIFactory::CreateVertexBuffer(s_Data.MaxVertices * sizeof(TextVertex));
 		s_Data.TextVertexBuffer->SetLayout({
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color"    },
@@ -210,10 +212,10 @@ namespace Engine::Render
 		s_Data.TextVertexBufferBase = new TextVertex[s_Data.MaxVertices];
 		s_Data.TextVertexBufferPtr = s_Data.TextVertexBufferBase;
 
-		s_Data.TextShader = Shader::Create("Resources/Shaders/Renderer2D_Text.glsl");
-		s_Data.QuadShader = Shader::Create("Resources/Shaders/Renderer2D_Quad.glsl");
-		s_Data.CircleShader = Shader::Create("Resources/Shaders/Renderer2D_Circle.glsl");
-		s_Data.LineShader = Shader::Create("Resources/Shaders/Renderer2D_Line.glsl");
+		s_Data.TextShader = RenderAPIFactory::CreateShaderFromPath("Resources/Shaders/Renderer2D_Text.glsl");
+		s_Data.QuadShader = RenderAPIFactory::CreateShaderFromPath("Resources/Shaders/Renderer2D_Quad.glsl");
+		s_Data.CircleShader = RenderAPIFactory::CreateShaderFromPath("Resources/Shaders/Renderer2D_Circle.glsl");
+		s_Data.LineShader = RenderAPIFactory::CreateShaderFromPath("Resources/Shaders/Renderer2D_Line.glsl");
 
 
 		// Set first texture slot to 0
@@ -224,7 +226,7 @@ namespace Engine::Render
 		s_Data.QuadVertexPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
 		s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 
-		s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
+		s_Data.CameraUniformBuffer = RenderAPIFactory::CreateUniformBuffer(sizeof(Renderer2DData::CameraData), 0);
 	}
 
 	void Renderer2D::Shutdown()

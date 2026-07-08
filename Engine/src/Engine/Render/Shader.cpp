@@ -12,32 +12,6 @@
 
 namespace Engine::Render
 {
-    TRef<Shader> Shader::Create(const std::string& filepath)
-	{
-		switch (RenderAPIFactory::GetRenderAPI())
-		{
-			case RenderAPIFactory::RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RenderAPIFactory::RHI_API::OpenGL:  return CreateRef<OpenGLShader>(filepath);
-			case RenderAPIFactory::RHI_API::Vulkan:  return CreateRef<VulkanShader>(filepath);
-		}
-
-		ENGINE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
-	}
-
-	TRef<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
-	{
-		switch (RenderAPIFactory::GetRenderAPI())
-		{
-			case RenderAPIFactory::RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RenderAPIFactory::RHI_API::OpenGL:  return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
-			case RenderAPIFactory::RHI_API::Vulkan:  return CreateRef<VulkanShader>(name, vertexSrc, fragmentSrc);
-		}
-
-		ENGINE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
-	}
-
 	void ShaderLibrary::Add(const std::string& name, const TRef<Shader>& shader)
 	{
 		ENGINE_ASSERT(!Exists(name), "Shader already exists!");
@@ -52,14 +26,14 @@ namespace Engine::Render
 
 	TRef<Shader> ShaderLibrary::Load(const std::string& filepath)
 	{
-		auto shader = Shader::Create(filepath);
+		auto shader = RenderAPIFactory::CreateShaderFromPath(filepath);
 		Add(shader);
 		return shader;
 	}
 
 	TRef<Shader> ShaderLibrary::Load(const std::string& name, const std::string& filepath)
 	{
-		auto shader = Shader::Create(filepath);
+		auto shader = RenderAPIFactory::CreateShaderFromPath(filepath);
 		Add(name, shader);
 		return shader;
 	}

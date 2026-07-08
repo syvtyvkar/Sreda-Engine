@@ -72,8 +72,6 @@ namespace Engine::Render
 
 	class Texture2D : public Texture
 	{
-	public:
-		static TRef<Texture2D> Create(const TextureSpecification& specification);
-		static TRef<Texture2D> Create(const std::string& path);
+		
 	};
 }

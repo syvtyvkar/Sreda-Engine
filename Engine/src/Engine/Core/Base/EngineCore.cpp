@@ -63,7 +63,7 @@ namespace Engine
         bool LWorkInit = true;
         while (LWorkInit)
         {
-            Time::TimeSystem::Update();
+            FrameLoopUpdate();
 
             if (Time::TimeSystem::GetTime() >= 5.f)
             {

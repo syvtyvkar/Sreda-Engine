@@ -14,24 +14,6 @@
 
 namespace Engine::Log
 {
-    enum LogType : int8_t
-    {
-        Temp,
-        Trace,
-        Info,
-        Warning,
-        Error,
-        Critical
-    };
-
-    enum Category : int8_t
-    {
-        Custom,
-        Core,
-        Render,
-        Input
-    };
-
     /*  Log class handles initialization and provides a global spdlog logger.
         Implemented as a static class (all methods are static).*/
     class LogSystem 

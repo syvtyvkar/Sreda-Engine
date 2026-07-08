@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Engine/Core/EngineConfig.h"
+#include "Engine/Render/RenderAPIFactory.h"
 
 using namespace Engine::Render;
 
@@ -29,7 +30,7 @@ void EditorAppInstance::OnInit(Application *InOwnerApp)
     WindowConfig.vsync = LConfig->Get<bool>("render.vsync",false);
 	WindowConfig.widget = std::make_shared<EditorMainWidget>();
 
-	WindowContext LWinContx = EngineCore::GetEngineContext().GetWindowManager()->CreateEngineWindow(WindowConfig);
+	WindowContext LWinContx = EngineCore::GetEngineContext().GetWindowManager()->CreateEngineWindow(WindowConfig, true);
 
 	IWindow* LWin = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(LWinContx);
 
@@ -48,6 +49,8 @@ void EditorAppInstance::OnInit(Application *InOwnerApp)
 
 void EditorAppInstance::DeInit()
 {
+	auto LConfig = Engine::EngineCore::GetEngineContext().GetConfigSystem();                    // Get config system
+	LConfig->SaveConfig(EngineConfig::ENINGE_CONFIG_FILE);
 	__super::DeInit();
 }
 
@@ -65,7 +68,7 @@ void EditorAppInstance::OnStart()
     m_EditorInputHotKey = CreateUniquePtr<EditorInputComponent>();
     m_EditorInputHotKey.get()->Init();
 
-	m_VertexArray = VertexArray::Create();
+	m_VertexArray = RenderAPIFactory::CreateVertexArray();
 
 	float vertices[3 * 7] = {
 		-0.5f, -0.5f, 0.0f, 0.8f, 0.2f, 0.8f, 1.0f,
@@ -73,7 +76,7 @@ void EditorAppInstance::OnStart()
 		 0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 	};
 
-	TRef<VertexBuffer> vertexBuffer = VertexBuffer::Create(vertices, sizeof(vertices));
+	TRef<VertexBuffer> vertexBuffer = RenderAPIFactory::CreateVertexBufferFromVertex(vertices, sizeof(vertices));
 	BufferLayout layout = {
 		{ ShaderDataType::Float3, "a_Position" },
 		{ ShaderDataType::Float4, "a_Color" }
@@ -82,10 +85,10 @@ void EditorAppInstance::OnStart()
 	m_VertexArray->AddVertexBuffer(vertexBuffer);
 
 	uint32_t indices[3] = { 0, 1, 2 };
-	TRef<IndexBuffer> indexBuffer = IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
+	TRef<IndexBuffer> indexBuffer = RenderAPIFactory::CreateIndexBuffer(indices, sizeof(indices) / sizeof(uint32_t));
 	m_VertexArray->SetIndexBuffer(indexBuffer);
 
-	m_SquareVA = VertexArray::Create();
+	m_SquareVA = RenderAPIFactory::CreateVertexArray();
 
 	float squareVertices[5 * 4] = {
 		-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
@@ -94,7 +97,7 @@ void EditorAppInstance::OnStart()
 		-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
 	};
 
-	TRef<VertexBuffer> squareVB = VertexBuffer::Create(squareVertices, sizeof(squareVertices));
+	TRef<VertexBuffer> squareVB = RenderAPIFactory::CreateVertexBufferFromVertex(squareVertices, sizeof(squareVertices));
 	squareVB->SetLayout({
 		{ ShaderDataType::Float3, "a_Position" },
 		{ ShaderDataType::Float2, "a_TexCoord" }
@@ -102,7 +105,7 @@ void EditorAppInstance::OnStart()
 	m_SquareVA->AddVertexBuffer(squareVB);
 
 	uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
-	TRef<IndexBuffer> squareIB = IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
+	TRef<IndexBuffer> squareIB = RenderAPIFactory::CreateIndexBuffer(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 	m_SquareVA->SetIndexBuffer(squareIB);
 
 	std::string vertexSrc = R"(
@@ -140,7 +143,7 @@ void EditorAppInstance::OnStart()
 			}
 		)";
 
-	m_Shader = Shader::Create("VertexPosColor", vertexSrc, fragmentSrc);
+	m_Shader = RenderAPIFactory::CreateShader("VertexPosColor", vertexSrc, fragmentSrc);
 
 	std::string flatColorShaderVertexSrc = R"(
 			#version 330 core
@@ -174,12 +177,12 @@ void EditorAppInstance::OnStart()
 			}
 		)";
 
-	m_FlatColorShader = Shader::Create("FlatColor", flatColorShaderVertexSrc, flatColorShaderFragmentSrc);
+	m_FlatColorShader = RenderAPIFactory::CreateShader("FlatColor", flatColorShaderVertexSrc, flatColorShaderFragmentSrc);
 
 	//auto textureShader = m_ShaderLibrary.Load("/Resources/Shaders/SimpleTexture.glsl");
 
-	//m_Texture = Texture2D::Create("/Resources/Textures/t_test_texture_black.png");
-	//m_CheckerboardTexture = Texture2D::Create("/Resources/Textures/SredaLogo.png");
+	//m_Texture = RenderAPIFactory::CreateTexture2DFromPath("/Resources/Textures/t_test_texture_black.png");
+	//m_CheckerboardTexture = RenderAPIFactory::CreateTexture2DFromPath("/Resources/Textures/SredaLogo.png");
 
 	//textureShader->Bind();
 	//textureShader->SetInt("u_Texture", 0);
@@ -287,5 +290,10 @@ void EditorAppInstance::OnRender()
 void EditorAppInstance::CallOnWindowReSize(WindowContext cntxt, int x, int y)
 {
 	m_CameraController.OnResize(x,y);
-		m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);
+	m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);
+
+	auto LConfig = Engine::EngineCore::GetEngineContext().GetConfigSystem();                    // Get config system
+	
+	LConfig->Set("window.width", x);
+	LConfig->Set("window.height", y);
 }
