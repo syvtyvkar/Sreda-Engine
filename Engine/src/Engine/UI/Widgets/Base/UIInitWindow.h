@@ -5,19 +5,15 @@
 #include "Engine/UI/Widgets/Editor/EditorTabContainer.h"
 #include "Engine/UI/Widgets/Editor/EditorMainMenuBar/EditorMainMenuBar.h"
 
-class EditorMainWidget : public UIWidget
+class UIInitWindow : public UIWidget
 {
 public:
-    EditorMainWidget();
-    virtual ~EditorMainWidget() = default;
+    UIInitWindow();
+    virtual ~UIInitWindow() = default;
 
     virtual void OnInit() override;
     virtual void OnRender() override;
 
-    void CallOnWindowReSize(WindowContext cntxt, int x, int y); 
-
 private:
-    TRef<EditorTabContainer> m_mainTabs;
-    TRef<UIButton> m_mainButton;
-    TRef<EditorMainMenuBar> m_EditorMainMenuBar;
+    TRef<UIImage> m_Background;
 };

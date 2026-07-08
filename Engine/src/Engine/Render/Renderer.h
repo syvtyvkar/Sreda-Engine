@@ -7,6 +7,7 @@
 #include "OrthographicCamera.h"
 #include "Shader.h"
 #include "RendererAPI.h"
+#include "RenderAPIFactory.h"
 
 namespace Engine::Render
 {
@@ -23,7 +24,7 @@ namespace Engine::Render
 
 		static void Submit(const TRef<Shader>& shader, const TRef<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
-		static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+		static RenderAPIFactory::RHI_API GetAPI() { return RenderAPIFactory::GetRenderAPI(); }
 	private:
 		struct SceneData
 		{

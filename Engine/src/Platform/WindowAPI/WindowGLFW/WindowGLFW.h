@@ -45,7 +45,7 @@ namespace Engine
         virtual void ExitApp() override;                                                // Закрываем окно
         virtual void SetTittle(const std::string NewTittle) override {NameWindow = NewTittle;};
         //virtual Scene* GetCurrentScene() override {return m_currentScene.get();}
-        virtual GraphicsContext* GetGraphicsContext() override {return m_context.get();}
+        virtual GraphicsContext* GetGraphicsContext() override {return m_GraphicsContext.get();}
         virtual WindowMode GetWindowMode() override {return m_windowMode;};
         virtual void SetWindowMode(WindowMode NewMode) override;
         DOnUpdateWindowHandle& OnUpdateWindowHandle() {return s_OnUpdateWindowHandle;}
@@ -76,9 +76,9 @@ namespace Engine
         bool m_WindowHasFocus = true;
         bool m_WindowIsMinimized = false;
     protected:
-        //TUniquePtr<Scene> m_currentScene;                  // Текущая сцена
+        //TUniquePtr<Scene> m_currentScene;               // Текущая сцена
         TUniquePtr<UISystem> m_uiSystem;                  // Текущая система UI
-        TUniquePtr<GraphicsContext> m_context;             // Графический контекст (OpenGL, Vulkan и т.д.)
+        TUniquePtr<GraphicsContext> m_GraphicsContext;    // Графический контекст (OpenGL, Vulkan и т.д.)
         Engine::WindowContext m_WindowContext = Engine::WindowContext(0);
     };
 }

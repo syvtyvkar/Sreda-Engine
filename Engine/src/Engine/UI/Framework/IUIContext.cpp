@@ -37,6 +37,7 @@ namespace Engine::UI
     void UIContext::SetRootWidget(TRef<UIElement> root)
     {
         m_rootWidget = root;
+        m_rootWidget.get()->m_ui_context=shared_from_this();
     }
     void UIContext::RenderUIElements(TRef<UIElement> element)
     {

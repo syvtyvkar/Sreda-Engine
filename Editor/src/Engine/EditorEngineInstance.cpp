@@ -9,6 +9,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Engine/Core/EngineConfig.h"
+
 using namespace Engine::Render;
 
 EditorAppInstance::EditorAppInstance() : ApplicationInstance(), m_CameraController(1280.0f / 720.0f), m_ui_camera(0.f,12800.f,720.f,0.f)
@@ -19,21 +21,29 @@ void EditorAppInstance::OnInit(Application *InOwnerApp)
 {
 	__super::OnInit(InOwnerApp);
 
-	if (InOwnerApp->GetWindow() != nullptr)
-	{
-		InOwnerApp->GetWindow()->OnWindowReSize().Subscribe([&,this](WindowContext cntxt, int x, int y) 
-		{
-			m_CameraController.OnResize(x,y);
-			m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);
-		});
-		m_CameraController.OnResize(InOwnerApp->GetWindow()->GetWidth(),InOwnerApp->GetWindow()->GetHeight());
+	auto LConfig = Engine::EngineCore::GetEngineContext().GetConfigSystem();                    // Get config system
+    Engine::WindowConfig WindowConfig;                                                          // TODO: MOVE TO CONFIGS!!! Window parameter setup 
+    WindowConfig.wight = LConfig->Get<int>("window.width", 800);
+    WindowConfig.height = LConfig->Get<int>("window.height", 600);
+    WindowConfig.title = GetNameApp();
+    WindowConfig.vsync = LConfig->Get<bool>("render.vsync",false);
+	WindowConfig.widget = std::make_shared<EditorMainWidget>();
 
-		int w = InOwnerApp->GetWindow()->GetWidth();
-		int h = InOwnerApp->GetWindow()->GetHeight();
-		m_ui_camera.SetProjection(0.0f, (float)w, (float)h, 0.0f);
-		m_ui_camera.SetPosition(Vector3(0.0f));
-		m_ui_camera.SetRotation(0.0f);
-	}
+	WindowContext LWinContx = EngineCore::GetEngineContext().GetWindowManager()->CreateEngineWindow(WindowConfig);
+
+	IWindow* LWin = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(LWinContx);
+
+	LWin->OnWindowReSize().Subscribe(this, &EditorAppInstance::CallOnWindowReSize);
+
+	m_CameraController.OnResize(LWin->GetWidth(),LWin->GetHeight());
+
+	int w = LWin->GetWidth();
+	int h = LWin->GetHeight();
+	m_ui_camera.SetProjection(0.0f, (float)w, (float)h, 0.0f);
+	m_ui_camera.SetPosition(Vector3(0.0f));
+	m_ui_camera.SetRotation(0.0f);
+
+	Renderer::Init();
 }
 
 void EditorAppInstance::DeInit()
@@ -179,10 +189,6 @@ void EditorAppInstance::OnStart()
 	{
 		ENGINE_ASSERT(false, "Failed to load font!!!");
 	}
-
-	GetOwnerApp()->GetWindow()->LoadIconFromFile();
-	GetUISystem()->RegisterWidget(std::make_shared<EditorMainWidget>());
-	GetUISystem()->GetContext()->GetRootWidget()->OnInit();
 }
 
 void EditorAppInstance::OnEnd()
@@ -276,4 +282,10 @@ void EditorAppInstance::Update(float DeltaTime)
 void EditorAppInstance::OnRender()
 {
 	__super::OnRender();
+}
+
+void EditorAppInstance::CallOnWindowReSize(WindowContext cntxt, int x, int y)
+{
+	m_CameraController.OnResize(x,y);
+		m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);
 }

@@ -14,13 +14,13 @@ namespace Engine::UI
 {
 
     using namespace Engine;
-    class UIContext 
+    class UIContext : public std::enable_shared_from_this<UIContext>
     {
     public:
         virtual ~UIContext() = default; 
         
 
-        virtual void InitContext() = 0;
+        virtual void InitContext(Engine::WindowContext InContext) = 0;
 
         // UI Element Management
         void RegisterWidget(TRef<UIElement> widget);
@@ -47,6 +47,7 @@ namespace Engine::UI
         virtual void BeginFrame()= 0;
 	    virtual void EndFrame()= 0;
 
+        virtual Engine::WindowContext GetWindowContext() = 0;
     protected:
         void RenderUIElements(TRef<UIElement> element);
 

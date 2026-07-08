@@ -2,6 +2,7 @@
 
 #include "Vertex.h"
 #include "RendererAPI.h"
+#include "RenderAPIFactory.h"
 
 #include "Platform/RenderAPI/OpenGL/OpenGLVertex.h"
 #include "Platform/RenderAPI/Vulkan/VulkanVertex.h"
@@ -10,11 +11,11 @@ namespace Engine::Render
 {
     TRef<VertexArray> VertexArray::Create()
 	{
-		switch (RendererAPI::GetAPI())
+		switch (RenderAPIFactory::GetRenderAPI())
 		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexArray>();
-			case RendererAPI::API::Vulkan:  return CreateRef<VulkanVertexArray>();
+			case RenderAPIFactory::RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RenderAPIFactory::RHI_API::OpenGL:  return CreateRef<OpenGLVertexArray>();
+			case RenderAPIFactory::RHI_API::Vulkan:  return CreateRef<VulkanVertexArray>();
 		}
 
 		ENGINE_ASSERT(false, "Unknown RendererAPI!");

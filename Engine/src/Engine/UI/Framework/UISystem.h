@@ -28,21 +28,20 @@ namespace Engine::UI
         void Render();
         void BeginFrame();
 	    void EndFrame();
-        
-        // Context management
-        UIContext* CreateContext();
-        UIContext* GetContext() {return m_context.get();}
-        void DestroyContext();
+
+        void CreateContextFromWindowContext(WindowContext InContext);
+        UIContext* GetContextFromWindowContext(WindowContext InContext);
+        void DestroyContextFromWindowContext(WindowContext InContext);
 
         // UI Element Management
-        void RegisterWidget(TRef<UIElement> widget);
-        void RemoveWidget(const TRef<UIElement>& widget);
+        void RegisterWidget(WindowContext InWinContext,TRef<UIElement> widget);
+        void RemoveWidget(WindowContext InWinContext,const TRef<UIElement>& widget);
 
         //Focus system
-        UIWidget* GetFocusWidget();
-        void SetFocusWidget(TRef<UIWidget> InNewFocus);
-        UIWidget* GetHoverWidget();
-        void SetHoverWidget(TRef<UIWidget> InNewHover);
+        UIWidget* GetFocusWidget(WindowContext InWinContext);
+        void SetFocusWidget(WindowContext InWinContext,TRef<UIWidget> InNewFocus);
+        UIWidget* GetHoverWidget(WindowContext InWinContext);
+        void SetHoverWidget(WindowContext InWinContext, TRef<UIWidget> InNewHover);
         
         // Debug
         void ToggleDebugger();
@@ -52,9 +51,17 @@ namespace Engine::UI
         void RemoveButtonContext(std::string InNameButton);
         void ClearAllButton();
     private:
-        TUniquePtr<UIContext> m_context;
-
         TUniquePtr<UIContextMenu> m_contextMenu;
+
+        //Delegate
+        Engine::DelegateHandle m_DH_OnWinCreate;
+        Engine::DelegateHandle m_DH_OnWinDestroy;
+
+        unordered_map<WindowContext,TRef<UIContext>, WindowContextHash> m_ui_contexts; 
+
+
+        void CallOnWinCreate(IWindow* InWin, WindowContext InWinContext);
+        void CallOnWinDestroy(IWindow* InWin, WindowContext InWinContext);
     };
 
 }

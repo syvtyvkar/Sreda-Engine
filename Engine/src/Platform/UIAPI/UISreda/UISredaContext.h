@@ -23,13 +23,17 @@ namespace Engine::UI
         virtual void Render() override;
         void Shutdown();
 
-        virtual void InitContext() override;
+        virtual void InitContext(Engine::WindowContext InContext) override;
 
         virtual void Show() override;
         virtual void Hide() override;
         virtual bool IsVisible() const override;
 
         virtual void Update(float DeltaTime) override;
+
+        virtual Engine::WindowContext GetWindowContext() override {return m_WindowContext;};
+
+        void CallOnWindowReSize(WindowContext cntxt, int x, int y); 
 
     protected:
 
@@ -54,5 +58,7 @@ namespace Engine::UI
 
         Engine::DelegateHandle m_mousePressedHandle;
         Engine::DelegateHandle m_mouseReleasedHandle;
+
+        WindowContext m_WindowContext = WindowContext(0);
     };
 }

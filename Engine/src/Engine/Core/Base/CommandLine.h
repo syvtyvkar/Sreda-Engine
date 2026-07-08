@@ -18,9 +18,11 @@ namespace Engine
 
         void Parse(int argc, char **argv)
         {
+            ENGINE_LOG_INFO("Read arguments program:");
             m_args.clear();
             for (int i =1; i < argc; ++i)
             {   
+                ENGINE_LOG_INFO("- Parameter argument: id: {} arg: {}", i, argv[i]);
                 std::string arg(argv[i]);
                 if (arg._Starts_with("=="))
                 {

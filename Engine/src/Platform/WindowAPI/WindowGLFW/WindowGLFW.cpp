@@ -12,6 +12,7 @@
 //#include "Engine/Render/Camera.h"   
 #include "Engine/Core/EngineConfig.h"   
 #include "Engine/Render/RendererAPI.h"
+#include "Engine/Render/RenderAPIFactory.h"
 
 #include "Platform/RenderAPI/OpenGL/OpenGLContext.h"   
 
@@ -42,13 +43,13 @@ namespace Engine
 
         bool isVulkan = false;
         
-        switch (Engine::Render::RendererAPI::GetAPI())
+        switch (Engine::Render::RenderAPIFactory::GetRenderAPI())
         {
-        case Engine::Render::RendererAPI::API::Vulkan:
+        case Engine::Render::RenderAPIFactory::RHI_API::Vulkan:
             isVulkan = true;
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
             break;
-        case Engine::Render::RendererAPI::API::OpenGL:
+        case Engine::Render::RenderAPIFactory::RHI_API::OpenGL:
             // OpenGL (4.5 Core Profile)
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -102,8 +103,8 @@ namespace Engine
         ///////////////////////////////////////////
 
 
-        m_context = Engine::Render::GraphicsContext::Create(GetHandle());     // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
-		m_context->Init();                                                 // Инициализация
+        m_GraphicsContext = Engine::Render::GraphicsContext::Create(GetHandle());     // Создание рендерера через фабрику (OpenGL, Vulkan и т.д.)
+		m_GraphicsContext->Init();                                                 // Инициализация
 
         // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
         glfwSetWindowUserPointer(GetHandle(), this);
@@ -120,7 +121,7 @@ namespace Engine
         //glfwSetWindowTitle(m_window,Empty.c_str());
         std::string NewNameResult;
         NewNameResult.append(NameWindow + " ");
-        NewNameResult.append(RendererAPI::GetNameAPI() + " ");
+        NewNameResult.append(RenderAPIFactory::GetNameRenderAPI() + " ");
         NewNameResult.append("[" + NewName + " FPS]");
         glfwSetWindowTitle(GetHandle(),NewNameResult.c_str());
     }
@@ -145,7 +146,7 @@ namespace Engine
     void WindowGLFW::EndRender()
     {
         glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
-		m_context->SwapBuffers();   
+		m_GraphicsContext->SwapBuffers();   
     }
 
     /**
@@ -252,7 +253,7 @@ namespace Engine
 
         int fbW, fbH;
         glfwGetFramebufferSize(GetHandle(), &fbW, &fbH);
-        if (Engine::Render::RendererAPI::GetAPI() != Engine::Render::RendererAPI::API::Vulkan)
+        if (Engine::Render::RenderAPIFactory::GetRenderAPI() != Engine::Render::RenderAPIFactory::RHI_API::Vulkan)
             glViewport(0, 0, fbW, fbH);
 
         FramebufferResizeCallback(GetHandle(), fbW, fbH);
@@ -290,7 +291,7 @@ namespace Engine
             }
             
             // Устанавливаем область вывода на весь новый размер окна
-            if (Engine::Render::RendererAPI::GetAPI() != Engine::Render::RendererAPI::API::Vulkan)
+            if (Engine::Render::RenderAPIFactory::GetRenderAPI() != Engine::Render::RenderAPIFactory::RHI_API::Vulkan)
                 glViewport(0, 0, width, height);
             win->OnUpdateWindowSize().Broadcast(window, width, height);
             win->OnWindowReSize().Broadcast(win->GetWindowContext(),width,height);

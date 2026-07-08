@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Engine/UI/Framework/UISystem.h"
+#include "Engine/Core/Base/EngineCore.h"
 
 namespace Engine
 {
@@ -13,34 +14,35 @@ namespace Engine
     class ApplicationInstance
     {
         class Application* m_OwnerApp = nullptr;
-        TUniquePtr<Engine::UI::UISystem> m_UISystem = nullptr;
     public:
         ApplicationInstance() = default;
-        virtual ~ApplicationInstance() {OnEnd();m_OwnerApp = nullptr; m_UISystem.reset();};
+        virtual ~ApplicationInstance() {OnEnd();m_OwnerApp = nullptr;};
         virtual void OnInit(class Application* InOwnerApp)
         {
             m_OwnerApp = InOwnerApp; 
-            m_UISystem = CreateUniquePtr<Engine::UI::UISystem>();
-            m_UISystem.get()->Initialize();
+
+            EngineCore::GetEngineDelegates().OnAppUpdFrameDelta().Subscribe(this, &ApplicationInstance::Update);
+            EngineCore::GetEngineDelegates().OnAppRender().Subscribe(this, &ApplicationInstance::OnRender);
+            EngineCore::GetEngineDelegates().OnAppRenderUI().Subscribe(this, &ApplicationInstance::OnRenderUI);
         }
         virtual void DeInit(){}
         virtual void OnStart(){}
         virtual void OnEnd(){}
         virtual void Update(float DeltaTime)
         {
-            m_UISystem.get()->Update(DeltaTime);
+            EngineCore::GetEngineContext().GetUISystem()->Update(DeltaTime);
         }
         virtual void OnRender(){}
         virtual void OnRenderUI()
         {
-            if (m_UISystem.get() != nullptr)
+            if (EngineCore::GetEngineContext().GetUISystem() != nullptr)
             {
-                m_UISystem.get()->Render();
+                EngineCore::GetEngineContext().GetUISystem()->Render();
             }
         }
 
         class Application* GetOwnerApp() {return m_OwnerApp;}
-        Engine::UI::UISystem* GetUISystem() {return m_UISystem.get();}
+        Engine::UI::UISystem* GetUISystem() {return EngineCore::GetEngineContext().GetUISystem();}
 
         virtual std::string GetNameApp() {return "Engine application";}
     };

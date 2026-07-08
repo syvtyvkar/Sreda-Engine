@@ -154,7 +154,7 @@ namespace Engine
 // Set of macros for convenient declaration of specific delegate types (singletons) with different parameter counts.
 
     // Delegate with no parameters (singleton)
-    #define ADD_DELEGATE(DelegateName) \                        
+    #define ADD_DELEGATE(DelegateName) \
         class DelegateName : public Engine::Delegate<> { \
         public: \
             static DelegateName& Get() { \

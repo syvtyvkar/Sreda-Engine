@@ -2,6 +2,7 @@
 
 #include "Framebuffer.h"
 #include "RendererAPI.h"
+#include "RenderAPIFactory.h"
 
 #include "Platform/RenderAPI/OpenGL/OpenGLFramebuffer.h"
 #include "Platform/RenderAPI/Vulkan/VulkanFramebuffer.h"
@@ -10,11 +11,11 @@ namespace Engine::Render
 {
     TRef<Framebuffer> Framebuffer::Create(const FramebufferSpecification& spec)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (RenderAPIFactory::GetRenderAPI())
 		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLFramebuffer>(spec);
-			case RendererAPI::API::Vulkan:  return CreateRef<VulkanFramebuffer>(spec);
+			case RenderAPIFactory::RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RenderAPIFactory::RHI_API::OpenGL:  return CreateRef<OpenGLFramebuffer>(spec);
+			case RenderAPIFactory::RHI_API::Vulkan:  return CreateRef<VulkanFramebuffer>(spec);
 		}
 
 		ENGINE_ASSERT(false, "Unknown RendererAPI!");

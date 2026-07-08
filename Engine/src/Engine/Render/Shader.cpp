@@ -5,6 +5,7 @@
 #include "BaseEngine.h"
 
 #include "RendererAPI.h"
+#include "RenderAPIFactory.h"
 
 #include "Platform/RenderAPI/OpenGL/OpenGLShader.h"
 #include "Platform/RenderAPI/Vulkan/VulkanShader.h"
@@ -13,11 +14,11 @@ namespace Engine::Render
 {
     TRef<Shader> Shader::Create(const std::string& filepath)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (RenderAPIFactory::GetRenderAPI())
 		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(filepath);
-			case RendererAPI::API::Vulkan:  return CreateRef<VulkanShader>(filepath);
+			case RenderAPIFactory::RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RenderAPIFactory::RHI_API::OpenGL:  return CreateRef<OpenGLShader>(filepath);
+			case RenderAPIFactory::RHI_API::Vulkan:  return CreateRef<VulkanShader>(filepath);
 		}
 
 		ENGINE_ASSERT(false, "Unknown RendererAPI!");
@@ -26,11 +27,11 @@ namespace Engine::Render
 
 	TRef<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (RenderAPIFactory::GetRenderAPI())
 		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
-			case RendererAPI::API::Vulkan:  return CreateRef<VulkanShader>(name, vertexSrc, fragmentSrc);
+			case RenderAPIFactory::RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RenderAPIFactory::RHI_API::OpenGL:  return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
+			case RenderAPIFactory::RHI_API::Vulkan:  return CreateRef<VulkanShader>(name, vertexSrc, fragmentSrc);
 		}
 
 		ENGINE_ASSERT(false, "Unknown RendererAPI!");

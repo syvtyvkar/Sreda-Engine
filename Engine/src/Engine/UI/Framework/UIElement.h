@@ -13,6 +13,7 @@ namespace Engine::UI
 
     class UIElement : public std::enable_shared_from_this<UIElement>
     {
+        friend class UIContext;
     public:
         virtual ~UIElement() = default;
         
@@ -61,9 +62,12 @@ namespace Engine::UI
 
         TRef<UIElement> GetParent() const { return m_parent.lock(); }
 
+        TRef<class UIContext> GetUIContext() {return m_ui_context.lock();}
+
     protected:
         std::vector<TRef<UIElement>> m_children;
         TWeak<UIElement> m_parent;
+        TWeak<class UIContext> m_ui_context;
         UIVisibleMode m_visible = UIVisibleMode::Visible;
         Vector2 m_position = { 0.0f, 0.0f };
         Vector2 m_size = { 30.0f, 30.0f };

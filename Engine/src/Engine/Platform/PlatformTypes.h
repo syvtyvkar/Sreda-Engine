@@ -4,6 +4,10 @@
 
 #include <string>
 
+#include "Engine/UI/Framework/UIWidget.h"
+#include "Engine/Core/Utilities/Types.h"
+
+
 namespace Engine
 {
     /**
@@ -38,12 +42,18 @@ namespace Engine
      */
     struct WindowConfig
     {
-        int wight = 800;                        // Window width in pixels
-        int height = 600;                       // Window height in pixels
-        std::string title = "Render Window";    // Window title
-        bool resizable = true;                  // Flag allowing the user to resize the window
-        bool vsync = false;                     // Vertical synchronization
-        WindowContext cntx = WindowContext(0);  // Contex
+        WindowConfig() {}
+        WindowConfig(const WindowConfig& InConfig) : wight(InConfig.wight),height(InConfig.height),
+        title(InConfig.title),resizable(InConfig.resizable),vsync(InConfig.vsync),cntx(InConfig.cntx),
+        widget(InConfig.widget) {}
+
+        int wight = 800;                                    // Window width in pixels
+        int height = 600;                                   // Window height in pixels
+        std::string title = "Render Window";                // Window title
+        bool resizable = true;                              // Flag allowing the user to resize the window
+        bool vsync = false;                                 // Vertical synchronization
+        WindowContext cntx = WindowContext(0);              // Contex
+        TRef<Engine::UI::UIWidget> widget = nullptr;  // Widget
     };
 
     /**

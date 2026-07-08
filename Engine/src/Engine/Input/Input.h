@@ -35,8 +35,11 @@ namespace Engine
     class InputSystem
     {
     public:
-        static void Init();                     // Initialize input system.
-        static void Shutdown();                                             // Shutdown input system, free resources.
+        InputSystem() = default;
+        ~InputSystem() = default;
+
+        void Init();                     // Initialize input system.
+        void Shutdown();                 // Shutdown input system, free resources.
         static void Update();                                               // Update input state (should be called every frame).
 
         void InitNewWindow(Engine::IWindow* InWinHandle, Engine::WindowContext InWinContext);
@@ -64,7 +67,7 @@ namespace Engine
         static void SetCursorMode(int Mode);                                // Sets cursor mode: 0=Normal, 1=Hidden, 2=Disabled
 
         // Singleton
-        static InputSystem& GetInstance();                                  // Returns reference to the single InputSystem instance.
+        static InputSystem* GetInstance();                                  // Returns reference to the single InputSystem instance.
 
         static void* GetWindowHandle();                                     // Returns pointer to native window handle (e.g., GLFWwindow*).
 
@@ -84,13 +87,11 @@ namespace Engine
         //TUniquePtr<IInputListen> m_InputListen=nullptr;                 // Input listener
         unordered_map<Engine::WindowContext, TUniquePtr<IInputListen>,Engine::WindowContextHash> m_InputListenList;
     private:
-        InputSystem() = default;
-        ~InputSystem() =default;
 
         void SetKeyState(InputKey Key, InputState State);                   // Sets the state of the specified key.
         InputState GetKeyStateInternal(InputKey Key) const;                 // Internal method for getting key state.
 
-        static InputSystem* s_InputInstance;                                // Pointer to the single instance (singleton).
+        //static InputSystem* s_InputInstance;                                // Pointer to the single instance (singleton).
 
         // Key states: current and previous (for determining just pressed/released).
         uint8_t m_keyStates[static_cast<uint32_t>(InputKey::KeyCount)];

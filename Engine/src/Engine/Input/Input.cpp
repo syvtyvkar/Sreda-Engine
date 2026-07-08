@@ -5,69 +5,46 @@
 
 namespace Engine
 {
-    InputSystem* InputSystem::s_InputInstance = nullptr;        // Static pointer initialization for the single InputSystem instance.
+    //InputSystem* InputSystem::s_InputInstance = nullptr;        // Static pointer initialization for the single InputSystem instance.
 
     /*************** BASE (basic init/shutdown methods) */
 
-    void InputSystem::Init()                    // Initialize input system.
+    void InputSystem::Init()    // Initialize input system.
     {
-        if (s_InputInstance) {
-            ENGINE_LOG_WARN("Input already initialized!");                  // Warning about reinitialization
-            return;
-        }
-        s_InputInstance = new InputSystem();
-
         // Zero out key state arrays (current and previous).
-        for (auto& LState : s_InputInstance->m_keyStates) LState = 0;
-        for (auto& LState : s_InputInstance->m_prevKeyStates) LState = 0;
-
-        /*s_InputInstance->m_InputListen = InputListenAPIFactory::create();
-        if (!s_InputInstance->m_InputListen.get())
-        {
-            ENGINE_LOG_ERROR("ERROR SERACH INPUT LISTEN!");
-            return;
-        }
-        s_InputInstance->m_InputListen.get()->Init(windowHandle);
-        s_InputInstance->m_InputListen.get()->OnKeyPressed().Subscribe([&](InputKey key, int mods, int repeat,InputState state) { s_InputInstance->CallOnKeyPressed(key,mods,repeat,state);});
-        s_InputInstance->m_InputListen.get()->OnMouseButtonPressed().Subscribe([&](InputKey button, int mods,InputState state) {s_InputInstance->CallOnMouseButtonPressed(button,mods,state);});
-        s_InputInstance->m_InputListen.get()->OnMouseMoved().Subscribe([&](float x, float y) {s_InputInstance->CallOnMouseMoved(x,y);});
-        s_InputInstance->m_InputListen.get()->OnMouseScrolled().Subscribe([&](float x, float y) {s_InputInstance->CallOnMouseScrolled(x,y);});
-        s_InputInstance->m_InputListen.get()->OnCharInput().Subscribe([&](uint32_t codepoint) {s_InputInstance->OnCharInput().Broadcast(codepoint);});*/
+        for (auto& LState : m_keyStates) LState = 0;
+        for (auto& LState : m_prevKeyStates) LState = 0;
 
         if (!Engine::EngineCore::GetEngineContext().GetWindowManager()) return;
 
-        s_InputInstance->m_DH_OnHasFocusChange = Engine::EngineCore::GetEngineContext().GetWindowManager()->OnHasFocusChange().Subscribe(s_InputInstance, &InputSystem::CallOnHasFocusChange);
-        s_InputInstance->m_DH_OnWinCreate = Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinCreate().Subscribe(s_InputInstance, &InputSystem::CallOnWinCreate);
-        s_InputInstance->m_DH_OnWinDestroy = Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinDestroy().Subscribe(s_InputInstance, &InputSystem::CallOnWinDestroy);
+        m_DH_OnHasFocusChange = Engine::EngineCore::GetEngineContext().GetWindowManager()->OnHasFocusChange().Subscribe(this, &InputSystem::CallOnHasFocusChange);
+        m_DH_OnWinCreate = Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinCreate().Subscribe(this, &InputSystem::CallOnWinCreate);
+        m_DH_OnWinDestroy = Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinDestroy().Subscribe(this, &InputSystem::CallOnWinDestroy);
 
         ENGINE_LOG_TRACE("Input system start!");
     }
 
-    void InputSystem::Shutdown()                        // Shutdown input system.
+    void InputSystem::Shutdown()  // Shutdown input system.
     {
-        if (!s_InputInstance) return;
+        Engine::EngineCore::GetEngineContext().GetWindowManager()->OnHasFocusChange().Unsubscribe(m_DH_OnHasFocusChange);
+        Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinCreate().Unsubscribe(m_DH_OnWinCreate);
+        Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinDestroy().Unsubscribe(m_DH_OnWinDestroy);
 
-        Engine::EngineCore::GetEngineContext().GetWindowManager()->OnHasFocusChange().Unsubscribe(s_InputInstance->m_DH_OnHasFocusChange);
-        Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinCreate().Unsubscribe(s_InputInstance->m_DH_OnWinCreate);
-        Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinDestroy().Unsubscribe(s_InputInstance->m_DH_OnWinDestroy);
+        m_InputListenList.clear();
 
-        //s_InputInstance->m_InputListen.reset();
-        s_InputInstance->m_InputListenList.clear();
-
-        delete s_InputInstance;
-        s_InputInstance = nullptr;
         ENGINE_LOG_INFO("Input system shutdown");
     }
 
     void InputSystem::Update()                          // Update input state (called every frame).
     {
-        if (!s_InputInstance) return;
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return;
 
         // Save current states as "previous" for the next frame.
-        memcpy(s_InputInstance->m_prevKeyStates, s_InputInstance->m_keyStates, sizeof(s_InputInstance->m_keyStates));
+        memcpy(LInputSystem->m_prevKeyStates, LInputSystem->m_keyStates, sizeof(LInputSystem->m_keyStates));
         // Reset mouse delta and scroll, as they accumulate only for one frame.
-        s_InputInstance->m_mouseDelta={0,0};
-        s_InputInstance->m_scrollDelta=0.0;
+        LInputSystem->m_mouseDelta={0,0};
+        LInputSystem->m_scrollDelta=0.0;
     }
 
     void InputSystem::InitNewWindow(Engine::IWindow *InWinHandle, Engine::WindowContext InWinContext)
@@ -113,31 +90,39 @@ namespace Engine
 
     bool InputSystem::IsKeyPressed(InputKey Key)    // Check if a key is held down in the current frame (including repeat).
     {
-        if (!s_InputInstance) return false;
-        if (!s_InputInstance->GetInputListenFromActivWin()) return false;
-        return s_InputInstance->GetKeyStateInternal(Key) == InputState::Pressed || s_InputInstance->GetKeyStateInternal(Key) == InputState::Repeated;
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return false;
+
+        if (!LInputSystem->GetInputListenFromActivWin()) return false;
+        return LInputSystem->GetKeyStateInternal(Key) == InputState::Pressed || LInputSystem->GetKeyStateInternal(Key) == InputState::Repeated;
     }
 
     bool InputSystem::IsKeyJustPressed(InputKey Key)    // Check if a key was just pressed (this frame).
     {
-        if (!s_InputInstance) return false;
-        if (!s_InputInstance->GetInputListenFromActivWin()) return false;
-        return s_InputInstance->GetKeyStateInternal(Key) == InputState::Pressed && s_InputInstance->m_prevKeyStates[static_cast<uint32_t>(Key)] == 0;
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return false;
+
+        if (!LInputSystem->GetInputListenFromActivWin()) return false;
+        return LInputSystem->GetKeyStateInternal(Key) == InputState::Pressed && LInputSystem->m_prevKeyStates[static_cast<uint32_t>(Key)] == 0;
     }
 
     bool InputSystem::IsKeyJustReleased(InputKey Key)   // Check if a key was just released.
     {
-        if (!s_InputInstance) return false;
-        if (!s_InputInstance->GetInputListenFromActivWin()) return false;
-        return s_InputInstance->GetKeyStateInternal(Key) == InputState::Released || s_InputInstance->m_prevKeyStates[static_cast<uint32_t>(Key)] == 0;
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return false;
+
+        if (!LInputSystem->GetInputListenFromActivWin()) return false;
+        return LInputSystem->GetKeyStateInternal(Key) == InputState::Released || LInputSystem->m_prevKeyStates[static_cast<uint32_t>(Key)] == 0;
     }
 
 
     InputState InputSystem::GetKeyState(InputKey Key)   // Get current key state.
     {
-        if (!s_InputInstance) return InputState::Unknown;
-        if (!s_InputInstance->GetInputListenFromActivWin()) InputState::Unknown;
-        return s_InputInstance->GetKeyStateInternal(Key);
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return InputState::Unknown;
+
+        if (!LInputSystem->GetInputListenFromActivWin()) InputState::Unknown;
+        return LInputSystem->GetKeyStateInternal(Key);
     }
 
     /*************** MOUSE (mouse polling) */
@@ -147,41 +132,52 @@ namespace Engine
 
     Vector2 InputSystem::GetMousePosition()   // Returns current cursor position.
     {
-        if (!s_InputInstance) return {0,0};
-        return s_InputInstance->m_mousePosition;
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return {0,0};
+
+        return LInputSystem->m_mousePosition;
     };
 
     Vector2 InputSystem::GetMouseDelta()      // Returns cursor position change over the last frame.
     {
-        if (!s_InputInstance) return {0,0};
-        return s_InputInstance->m_mouseDelta;
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return {0,0};
+
+        return LInputSystem->m_mouseDelta;
     }
 
     double InputSystem::GetMouseScrollDelta()   // Returns scroll wheel delta over the last frame.
     {
-        if (!s_InputInstance) return 0,0;
-        return s_InputInstance->m_scrollDelta;
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return 0,0;
+
+        return LInputSystem->m_scrollDelta;
     }
 
     float InputSystem::GetMouseSensivity()
     {
-        if (!s_InputInstance) return 0,0;
-        return s_InputInstance->m_mouseSensivity;
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return 0,0;
+
+        return LInputSystem->m_mouseSensivity;
     }
 
     bool InputSystem::IsInverMoveY()
     {
-        if (!s_InputInstance) return false;
-        return s_InputInstance->m_Invers_Y;
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return false;
+
+        return LInputSystem->m_Invers_Y;
     }
 
     /*************** CURSOR (cursor management) */
 
     bool InputSystem::GetCursorVisible()
     {
-        if (s_InputInstance && s_InputInstance->GetInputListenFromActivWin())
+        InputSystem* LInputSystem = GetInstance();
+        if (LInputSystem && LInputSystem->GetInputListenFromActivWin())
         {
-            return s_InputInstance->GetInputListenFromActivWin()->GetCursorVisible();
+            return LInputSystem->GetInputListenFromActivWin()->GetCursorVisible();
         }
         ENGINE_LOG_WARN("No search InputListen!");
         return false;
@@ -189,9 +185,10 @@ namespace Engine
 
     int InputSystem::GetCursorMode()
     {
-        if (s_InputInstance && s_InputInstance->GetInputListenFromActivWin())
+        InputSystem* LInputSystem = GetInstance();
+        if (LInputSystem && LInputSystem->GetInputListenFromActivWin())
         {
-            return s_InputInstance->GetInputListenFromActivWin()->GetCursorMode();
+            return LInputSystem->GetInputListenFromActivWin()->GetCursorMode();
         }
         ENGINE_LOG_WARN("No search InputListen!");
         return 0;
@@ -199,27 +196,29 @@ namespace Engine
 
     void InputSystem::SetCursorVisible(bool InVisible) // Set cursor visibility.
     {
-        if (s_InputInstance && s_InputInstance->GetInputListenFromActivWin())
+        InputSystem* LInputSystem = GetInstance();
+        if (LInputSystem && LInputSystem->GetInputListenFromActivWin())
         {
-            s_InputInstance->GetInputListenFromActivWin()->SetCursorVisible(InVisible);
+            LInputSystem->GetInputListenFromActivWin()->SetCursorVisible(InVisible);
             ENGINE_LOG_INFO("Cursor visible: {}", InVisible);
         }
     }
 
     void InputSystem::SetCursorMode(int mode)   // Set cursor mode: 0 - normal, 1 - hidden, 2 - disabled.
     {
-        if (s_InputInstance && s_InputInstance->GetInputListenFromActivWin())
+        InputSystem* LInputSystem = GetInstance();
+        if (LInputSystem && LInputSystem->GetInputListenFromActivWin())
         {
-            s_InputInstance->GetInputListenFromActivWin()->SetCursorMode(mode);
+            LInputSystem->GetInputListenFromActivWin()->SetCursorMode(mode);
             ENGINE_LOG_INFO("Cursor mode: {}", mode);
         }
     }
 
     /*************** METODS (other methods) */
 
-    InputSystem& InputSystem::GetInstance() // Returns reference to the single instance.
+    InputSystem* InputSystem::GetInstance() // Returns reference to the single instance.
     {
-        return *s_InputInstance;
+        return EngineCore::GetEngineContext().GetInputSystem();
     }
 
     IInputListen *InputSystem::GetInputListenFromWinContext(Engine::WindowContext InContext)
@@ -257,8 +256,9 @@ namespace Engine
     
     void InputSystem::CallOnKeyPressed(InputKey key, int scancode, int mods, InputState State)
     {
-        if (!s_InputInstance) return;
-        s_InputInstance->SetKeyState(key, State);
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return;
+        LInputSystem->SetKeyState(key, State);
 
         /*switch (State)
         {
@@ -278,41 +278,44 @@ namespace Engine
                     break;
         }*/
 
-        s_InputInstance->OnKeyPressed().Broadcast(key, scancode, mods);
+        LInputSystem->OnKeyPressed().Broadcast(key, scancode, mods);
     }
 
     void InputSystem::CallOnMouseMoved(float x, float y)
     {
-        if (!s_InputInstance) return;
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return;
         float LNewX = x-GetMousePosition().x;
         float LNewY = y-GetMousePosition().y;
         LNewY = IsInverMoveY() ? LNewY*-1.f : LNewY;
         //float LDeltaTime = Engine::Time::TimeSystem::GetDeltaTime();
         //float LSensivityMouse = GetMouseSensivity();
         //ENGINE_LOG_TRACE("Mouse Move: x {} y {}",LNewX,LNewY);
-        s_InputInstance->OnMouseMoved().Broadcast(LNewX, LNewY);
-        s_InputInstance->m_mousePosition.x=x;
-        s_InputInstance->m_mousePosition.y=y;
+        LInputSystem->OnMouseMoved().Broadcast(LNewX, LNewY);
+        LInputSystem->m_mousePosition.x=x;
+        LInputSystem->m_mousePosition.y=y;
     }
 
     void InputSystem::CallOnMouseScrolled(float x, float y)
     {
-        if (!s_InputInstance) return;
-        s_InputInstance->OnMouseScrolled().Broadcast(x, y);
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return;
+        LInputSystem->OnMouseScrolled().Broadcast(x, y);
     }
 
     void InputSystem::CallOnMouseButtonPressed(InputKey button, int mods, InputState State)
     {
-        if (!s_InputInstance) return;
-        s_InputInstance->SetKeyState(button, State);
+        InputSystem* LInputSystem = GetInstance();
+        if (!LInputSystem) return;
+        LInputSystem->SetKeyState(button, State);
 
         switch (State)
         {
                 case InputState::Pressed:
-                    s_InputInstance->OnMouseButtonPressed().Broadcast(button, mods);
+                    LInputSystem->OnMouseButtonPressed().Broadcast(button, mods);
                     break;
                 case InputState::Released:
-                    s_InputInstance->OnMouseButtonReleased().Broadcast(button, mods);
+                    LInputSystem->OnMouseButtonReleased().Broadcast(button, mods);
                     break;
                 default:
                     break;

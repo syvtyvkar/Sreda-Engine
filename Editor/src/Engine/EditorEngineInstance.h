@@ -39,6 +39,8 @@ public:
 
     virtual void Update(float DeltaTime) override;
     virtual void OnRender() override;
+
+    void CallOnWindowReSize(WindowContext cntxt, int x, int y);
 private:
 
     TUniquePtr<EditorInputComponent> m_EditorInputHotKey;

@@ -2,6 +2,9 @@
 
 #include "WindowManager.h"                                   // Concrete window implementation for GLFW
 #include "IWindow.h"                                         // Include window interface (abstract Window class)
+#include "Engine/Core/Base/EngineCore.h"
+#include "Engine/UI/Framework/UISystem.h"
+#include "Engine/UI/Framework/IUIContext.h"
 
 namespace Engine 
 {
@@ -38,9 +41,19 @@ namespace Engine
         LW.get()->OnHasFocusChange().Subscribe(this, &WindowManager::CallWindowFocusChange);
         LW.get()->OnMinimizedChange().Subscribe(this, &WindowManager::CallWindowMinimized);
         LW.get()->OnWindowReSize().Subscribe(this, &WindowManager::CallWindowReSize);
+        LW.get()->LoadIconFromFile();
 
         m_windowList.insert({LResultContext.cntx, std::move(LW)});
         OnWinCreate().Broadcast(GetEngineWindow(LResultContext.cntx),LResultContext.cntx);
+
+        if (InConfigWindow.widget)
+        {
+            EngineCore::GetEngineContext().GetUISystem()->GetContextFromWindowContext(LResultContext.cntx)->RegisterWidget(InConfigWindow.widget);
+            EngineCore::GetEngineContext().GetUISystem()->GetContextFromWindowContext(LResultContext.cntx)->GetRootWidget()->OnInit();
+        }
+
+        m_focusWindow=LResultContext.cntx;
+
         return LResultContext.cntx;
     }
 

@@ -2,13 +2,15 @@
 
 #include "RenderCommand.h"
 
+#include "RenderAPIFactory.h"
+
 namespace Engine::Render
 {
     TUniquePtr<RendererAPI> RenderCommand::s_RendererAPI = nullptr;
 
     void RenderCommand::Init()
     {
-        s_RendererAPI = RendererAPI::Create();
+        s_RendererAPI = RenderAPIFactory::CreateRendererAPI();
         if (s_RendererAPI)
             s_RendererAPI->Init();
     }

@@ -34,13 +34,11 @@ namespace Engine::Render
         virtual void EnableScissor(bool enabled) = 0;
         virtual void SetScissor(int x, int y, int width, int height) = 0;
 
-        static API GetAPI() { return s_API; }
+        /*static API GetAPI() { return s_API; }
         static void SetAPI(API api) { s_API = api; }
-        static TUniquePtr<RendererAPI> Create();
-
 		static std::string GetNameAPI()
 		{
-			API LAPI = RendererAPI::GetAPI();
+			API LAPI = RenderAPIFactory::GetRenderAPI();
 			switch (LAPI)
 			{
 			case API::OpenGL:
@@ -53,8 +51,6 @@ namespace Engine::Render
 				return "No Render API";
 			}
 		return "No Render API";
-		}
-	private:
-		static API s_API;
+		}*/
 	};
 }

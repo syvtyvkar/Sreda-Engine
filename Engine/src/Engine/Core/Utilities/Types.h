@@ -46,7 +46,7 @@ namespace Engine
 	template<typename T, typename ... Args>
 	constexpr TWeak<T> CreateWeak(Args&& ... args)
 	{
-		return std::shared_ptr<Args>(args)...;
+		return std::shared_ptr<T>(std::forward<Args>(args)...);
 	}
 
     /*3D vector with x, y, z components.

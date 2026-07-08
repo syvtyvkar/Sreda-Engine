@@ -14,6 +14,8 @@
 //#include "Engine/Core/Utilities/Math.h"       // Своя математика (пока без нее)
 #include "Engine/Core/Utilities/Event.h"        // Поддержка ивентов и делегатов
 
+//#include "Engine/Core/Base/EngineCore.h"
+
 #include "Engine/Core/FileSystem/ResourceManager.h"
 #include "Engine/Core/FileSystem/FileIO.h"      // Работа с файловой системой
 #include "Engine/Core/Utilities/Time.h"                   // Система времени

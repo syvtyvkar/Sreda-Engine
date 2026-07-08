@@ -23,9 +23,12 @@
 #include "Platform/RenderAPI/Vulkan/VulkanUniformBuffer.h"
 #include "Platform/RenderAPI/Vulkan/VulkanVertex.h"
 
+// Engine core
+#include "Engine/Core/Base/EngineCore.h"
+
 namespace Engine::Render
 {
-    RenderAPIFactory::RHI_API RenderAPIFactory::s_API = RenderAPIFactory::RHI_API::None;
+    RenderAPIFactory::RHI_API RenderAPIFactory::s_API = RenderAPIFactory::RHI_API::OpenGL;
 
     RenderAPIFactory::VertexArrayCreator RenderAPIFactory::s_VertexArrayCreator = nullptr;
     RenderAPIFactory::UniformBufferCreator RenderAPIFactory::s_UniformBufferCreator = nullptr;
@@ -38,18 +41,19 @@ namespace Engine::Render
 
     void RenderAPIFactory::Init()
     {
-        std::string renderAPIStr = EngineConfig::ConfigSystem::Get()->Get<std::string>("Engine.RenderAPI", "OpenGL");
+        ENGINE_ASSERT(Engine::EngineCore::GetEngineContext().GetConfigSystem(), "Config System no valid!");
+        std::string renderAPIStr = Engine::EngineCore::GetEngineContext().GetConfigSystem()->Get<std::string>("Engine.RenderAPI", "OpenGL");
         if (renderAPIStr == "Vulkan")
 		{
-			RendererAPI::SetAPI(RendererAPI::API::Vulkan);
+            s_API = RHI_API::Vulkan;
 		}
 
-        switch (RendererAPI::GetAPI())
+        switch (RenderAPIFactory::GetRenderAPI())
 		{
-			case RendererAPI::API::None:
+			case RHI_API::None:
                 ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); 
                 return;
-			case RendererAPI::API::OpenGL:  
+			case RHI_API::OpenGL:  
                 // Init OpenGL Factory
                 s_VertexArrayCreator = []() -> TRef<VertexArray> { return CreateRef<OpenGLVertexArray>(); };
                 s_UniformBufferCreator = [](uint32_t size, uint32_t binding) -> TRef<UniformBuffer> { return CreateRef<OpenGLUniformBuffer>(size, binding); };
@@ -60,7 +64,7 @@ namespace Engine::Render
                 s_VertexBufferCreator = [](float* vertices, uint32_t size) -> TRef<VertexBuffer> { return CreateRef<OpenGLVertexBuffer>(vertices,size); };
                 s_IndexBufferCreator = [](uint32_t* indices, uint32_t count) -> TRef<IndexBuffer> { return CreateRef<OpenGLIndexBuffer>(indices,count); };
                 return;
-			case RendererAPI::API::Vulkan:  
+			case RHI_API::Vulkan:  
                 // Init Vulkan Factory
                 s_VertexArrayCreator = []() -> TRef<VertexArray> { return CreateRef<VulkanVertexArray>(); };
                 s_UniformBufferCreator = [](uint32_t size, uint32_t binding) -> TRef<UniformBuffer> { return CreateRef<VulkanUniformBuffer>(size, binding); };
@@ -76,19 +80,11 @@ namespace Engine::Render
 
     TUniquePtr<class RendererAPI> RenderAPIFactory::CreateRendererAPI()
     {
-        std::string renderAPIStr = EngineConfig::ConfigSystem::Get()->Get<std::string>("Engine.RenderAPI", "OpenGL");
-        if (renderAPIStr == "Vulkan")
+        switch (RenderAPIFactory::GetRenderAPI())
 		{
-			RendererAPI::SetAPI(RendererAPI::API::Vulkan);
-		}
-
-        switch (RendererAPI::GetAPI())
-		{
-			case RendererAPI::API::None:
-                ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); 
-                return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateUniquePtr<OpenGLRendererAPI>();
-			case RendererAPI::API::Vulkan:  return CreateUniquePtr<VulkanRendererAPI>();
+			case RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RHI_API::OpenGL:  return CreateUniquePtr<OpenGLRendererAPI>();
+			case RHI_API::Vulkan:  return CreateUniquePtr<VulkanRendererAPI>();
 		}
         ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
         return nullptr;
@@ -96,91 +92,13 @@ namespace Engine::Render
 
     TUniquePtr<class GraphicsContext> RenderAPIFactory::CreateGraphicsContext(void *window)
     {
-        switch (RendererAPI::GetAPI())
+        switch (RenderAPIFactory::GetRenderAPI())
 		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateUniquePtr<OpenGLContext>(static_cast<GLFWwindow*>(window));
-			case RendererAPI::API::Vulkan:  return CreateUniquePtr<VulkanContext>(static_cast<GLFWwindow*>(window));
+			case RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RHI_API::OpenGL:  return CreateUniquePtr<OpenGLContext>(static_cast<GLFWwindow*>(window));
+			case RHI_API::Vulkan:  return CreateUniquePtr<VulkanContext>(static_cast<GLFWwindow*>(window));
 		}
         ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
         return nullptr;
     }
-
-    /*TRef<class VertexArray> RenderAPIFactory::CreateVertexArray()
-    {
-        switch (RendererAPI::GetAPI())
-		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "VertexArray::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateUniquePtr<OpenGLVertexArray>();
-			case RendererAPI::API::Vulkan:  return CreateUniquePtr<VulkanVertexArray>();
-		}
-    }
-
-    TRef<class UniformBuffer> RenderAPIFactory::CreateUniformBuffer(uint32_t size, uint32_t binding)
-    {
-        switch (RendererAPI::GetAPI())
-		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "VertexArray::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateUniquePtr<OpenGLUniformBuffer>();
-			case RendererAPI::API::Vulkan:  return CreateUniquePtr<VulkanUniformBuffer>();
-		}
-    }
-
-    TRef<class Texture2D> RenderAPIFactory::CreateTexture2D(const TextureSpecification &specification)
-    {
-        switch (RendererAPI::GetAPI())
-		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "VertexArray::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateUniquePtr<OpenGLTexture2D>();
-			case RendererAPI::API::Vulkan:  return CreateUniquePtr<VulkanTexture2D>();
-		}
-    }
-
-    TRef<class Shader> RenderAPIFactory::CreateShader(const std::string &name, const std::string &vertexSrc, const std::string &fragmentSrc)
-    {
-        switch (RendererAPI::GetAPI())
-		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "VertexArray::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateUniquePtr<OpenGLShader>();
-			case RendererAPI::API::Vulkan:  return CreateUniquePtr<VulkanShader>();
-		}
-    }
-
-    TUniquePtr<class GraphicsContext> RenderAPIFactory::CreateGraphicsContext(void *window)
-    {
-        switch (RendererAPI::GetAPI())
-		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "VertexArray::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateUniquePtr<OpenGLContext>();
-			case RendererAPI::API::Vulkan:  return CreateUniquePtr<VulkanContext>();
-		}
-    }
-
-    TRef<class Framebuffer> RenderAPIFactory::CreateFramebuffer(const FramebufferSpecification &spec)
-    {
-        switch (RendererAPI::GetAPI())
-		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "VertexArray::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateUniquePtr<OpenGLFramebuffer>();
-			case RendererAPI::API::Vulkan:  return CreateUniquePtr<VulkanFramebuffer>();
-		}
-    }
-    TRef<class VertexBuffer> RenderAPIFactory::CreateVertexBuffer(float *vertices, uint32_t size)
-    {
-        switch (RendererAPI::GetAPI())
-		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "VertexArray::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateUniquePtr<OpenGLVertexBuffer>();
-			case RendererAPI::API::Vulkan:  return CreateUniquePtr<VulkanVertexBuffer>();
-		}
-    }
-    TRef<class IndexBuffer> RenderAPIFactory::CreateIndexBuffer(uint32_t *indices, uint32_t count)
-    {
-        switch (RendererAPI::GetAPI())
-		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "VertexArray::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateUniquePtr<OpenGLIndexBuffer>();
-			case RendererAPI::API::Vulkan:  return CreateUniquePtr<VulkanIndexBuffer>();
-		}
-    }*/
 }

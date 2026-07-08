@@ -26,7 +26,7 @@ namespace Engine::UI
         m_font = FontManager::GetFontManager().AddFont(InFontName);
         SetFocusable(true);
 
-        m_charInputHandle = InputSystem::GetInstance().OnCharInput().Subscribe(this, &UILineEdit::OnCallCharInput);
+        m_charInputHandle = InputSystem::GetInstance()->OnCharInput().Subscribe(this, &UILineEdit::OnCallCharInput);
         m_clickHandle = OnClick().Subscribe(this, &UILineEdit::OnCallClick);
     }
 
@@ -687,8 +687,12 @@ namespace Engine::UI
         Vector2 mousePos = InputSystem::GetMousePosition();
         m_contextMenuPos = mousePos;
 
-        int windowW = Application::Get().GetWindow()->GetWidth();
-        int windowH = Application::Get().GetWindow()->GetHeight();
+        ENGINE_ASSERT(GetUIContext(), "No valid UIContext!");
+        IWindow* LWin = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(GetUIContext().get()->GetWindowContext());
+        ENGINE_ASSERT(LWin, "Error init EditorMainWidget. No valid window!");
+
+        int windowW = LWin->GetWidth();
+        int windowH = LWin->GetHeight();
         float menuH = (int)ContextMenuAction::Count * m_contextMenuItemHeight + 4.0f;
 
         if (m_contextMenuPos.x + m_contextMenuWidth > (float)windowW)

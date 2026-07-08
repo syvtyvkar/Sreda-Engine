@@ -258,8 +258,8 @@ namespace Engine
 
     InputListenGLFWSystem *InputListenGLFWSystem::GetInputListen(GLFWwindow *window)
     {
-        if (!Engine::InputSystem::GetInstance().GetInputListenFromActivWin()) return nullptr;
-        return static_cast<InputListenGLFWSystem*>(Engine::InputSystem::GetInstance().GetInputListenFromActivWin());
+        if (!Engine::InputSystem::GetInstance()->GetInputListenFromActivWin()) return nullptr;
+        return static_cast<InputListenGLFWSystem*>(Engine::InputSystem::GetInstance()->GetInputListenFromActivWin());
     };
 
     void InputListenGLFWSystem::OnGLFWCharCallback(GLFWwindow* window, unsigned int codepoint)

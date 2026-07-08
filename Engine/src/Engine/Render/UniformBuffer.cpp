@@ -2,6 +2,7 @@
 
 #include "UniformBuffer.h"
 #include "RendererAPI.h"
+#include "RenderAPIFactory.h"
 
 #include "Platform/RenderAPI/OpenGL/OpenGLUniformBuffer.h"
 #include "Platform/RenderAPI/Vulkan/VulkanUniformBuffer.h"
@@ -10,11 +11,11 @@ namespace Engine::Render
 {
     TRef<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding)
 	{
-		switch (RendererAPI::GetAPI())
+		switch (RenderAPIFactory::GetRenderAPI())
 		{
-			case RendererAPI::API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLUniformBuffer>(size, binding);
-			case RendererAPI::API::Vulkan:  return CreateRef<VulkanUniformBuffer>(size, binding);
+			case RenderAPIFactory::RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RenderAPIFactory::RHI_API::OpenGL:  return CreateRef<OpenGLUniformBuffer>(size, binding);
+			case RenderAPIFactory::RHI_API::Vulkan:  return CreateRef<VulkanUniformBuffer>(size, binding);
 		}
 
 		ENGINE_ASSERT(false, "Unknown RendererAPI!");

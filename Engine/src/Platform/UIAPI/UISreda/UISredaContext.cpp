@@ -9,22 +9,23 @@ namespace Engine::UI
 {
     UISredaContext::UISredaContext() : m_ui_camera(0.f,12800.f,720.f,0.f)
     {
-        Application::Get().GetWindow()->OnWindowReSize().Subscribe([&,this](WindowContext cntxt, int x, int y) 
-		{
-			m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);
-		});
-        int w = Application::Get().GetWindow()->GetWidth();
-		int h = Application::Get().GetWindow()->GetHeight();
+        IWindow* LWin = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(m_WindowContext);
+        ENGINE_ASSERT(LWin, "Error init UI Context. No valid window!");
+        LWin->OnWindowReSize().Subscribe(this, &UISredaContext::CallOnWindowReSize);
+        int w = LWin->GetWidth();
+		int h = LWin->GetHeight();
 		m_ui_camera.SetProjection(0.0f, (float)w, (float)h, 0.0f);
 		m_ui_camera.SetPosition(Vector3(0.0f));
 		m_ui_camera.SetRotation(0.0f);
 
-        m_mousePressedHandle = InputSystem::GetInstance().OnMouseButtonPressed().Subscribe(
+        m_mousePressedHandle = InputSystem::GetInstance()->OnMouseButtonPressed().Subscribe(
             [this](InputKey button, int mods)
             {
                 if (button != InputKey::MouseLeft) return;
                 Vector2 mousePos = InputSystem::GetMousePosition();
                 TRef<UIWidget> hit = HitTest(GetRootWidget(), mousePos);
+
+                if (hit.get() == nullptr) return;
 
                 if (m_FocusWidget && m_FocusWidget != hit)
                 {
@@ -55,7 +56,7 @@ namespace Engine::UI
                 }
             });
 
-        m_mouseReleasedHandle = InputSystem::GetInstance().OnMouseButtonReleased().Subscribe(
+        m_mouseReleasedHandle = InputSystem::GetInstance()->OnMouseButtonReleased().Subscribe(
             [this](InputKey button, int mods)
             {
                 if (button != InputKey::MouseLeft) return;
@@ -74,8 +75,8 @@ namespace Engine::UI
 
     UISredaContext::~UISredaContext()
     {
-        //InputSystem::GetInstance().OnMouseButtonPressed().Unsubscribe(m_mousePressedHandle);
-        //InputSystem::GetInstance().OnMouseButtonReleased().Unsubscribe(m_mouseReleasedHandle);
+        //InputSystem::GetInstance()->OnMouseButtonPressed().Unsubscribe(m_mousePressedHandle);
+        //InputSystem::GetInstance()->OnMouseButtonReleased().Unsubscribe(m_mouseReleasedHandle);
     }
 
     void UISredaContext::BeginFrame()
@@ -92,12 +93,13 @@ namespace Engine::UI
     }
     void UISredaContext::Shutdown()
     {
-        InputSystem::GetInstance().OnMouseButtonPressed().Unsubscribe(m_mousePressedHandle);
-        InputSystem::GetInstance().OnMouseButtonReleased().Unsubscribe(m_mouseReleasedHandle);
+        InputSystem::GetInstance()->OnMouseButtonPressed().Unsubscribe(m_mousePressedHandle);
+        InputSystem::GetInstance()->OnMouseButtonReleased().Unsubscribe(m_mouseReleasedHandle);
         GetRootWidget().reset();
     }
-    void UISredaContext::InitContext()
+    void UISredaContext::InitContext(Engine::WindowContext InContext)
     {
+        m_WindowContext = InContext;
     }
 
     void UISredaContext::Show()
@@ -115,7 +117,8 @@ namespace Engine::UI
 
     TRef<UIWidget> UISredaContext::HitTest(TRef<UIElement> root, const Vector2 &point)
     {
-        if (!root || !root->IsVisible()) return nullptr;
+        if (!root) return nullptr;
+        if (!root->IsVisible()) return nullptr;
 
         for (auto it = root->GetChildren().rbegin(); it != root->GetChildren().rend(); ++it)
         {
@@ -165,5 +168,9 @@ namespace Engine::UI
         {
             GetRootWidget().get()->OnUpdate(DeltaTime);
         }
+    }
+    void UISredaContext::CallOnWindowReSize(WindowContext cntxt, int x, int y)
+    {
+        m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);
     }
 }

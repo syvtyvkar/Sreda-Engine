@@ -2,10 +2,9 @@
 
 #include "Time.h"
 #include "BaseEngine.h"
+#include "Engine/Core/Base/EngineCore.h"
 #include <chrono>
 #include <algorithm>
-
-#include "Engine/Core/Base/EngineCore.h"
 
 namespace Engine::Time 
 {

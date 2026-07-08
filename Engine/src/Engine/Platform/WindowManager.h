@@ -30,6 +30,7 @@ namespace Engine
 
         // Get and create
         IWindow* GetEngineWindow(WindowContext InContext = WindowContext(0));
+        IWindow* GetEngineWindowActiv() {return GetEngineWindow(GetActivIWin());};
         WindowContext CreateEngineWindow(const struct WindowConfig InConfigWindow);
         void CloseEngineWindow(WindowContext InContext = WindowContext(0));
         WindowContext GetActivIWin() {return m_focusWindow;};

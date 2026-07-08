@@ -18,12 +18,12 @@ void EditorMainWidget::OnInit()
 {
     __super::OnInit();
 
-    Application::Get().GetWindow()->OnWindowReSize().Subscribe([&,this](WindowContext cntxt, int x, int y) {
-        Vector2 FullSize = Vector2(Application::Get().GetWindow()->GetWidth(), Application::Get().GetWindow()->GetHeight());
-        SetSize(FullSize);
-        m_EditorMainMenuBar->SetSize(Vector2(FullSize.x,m_EditorMainMenuBar->GetSize().y));
-    });
-    Vector2 FullSize = Vector2(Application::Get().GetWindow()->GetWidth(), Application::Get().GetWindow()->GetHeight());
+    ENGINE_ASSERT(GetUIContext(), "No valid UIContext!");
+    IWindow* LWin = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(GetUIContext().get()->GetWindowContext());
+    ENGINE_ASSERT(LWin, "Error init EditorMainWidget. No valid window!");
+
+    LWin->OnWindowReSize().Subscribe(this, &EditorMainWidget::CallOnWindowReSize);
+    Vector2 FullSize = Vector2(LWin->GetWidth(), LWin->GetHeight());
     SetSize(FullSize);
 
     SetVerticalAlignment(UIVerticalAlignment::Stretch);
@@ -98,4 +98,15 @@ void EditorMainWidget::OnRender()
     //Renderer2D::DrawQuad(pos + size * 0.5f, size, color);
 
     UIWidget::OnRender();
+}
+
+void EditorMainWidget::CallOnWindowReSize(WindowContext cntxt, int x, int y)
+{
+    ENGINE_ASSERT(GetUIContext(), "No valid UIContext!");
+    IWindow* LWinD = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(GetUIContext().get()->GetWindowContext());
+    ENGINE_ASSERT(LWinD, "Error init EditorMainWidget. No valid window!");
+
+    Vector2 FullSize = Vector2(LWinD->GetWidth(), LWinD->GetHeight());
+    SetSize(FullSize);
+    m_EditorMainMenuBar->SetSize(Vector2(FullSize.x,m_EditorMainMenuBar->GetSize().y));
 }

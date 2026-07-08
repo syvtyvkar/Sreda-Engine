@@ -3,6 +3,8 @@
 #include "UISystem.h"
 #include "UIBuilder.h"
 
+#include "Engine/Core/Base/EngineCore.h"
+
 namespace Engine::UI 
 {
     void UISystem::ToggleDebugger()
@@ -36,15 +38,27 @@ namespace Engine::UI
         }
     }
 
+    void UISystem::CallOnWinCreate(IWindow *InWin, WindowContext InWinContext)
+    {
+        CreateContextFromWindowContext(InWinContext);
+    }
+
+    void UISystem::CallOnWinDestroy(IWindow *InWin, WindowContext InWinContext)
+    {
+        DestroyContextFromWindowContext(InWinContext);
+    }
+
     bool UISystem::Initialize()
     {
-        if (!CreateContext())
+        /*if (!CreateContext())
         {
             return false;
-        }
-        //GetContext()->SetRootWidget(UIBuilder::CreateWidget());
-
+        }*/
         m_contextMenu = CreateUniquePtr<UIContextMenu>();
+
+        m_DH_OnWinCreate = Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinCreate().Subscribe(this, &UISystem::CallOnWinCreate);
+        m_DH_OnWinDestroy = Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinDestroy().Subscribe(this, &UISystem::CallOnWinDestroy);
+
         return true;
     }
 
@@ -55,14 +69,18 @@ namespace Engine::UI
             m_contextMenu.get()->ClearAllButton();
             m_contextMenu.reset();
         }
-        DestroyContext();
+        Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinCreate().Unsubscribe(m_DH_OnWinCreate);
+        Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinDestroy().Unsubscribe(m_DH_OnWinDestroy);
+        m_ui_contexts.clear();
+        //DestroyContext();
     }
     
     void UISystem::Update(float DeltaTime)
     {
-        if (m_context.get())
+        for (auto& [LKey, LVal] : m_ui_contexts)
         {
-            m_context.get()->Update(DeltaTime);
+            if (!LVal) continue;
+            LVal.get()->Update(DeltaTime);
         }
         if (m_contextMenu.get())
         {
@@ -72,9 +90,10 @@ namespace Engine::UI
 
     void UISystem::Render()
     {
-        if (m_context.get())
+        for (auto& [LKey, LVal] : m_ui_contexts)
         {
-            m_context.get()->Render();
+            if (!LVal) continue;
+            LVal.get()->Render();
         }
         if (m_contextMenu.get())
         {
@@ -84,83 +103,103 @@ namespace Engine::UI
 
     void UISystem::BeginFrame()
     {
-        if (m_context.get())
+        for (auto& [LKey, LVal] : m_ui_contexts)
         {
-            m_context.get()->BeginFrame();
+            if (!LVal) continue;
+            LVal.get()->BeginFrame();
         }
     }
 
     void UISystem::EndFrame()
     {
-        if (m_context.get())
+        for (auto& [LKey, LVal] : m_ui_contexts)
         {
-            m_context.get()->EndFrame();
+            if (!LVal) continue;
+            LVal.get()->EndFrame();
         }
     }
 
-    UIContext *UISystem::CreateContext()
+    void UISystem::CreateContextFromWindowContext(WindowContext InContext)
     {
-        m_context = UIContextFactory::create();
-        ENGINE_ASSERT(m_context, "No UI context! The UI System cannot be initialized!");
-        m_context.get()->InitContext();
-        return m_context.get();
+        TUniquePtr<UIContext> LUIContext = UIContextFactory::create();
+        ENGINE_ASSERT(LUIContext, "No UI context! The UI System cannot be initialized!");
+        LUIContext.get()->InitContext(InContext);
+
+        m_ui_contexts.insert({InContext, std::move(LUIContext)});
     }
 
-    void UISystem::DestroyContext()
+    UIContext *UISystem::GetContextFromWindowContext(WindowContext InContext)
     {
-        m_context.reset();
+        auto it = m_ui_contexts.find(InContext);
+        return (it != m_ui_contexts.end()) ? it->second.get() : nullptr;
     }
 
-    void UISystem::RegisterWidget(TRef<UIElement> widget)
+    void UISystem::DestroyContextFromWindowContext(WindowContext InContext)
+    {
+        auto it = m_ui_contexts.find(InContext);
+        if (it == m_ui_contexts.end()) return;
+
+        m_ui_contexts.erase(InContext);
+    }
+
+    void UISystem::RegisterWidget(WindowContext InWinContext,TRef<UIElement> widget)
     {
         if (widget.get() == nullptr) return;
 
-        if (m_context.get() != nullptr)
+        UIContext* LCntxt = GetContextFromWindowContext(InWinContext);
+
+        if (LCntxt)
         {
-            m_context.get()->RegisterWidget(widget);
+            LCntxt->RegisterWidget(widget);
         }
     }
 
-    void UISystem::RemoveWidget(const TRef<UIElement> &widget)
+    void UISystem::RemoveWidget(WindowContext InWinContext,const TRef<UIElement> &widget)
     {
         if (widget.get() == nullptr) return;
+
+        UIContext* LCntxt = GetContextFromWindowContext(InWinContext);
         
-        if (m_context.get() != nullptr)
+        if (LCntxt)
         {
-            m_context.get()->RemoveWidget(widget);
+            LCntxt->RemoveWidget(widget);
         }
     }
-    UIWidget *UISystem::GetFocusWidget()
+    UIWidget *UISystem::GetFocusWidget(WindowContext InWinContext)
     {
-        if (GetContext())
+        UIContext* LCntxt = GetContextFromWindowContext(InWinContext);
+        if (LCntxt)
         {
-            return m_context.get()->GetFocusWidget();
-        }
-        return nullptr;
-    }
-
-    void UISystem::SetFocusWidget(TRef<UIWidget> InNewFocus)
-    {
-        if (GetContext())
-        {
-            return m_context.get()->SetFocusWidget(InNewFocus);
-        }
-    }
-
-    UIWidget *UISystem::GetHoverWidget()
-    {
-        if (GetContext())
-        {
-            return m_context.get()->GetHoverWidget();
+            return LCntxt->GetFocusWidget();
         }
         return nullptr;
     }
 
-    void UISystem::SetHoverWidget(TRef<UIWidget> InNewHover)
+    void UISystem::SetFocusWidget(WindowContext InWinContext,TRef<UIWidget> InNewFocus)
     {
-        if (GetContext())
+        UIContext* LCntxt = GetContextFromWindowContext(InWinContext);
+        if (LCntxt)
         {
-            return m_context.get()->SetHoverWidget(InNewHover);
+            return LCntxt->SetFocusWidget(InNewFocus);
+        }
+    }
+
+    UIWidget *UISystem::GetHoverWidget(WindowContext InWinContext)
+    {
+        UIContext* LCntxt = GetContextFromWindowContext(InWinContext);
+        if (LCntxt)
+        {
+            return LCntxt->GetHoverWidget();
+        }
+        return nullptr;
+    }
+
+    void UISystem::SetHoverWidget(WindowContext InWinContext,TRef<UIWidget> InNewHover)
+    {
+        UIContext* LCntxt = GetContextFromWindowContext(InWinContext);
+        if (LCntxt)
+        {
+            LCntxt->SetHoverWidget(InNewHover);
         }
     }
 }
