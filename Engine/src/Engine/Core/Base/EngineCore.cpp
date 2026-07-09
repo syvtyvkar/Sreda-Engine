@@ -56,7 +56,7 @@ namespace Engine
     {
         ENGINE_LOG_INFO("Engine init...");
 
-        Engine::WindowConfig WindowConfig;
+        /*Engine::WindowConfig WindowConfig;
         WindowConfig.wight = 200;
         WindowConfig.height = 200;
         WindowConfig.title = "Init Engine...";
@@ -77,7 +77,8 @@ namespace Engine
             }
         }
 
-        /*m_engineContext.m_WindowManager.get()->CloseEngineWindow(m_InitWindow);*/
+
+        m_engineContext.m_WindowManager.get()->CloseEngineWindow(m_InitWindow);*/
     }
 
     void EngineCore::Shotdown()

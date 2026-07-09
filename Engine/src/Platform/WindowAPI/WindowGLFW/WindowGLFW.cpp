@@ -19,11 +19,18 @@
 
 namespace Engine
 {
+    static GLFWwindow* s_SharedWindow = nullptr;  // First window's handle for context sharing
+
     WindowGLFW::WindowGLFW() =default;          // Конструктор по умолчанию
 
     WindowGLFW::~WindowGLFW()                   // Деструктор: автоматически закрывает окно при уничтожении объекта
     {
         //Close(false);
+        //glfwSetFramebufferSizeCallback(GetHandle(), nullptr);
+        //glfwSetWindowFocusCallback(GetHandle(), nullptr);
+        //glfwSetWindowIconifyCallback(GetHandle(), nullptr);
+        //OnUpdateWindowHandle().Clear();
+        //OnUpdateWindowSize().Clear();
     }
 
     /**
@@ -71,7 +78,7 @@ namespace Engine
             break;
         }
 
-        m_window = glfwCreateWindow(config.wight,config.height,config.title.c_str(),nullptr,nullptr);  // Создание окна GLFW
+        m_window = glfwCreateWindow(config.wight,config.height,config.title.c_str(),nullptr,s_SharedWindow);  // Создание окна GLFW
 
         if (!m_window) 
         {
@@ -105,6 +112,9 @@ namespace Engine
         m_GraphicsContext = RenderAPIFactory::CreateGraphicsContext(GetHandle());
 		m_GraphicsContext->Init();                                                 // Инициализация
 
+        if (!s_SharedWindow)
+            s_SharedWindow = GetHandle();
+
         // Сохраняем указатель на объект WindowGLF3 в пользовательских данных GLFW, чтобы иметь доступ к нему в статических колбэках.
         glfwSetWindowUserPointer(GetHandle(), this);
 
@@ -136,6 +146,8 @@ namespace Engine
 
     void WindowGLFW::BeginRender()
     {
+       // m_GraphicsContext->MakeCurrent();
+
         if (m_dirt_width_height)    // В прошлом кадре параметры окна изменились!
         {
             m_dirt_width_height = false;
@@ -159,11 +171,6 @@ namespace Engine
         ss >> ret;
         UpdateWindowName(ret);
 
-        //if (m_uiSystem.get())
-        //{
-        //    m_uiSystem->Update();
-        //}
-
         //m_currentScene->update(Time::TimeSystem::GetDeltaTimeSeconds());                                // Обновление логики сцены с передачей deltaTime
     }
 
@@ -178,9 +185,19 @@ namespace Engine
         OnMinimizedChange().Clear();
         OnWindowReSize().Clear();
 
+        if (GetHandle() == s_SharedWindow)
+            s_SharedWindow = nullptr;
+
         ENGINE_LOG_INFO("The Window close");
         glfwSetWindowShouldClose(GetHandle(), true);
         glfwDestroyWindow(GetHandle());            // Уничтожаем окно GLFW
+        
+        glfwSetFramebufferSizeCallback(GetHandle(), nullptr);
+        glfwSetWindowFocusCallback(GetHandle(), nullptr);
+        glfwSetWindowIconifyCallback(GetHandle(), nullptr);
+        OnUpdateWindowHandle().Clear();
+        OnUpdateWindowSize().Clear();
+
         m_window = nullptr;
     }
 
@@ -302,6 +319,7 @@ namespace Engine
         auto* win = (class WindowGLFW *)glfwGetWindowUserPointer(window);
         if (win != nullptr) 
         {
+            if (win->m_window == nullptr) return;
             win->m_WindowHasFocus = (focused == GLFW_TRUE);
             win->OnHasFocusChange().Broadcast(win->GetWindowContext(), win->m_WindowHasFocus);
             if (window != glfwGetCurrentContext())

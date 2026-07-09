@@ -21,6 +21,7 @@ namespace Engine::UI
         
 
         virtual void InitContext(Engine::WindowContext InContext) = 0;
+        virtual void Shutdown() = 0;
 
         // UI Element Management
         void RegisterWidget(TRef<UIElement> widget);

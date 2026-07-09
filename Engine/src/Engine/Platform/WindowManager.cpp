@@ -28,7 +28,8 @@ namespace Engine
     WindowContext WindowManager::CreateEngineWindow(const WindowConfig InConfigWindow, bool InMainWindow)
     {
         WindowConfig LResultContext = InConfigWindow;
-        LResultContext.cntx = WindowContext(0);
+        LResultContext.cntx = WindowContext(CountWindowID);
+        CountWindowID++;
 
         TUniquePtr<IWindow> LW = WindowAPIFactory::create();
         if (!LW) 
@@ -68,13 +69,17 @@ namespace Engine
         it->second->Close();
         if (m_mainWindow == InContext)
         {
-            /*if (m_windowList.empty()) return;
+            if (m_windowList.size() <= 1)
+            {
+                m_windowList.erase(it);
+                return;
+            }
 
             for (auto& [LKey,LVal] : m_windowList)
             {
                 if (!LVal) continue;
                 CloseEngineWindow(LKey);
-            }*/
+            }
             it->second->WindowTerminate();
             m_windowList.clear();
         }

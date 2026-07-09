@@ -9,6 +9,35 @@ namespace Engine::UI
 {
     UISredaContext::UISredaContext() : m_ui_camera(0.f,12800.f,720.f,0.f)
     {
+    }
+
+    UISredaContext::~UISredaContext()
+    {
+        //InputSystem::GetInstance()->OnMouseButtonPressed().Unsubscribe(m_mousePressedHandle);
+        //InputSystem::GetInstance()->OnMouseButtonReleased().Unsubscribe(m_mouseReleasedHandle);
+    }
+
+    void UISredaContext::BeginFrame()
+    {
+    }
+    void UISredaContext::EndFrame()
+    {
+    }
+    void UISredaContext::Render()
+    {
+        Renderer2D::BeginScene(m_ui_camera);
+        RenderUIElements(GetRootWidget());
+        Renderer2D::EndScene();
+    }
+    void UISredaContext::Shutdown()
+    {
+        InputSystem::GetInstance()->OnMouseButtonPressed().Unsubscribe(m_mousePressedHandle);
+        InputSystem::GetInstance()->OnMouseButtonReleased().Unsubscribe(m_mouseReleasedHandle);
+        GetRootWidget().reset();
+    }
+    void UISredaContext::InitContext(Engine::WindowContext InContext)
+    {
+        m_WindowContext = InContext;
         IWindow* LWin = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(m_WindowContext);
         ENGINE_ASSERT(LWin, "Error init UI Context. No valid window!");
         LWin->OnWindowReSize().Subscribe(this, &UISredaContext::CallOnWindowReSize);
@@ -71,35 +100,6 @@ namespace Engine::UI
                     m_LastPressWidget.reset();
                 }
             });
-    }
-
-    UISredaContext::~UISredaContext()
-    {
-        //InputSystem::GetInstance()->OnMouseButtonPressed().Unsubscribe(m_mousePressedHandle);
-        //InputSystem::GetInstance()->OnMouseButtonReleased().Unsubscribe(m_mouseReleasedHandle);
-    }
-
-    void UISredaContext::BeginFrame()
-    {
-    }
-    void UISredaContext::EndFrame()
-    {
-    }
-    void UISredaContext::Render()
-    {
-        Renderer2D::BeginScene(m_ui_camera);
-        RenderUIElements(GetRootWidget());
-        Renderer2D::EndScene();
-    }
-    void UISredaContext::Shutdown()
-    {
-        InputSystem::GetInstance()->OnMouseButtonPressed().Unsubscribe(m_mousePressedHandle);
-        InputSystem::GetInstance()->OnMouseButtonReleased().Unsubscribe(m_mouseReleasedHandle);
-        GetRootWidget().reset();
-    }
-    void UISredaContext::InitContext(Engine::WindowContext InContext)
-    {
-        m_WindowContext = InContext;
     }
 
     void UISredaContext::Show()

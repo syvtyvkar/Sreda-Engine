@@ -139,6 +139,8 @@ namespace Engine::UI
         auto it = m_ui_contexts.find(InContext);
         if (it == m_ui_contexts.end()) return;
 
+        it->second.get()->Shutdown();
+
         m_ui_contexts.erase(InContext);
     }
 

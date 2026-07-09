@@ -60,8 +60,7 @@ namespace Engine
         virtual Engine::WindowContext GetWindowContext() override {return m_WindowContext;}
 
     private:
-        GLFWwindow* m_window = nullptr;                                          // Указатель на объект окна GLFW
-        //GLFWwindow* m_window = nullptr;                                                     // Указатель на объект окна GLFW
+        GLFWwindow* m_window = nullptr;                                                     // Указатель на объект окна GLFW
         static void FramebufferResizeCallback(GLFWwindow* Window, int width, int height);   // Статический колбэк изменения размера фреймбуфера
         int m_width = 0;                                                                    // Текущая ширина окн
         int m_height = 0;                                                                   // Текущая высота окна
@@ -77,7 +76,6 @@ namespace Engine
         bool m_WindowIsMinimized = false;
     protected:
         //TUniquePtr<Scene> m_currentScene;               // Текущая сцена
-        TUniquePtr<UISystem> m_uiSystem;                  // Текущая система UI
         TUniquePtr<GraphicsContext> m_GraphicsContext;    // Графический контекст (OpenGL, Vulkan и т.д.)
         Engine::WindowContext m_WindowContext = Engine::WindowContext(0);
     };

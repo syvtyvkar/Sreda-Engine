@@ -87,6 +87,7 @@ namespace Engine
         DOnWinFocusChange s_OnMinimizedChange;
         DOnWinCreate s_OnWinCreate;
         DOnWinCreate s_OnWinDestroy;
+        int CountWindowID = 0;
     public:
         void CallWindowReSize(WindowContext InContext, int InX,int InY);
         void CallWindowFocusChange(WindowContext InContext,bool InVal);

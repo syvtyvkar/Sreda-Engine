@@ -21,7 +21,7 @@ namespace Engine::UI
         virtual void BeginFrame() override;
         virtual void EndFrame() override;
         virtual void Render() override;
-        void Shutdown();
+        virtual void Shutdown() override;
 
         virtual void InitContext(Engine::WindowContext InContext) override;
 

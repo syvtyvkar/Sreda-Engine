@@ -41,4 +41,9 @@ namespace Engine::Render
 	{
 		glfwSwapBuffers(m_WindowHandle);
 	}
+
+	void OpenGLContext::MakeCurrent()
+	{
+		glfwMakeContextCurrent(m_WindowHandle);
+	}
 }
