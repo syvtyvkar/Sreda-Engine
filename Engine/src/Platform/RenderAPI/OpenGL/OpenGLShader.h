@@ -64,7 +64,6 @@ namespace Engine::Render
     public:
         IAssetGLSLLoader()
         {
-            m_typeLoader = {"glsl"};
         };
         virtual ~IAssetGLSLLoader() = default;
 

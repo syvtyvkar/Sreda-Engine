@@ -13,6 +13,7 @@
 #include "Engine/Platform/WindowManager.h"
 #include "Engine/UI/Framework/UISystem.h"
 #include "Engine/Input/Input.h"
+#include "Engine/Render/Font/Font.h"
 
 namespace Engine
 {
@@ -30,6 +31,8 @@ namespace Engine
         WindowManager* GetWindowManager() {return m_WindowManager.get();}
         Engine::UI::UISystem* GetUISystem() {return m_UISystem.get();}
         Engine::InputSystem* GetInputSystem() {return m_InputSystem.get();}
+        AssetManager* GetAssetManager() {return m_AssetManager.get();}
+        Engine::Render::FontManager* GetFontManager() {return m_FontManager.get();}
 
         /*********************************************************************/
     protected:
@@ -37,10 +40,12 @@ namespace Engine
         TUniquePtr<Engine::Time::TimeSystem> m_TimeSystem;
         TUniquePtr<EngineConfig::ConfigSystem> m_ConfigSystem;
         TUniquePtr<IVirtualFileSystem> m_VFS;
+        TUniquePtr<AssetManager> m_AssetManager;
         TUniquePtr<CommandLine> m_CommandLine;
         TUniquePtr<WindowManager> m_WindowManager;
         TUniquePtr<Engine::UI::UISystem> m_UISystem;
         TUniquePtr<Engine::InputSystem> m_InputSystem;
+        TUniquePtr<Engine::Render::FontManager> m_FontManager;
     };
 
     struct EngineDelegates

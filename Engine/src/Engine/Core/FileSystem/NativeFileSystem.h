@@ -75,7 +75,10 @@ namespace Engine
 
                     if (!IsPathInside(entry.PhysPath, LFullPath.string())) continue;
 
-                    if (std::filesystem::exists(LFullPath) && std::filesystem::is_regular_file(LFullPath))
+                    bool LRegularFile = std::filesystem::is_regular_file(LFullPath);
+                    bool LExits = std::filesystem::exists(LFullPath);
+
+                    if (LExits && LRegularFile)
                     {
                         std::ifstream LStream(LFullPath, std::ios::binary | std::ios::ate);
                         if (!LStream.is_open()) continue;
@@ -112,7 +115,7 @@ namespace Engine
             std::lock_guard<std::mutex> lock(m_mutex);
             std::filesystem::path LPhys(InPhysPath);
             LPhys = std::filesystem::absolute(LPhys).lexically_normal();
-            ENGINE_ASSERT(!std::filesystem::is_directory(LPhys), "Error Native File System: mount not a directory!");
+            ENGINE_ASSERT(std::filesystem::is_directory(LPhys), "Error Native File System: mount not a directory!");
             std::string LNormalMount = NormalizeVirtualPath(InMountPoint);
             // Delete a previous mount with the same priority
             m_mountPoints.push_back({LNormalMount, LPhys.string(),InPriority});
@@ -130,6 +133,7 @@ namespace Engine
     private:
         struct MountEntry 
         {
+            MountEntry(std::string InMountPoint, std::string InPhysPath, int InPriority) :MountPoint(InMountPoint),PhysPath(InPhysPath),Priority(InPriority)  {}
             std::string MountPoint;     //  Normalized virtual path
             std::string PhysPath;       //  The physical path
             int Priority;

@@ -9,6 +9,7 @@
 
 #include "Engine/Platform/PlatformUtils.h"
 #include "Engine/Render/RenderAPIFactory.h"
+#include "Engine/Core/Base/EngineCore.h"
 
 /*#undef INFINITE
 #include "msdf-atlas-gen.h"
@@ -138,6 +139,16 @@ namespace Engine::Render
         GenerateAtlas(filepath, codepoints);
     }
 
+    Font::Font()
+    {
+    }
+
+    Font::~Font()
+    {
+        m_AtlasTexture.reset();
+        m_Glyphs.clear();
+    }
+
     Vector2 Font::CalculateTextSize(const std::wstring &InText, const Font* InFont, int InFontSize)
     {
         if (InFont==nullptr)
@@ -235,143 +246,6 @@ namespace Engine::Render
         FT_Done_FreeType(ft);
     }
 
-    /****************************************** */
-
-    /*template<typename T, typename S, int N, msdf_atlas::GeneratorFunction<S, N> GenFunc>
-	static Ref<Texture2D> CreateAndCacheAtlas(const std::string& fontName, float fontSize, const std::vector<msdf_atlas::GlyphGeometry>& glyphs,
-		const msdf_atlas::FontGeometry& fontGeometry, uint32_t width, uint32_t height)
-	{
-		msdf_atlas::GeneratorAttributes attributes;
-		attributes.config.overlapSupport = true;
-		attributes.scanlinePass = true;
-
-		msdf_atlas::ImmediateAtlasGenerator<S, N, GenFunc, msdf_atlas::BitmapAtlasStorage<T, N>> generator(width, height);
-		generator.setAttributes(attributes);
-		generator.setThreadCount(8);
-		generator.generate(glyphs.data(), (int)glyphs.size());
-
-		msdfgen::BitmapConstRef<T, N> bitmap = (msdfgen::BitmapConstRef<T, N>)generator.atlasStorage();
-
-		TextureSpecification spec;
-		spec.Width = bitmap.width;
-		spec.Height = bitmap.height;
-		spec.Format = ImageFormat::RGB8;
-		spec.GenerateMips = false;
-
-		Ref<Texture2D> texture = RenderAPIFactory::CreateTexture2D(spec);
-		texture->SetData((void*)bitmap.pixels, bitmap.width * bitmap.height * 3);
-		return texture;
-	}
-
-	FontAsset::FontAsset(const std::filesystem::path& filepath)
-		: m_Data(new MSDFData())
-	{
-		msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype();
-		HZ_CORE_ASSERT(ft);
-		
-		std::string fileString = filepath.string();
-
-		// TODO(Yan): msdfgen::loadFontData loads from memory buffer which we'll need 
-		msdfgen::FontHandle* font = msdfgen::loadFont(ft, fileString.c_str());
-		if (!font)
-		{
-			HZ_CORE_ERROR("Failed to load font: {}", fileString);
-			return;
-		}
-
-		struct CharsetRange
-		{
-			uint32_t Begin, End;
-		};
-
-		// From imgui_draw.cpp
-		static const CharsetRange charsetRanges[] =
-		{
-			{ 0x0020, 0x00FF }
-		};
-
-		msdf_atlas::Charset charset;
-		for (CharsetRange range : charsetRanges)
-		{
-			for (uint32_t c = range.Begin; c <= range.End; c++)
-				charset.add(c);
-		}
-		
-		double fontScale = 1.0;
-		m_Data->FontGeometry = msdf_atlas::FontGeometry(&m_Data->Glyphs);
-		int glyphsLoaded = m_Data->FontGeometry.loadCharset(font, fontScale, charset);
-		HZ_CORE_INFO("Loaded {} glyphs from font (out of {})", glyphsLoaded, charset.size());
-
-
-		double emSize = 40.0;
-
-		msdf_atlas::TightAtlasPacker atlasPacker;
-		// atlasPacker.setDimensionsConstraint()
-		atlasPacker.setPixelRange(2.0);
-		atlasPacker.setMiterLimit(1.0);
-		atlasPacker.setPadding(0);
-		atlasPacker.setScale(emSize);
-		int remaining = atlasPacker.pack(m_Data->Glyphs.data(), (int)m_Data->Glyphs.size());
-		HZ_CORE_ASSERT(remaining == 0);
-
-		int width, height;
-		atlasPacker.getDimensions(width, height);
-		emSize = atlasPacker.getScale();
-
-#define DEFAULT_ANGLE_THRESHOLD 3.0
-#define LCG_MULTIPLIER 6364136223846793005ull
-#define LCG_INCREMENT 1442695040888963407ull
-#define THREAD_COUNT 8
-		// if MSDF || MTSDF
-
-		uint64_t coloringSeed = 0;
-		bool expensiveColoring = false;
-		if (expensiveColoring)
-		{
-			msdf_atlas::Workload([&glyphs = m_Data->Glyphs, &coloringSeed](int i, int threadNo) -> bool {
-				unsigned long long glyphSeed = (LCG_MULTIPLIER * (coloringSeed ^ i) + LCG_INCREMENT) * !!coloringSeed;
-				glyphs[i].edgeColoring(msdfgen::edgeColoringInkTrap, DEFAULT_ANGLE_THRESHOLD, glyphSeed);
-				return true;
-				}, m_Data->Glyphs.size()).finish(THREAD_COUNT);
-		}
-		else {
-			unsigned long long glyphSeed = coloringSeed;
-			for (msdf_atlas::GlyphGeometry& glyph : m_Data->Glyphs)
-			{
-				glyphSeed *= LCG_MULTIPLIER;
-				glyph.edgeColoring(msdfgen::edgeColoringInkTrap, DEFAULT_ANGLE_THRESHOLD, glyphSeed);
-			}
-		}
-
-
-		m_AtlasTexture = CreateAndCacheAtlas<uint8_t, float, 3, msdf_atlas::msdfGenerator>("Test", (float)emSize, m_Data->Glyphs, m_Data->FontGeometry, width, height);
-
-
-#if 0
-		msdfgen::Shape shape;
-		if (msdfgen::loadGlyph(shape, font, 'C'))
-		{
-			shape.normalize();
-			//                      max. angle
-			msdfgen::edgeColoringSimple(shape, 3.0);
-			//           image width, height
-			msdfgen::Bitmap<float, 3> msdf(32, 32);
-			//                     range, scale, translation
-			msdfgen::generateMSDF(msdf, shape, 4.0, 1.0, msdfgen::Vector2(4.0, 4.0));
-			msdfgen::savePng(msdf, "output.png");
-		}
-#endif
-
-		msdfgen::destroyFont(font);
-		msdfgen::deinitializeFreetype(ft);
-	}
-
-	FontAsset::~FontAsset()
-	{
-		delete m_Data;
-        m_AtlasTexture.reset();
-	}*/
-
     std::vector<uint32_t> GetDefaultCodepoints()
     {
         std::vector<uint32_t> codepoints;
@@ -391,11 +265,10 @@ namespace Engine::Render
         return codepoints;
     }
 
-    TUniquePtr<FontManager> FontManager::s_Instance=nullptr;                           // Static pointer to the single (singleton)
-
     Render::FontManager::FontManager()
     {
         ENGINE_LOG_TRACE("Start Font Manager...");
+        EngineCore::GetEngineContext().GetAssetManager()->RegisterLoader(".ttf", CreateUniquePtr<AssetFontFileLoader>());
     }
 
     Render::FontManager::~FontManager()
@@ -406,15 +279,7 @@ namespace Engine::Render
 
     FontManager &Render::FontManager::GetFontManager()
     {
-        if (s_Instance)
-        {
-            return *s_Instance;
-        }
-
-        s_Instance = CreateUniquePtr<FontManager>();
-
-        return *s_Instance;
-        // TODO: insert return statement here
+        return *EngineCore::GetEngineContext().GetFontManager();
     }
 
     bool Render::FontManager::IsFontContain(const std::string &InNameFont)
@@ -446,8 +311,15 @@ namespace Engine::Render
 
     TRef<Font> Render::FontManager::AddFont(const std::string &InNameFont)
     {
+        auto LInt = m_FontDataBase.find(InNameFont);
+        if (LInt != m_FontDataBase.end())
+        {
+            return LInt->second;
+        }
         std::string LFontName = InNameFont;
-        TRef<Font> LNewFont = CreateRef<Font>("Resources/Fonts/" + InNameFont + ".ttf");
+        //TRef<Font> LNewFont = CreateRef<Font>("Resources/Fonts/" + InNameFont + ".ttf");
+
+        TRef<Font> LNewFont = EngineCore::GetEngineContext().GetAssetManager()->Get<Font>("Resources/Fonts/" + InNameFont + ".ttf");
         if (!LNewFont)
         {
             return nullptr;
@@ -471,5 +343,96 @@ namespace Engine::Render
             return true;
         }
         return false;
+    }
+
+    void FontManager::ClearAllFont()
+    {
+        if (m_FontDataBase.size() <= 0 ) return;
+        std::unordered_map<std::string, TRef<Font>> LDeleteFonts = m_FontDataBase;
+        for (auto& [LKey, LVal] : LDeleteFonts)
+        {
+            RemoveFont(LKey);
+        }
+    }
+
+    TRef<IAsset> AssetFontFileLoader::LoadStatic(const std::string &InPath, TUniquePtr<IFile> File)
+    {
+        TRef<Font> LNewFontAsset = CreateRef<Font>();
+
+        LNewFontAsset.get()->m_FontSize = 48;
+
+        auto codepoints = GetDefaultCodepoints();
+
+        FT_Library ft;
+        if (FT_Init_FreeType(&ft))
+        {
+            ENGINE_ASSERT(false, "FreeType: failed to initialize");
+        }
+
+        std::string fullPath = PlatformUtils::GetProjectDirectory() + "/" + InPath;
+        FT_Face face;
+        if (FT_New_Face(ft, fullPath.c_str(), 0, &face))
+        {
+            FT_Done_FreeType(ft);
+            ENGINE_LOG_CRITICAL("Error load font {}", fullPath);
+            ENGINE_ASSERT(false, "FreeType: failed to load font!");
+        }
+        FT_Set_Pixel_Sizes(face, 0, LNewFontAsset.get()->m_FontSize);
+
+        std::unordered_map<uint32_t, RawGlyph> rawMap;
+        for (uint32_t cp : codepoints)
+        {
+            if (FT_Load_Char(face, cp, FT_LOAD_RENDER))
+            {
+                ENGINE_LOG_WARN("FreeType: failed to load glyph for codepoint {}", cp);
+                continue;
+            }
+
+            FT_GlyphSlot g = face->glyph;
+            RawGlyph rg;
+            rg.width = g->bitmap.width;
+            rg.height = g->bitmap.rows;
+            rg.bearingX = g->bitmap_left;
+            rg.bearingY = g->bitmap_top;
+            rg.advance = g->advance.x;
+
+            if (rg.width > 0 && rg.height > 0)
+            {
+                rg.buffer.resize(rg.width * rg.height);
+                memcpy(rg.buffer.data(), g->bitmap.buffer, rg.buffer.size());
+            }
+            rawMap[cp] = rg;
+        }
+
+        std::vector<std::pair<uint32_t, RawGlyph>> glyphList(rawMap.begin(), rawMap.end());
+
+        std::vector<unsigned char> atlasPixels;
+        int atlasW, atlasH;
+        PackGlyphs(glyphList, atlasPixels, atlasW, atlasH, LNewFontAsset.get()->m_Glyphs, 1);
+
+        if (atlasPixels.empty())
+        {
+            FT_Done_Face(face);
+            FT_Done_FreeType(ft);
+            ENGINE_ASSERT(false, "Font atlas generation failed: no glyphs loaded");
+        }
+
+		TextureSpecification spec;
+		spec.Width = atlasW;
+		spec.Height = atlasH;
+		spec.Format = ImageFormat::R8;
+		spec.GenerateMips = false;
+		spec.WrapS = TextureWrap::ClampToEdge;
+		spec.WrapT = TextureWrap::ClampToEdge;
+
+        LNewFontAsset.get()->m_AtlasTexture = RenderAPIFactory::CreateTexture2D(spec);
+        LNewFontAsset.get()->m_AtlasTexture->SetData(atlasPixels.data(), atlasW * atlasH);
+
+        ENGINE_LOG_INFO("Font atlas created: {}x{} ({} glyphs). Source: {}", atlasW, atlasH, LNewFontAsset.get()->m_Glyphs.size(),InPath);
+
+        FT_Done_Face(face);
+        FT_Done_FreeType(ft);
+
+        return LNewFontAsset;
     }
 }

@@ -25,8 +25,11 @@ namespace Engine
         Engine::ResourceManager::getInstance().init(Engine::PlatformUtils::GetExecutablePath());
         ENGINE_LOG_TRACE("Working Directory: {}", Engine::PlatformUtils::GetProjectDirectory());
 
-        m_engineContext.m_VFS.get()->Mount("","/",0);
+        std::string resourcesPath = Engine::PlatformUtils::GetProjectDirectory() + "/Resources";
 
+        m_engineContext.m_VFS.get()->Mount(resourcesPath,"Resources/",0);
+
+        m_engineContext.m_AssetManager = CreateUniquePtr<AssetManager>(m_engineContext.m_VFS.get());
 
         m_engineContext.m_ConfigSystem = CreateUniquePtr<EngineConfig::ConfigSystem>();
         m_engineContext.m_ConfigSystem.get()->Init(EngineConfig::ENINGE_CONFIG_FILE);
@@ -37,20 +40,23 @@ namespace Engine
 
         m_engineContext.m_WindowManager = CreateUniquePtr<WindowManager>();
 
+        RenderAPIFactory::Init();
+
         m_engineContext.m_UISystem = CreateUniquePtr<Engine::UI::UISystem>();
         m_engineContext.m_UISystem.get()->Initialize();
 
+        m_engineContext.m_FontManager = CreateUniquePtr<Engine::Render::FontManager>();
+        //m_engineContext.m_FontManager.get()->AddFont(DEFAULT_FONT_NAME);
+
         m_engineContext.m_InputSystem = CreateUniquePtr<Engine::InputSystem>();
         m_engineContext.m_InputSystem.get()->Init();
-
-        RenderAPIFactory::Init();
     }
 
     void EngineCore::Init()
     {
         ENGINE_LOG_INFO("Engine init...");
 
-        /*Engine::WindowConfig WindowConfig;
+        Engine::WindowConfig WindowConfig;
         WindowConfig.wight = 200;
         WindowConfig.height = 200;
         WindowConfig.title = "Init Engine...";
@@ -71,15 +77,18 @@ namespace Engine
             }
         }
 
-        m_engineContext.m_WindowManager.get()->CloseEngineWindow(m_InitWindow);*/
+        /*m_engineContext.m_WindowManager.get()->CloseEngineWindow(m_InitWindow);*/
     }
 
     void EngineCore::Shotdown()
     {
-        Engine::Render::Renderer::Shutdown();
-
         m_engineContext.m_InputSystem.get()->Shutdown();
         m_engineContext.m_InputSystem.reset();
+
+        m_engineContext.m_FontManager.get()->ClearAllFont();
+        m_engineContext.m_FontManager.reset();
+
+        Engine::Render::Renderer::Shutdown();
 
         m_engineContext.m_UISystem.get()->Shutdown();
         m_engineContext.m_UISystem.reset();

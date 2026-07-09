@@ -9,9 +9,11 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include <type_traits>
 
 namespace Engine 
 {
+    using namespace Engine::Render;
     /**
      * @brief IAsset
      * 
@@ -49,11 +51,6 @@ namespace Engine
         /**
         *   Start Sync Load Asset */
         //virtual bool LoadSync(std::string& InPath) = 0;
-
-        /**
-        *   Get type loader */
-        std::vector<std::string> GetLoaderType() {return m_typeLoader; }
-
     protected:
 
         /**
@@ -61,8 +58,6 @@ namespace Engine
         //virtual TRef<IAsset> FinishLoadSync() = 0;
 
         DOnFinishSyncLoad& OnFinishSyncLoad() {return m_DOnFinishSyncLoad;}
-
-        std::vector<std::string> m_typeLoader= {};
 
     private:
         DOnFinishSyncLoad m_DOnFinishSyncLoad;
@@ -84,7 +79,7 @@ namespace Engine
         template<typename T>
         TRef<T> Get(const std::string& InPath)
         {
-            static_assert(std::is_base_of<IAsset, T>, "T must derive from Asset");
+            static_assert(std::is_base_of<IAsset, T>::value, "T must derive from Asset");
             
             std::string LNormalPath = Normalize(InPath);
 

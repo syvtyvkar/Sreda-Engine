@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Engine/Render/GraphicsContext.h"
+#include "Engine/Platform/PlatformTypes.h"
+#include "Engine/Platform/IWindow.h"
+#include <map>
 
 struct GLFWwindow;
 
@@ -13,6 +16,7 @@ namespace Engine::Render
 
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
+
 	private:
 		GLFWwindow* m_WindowHandle;
 	};

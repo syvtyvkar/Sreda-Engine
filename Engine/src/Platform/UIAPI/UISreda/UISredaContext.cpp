@@ -27,7 +27,7 @@ namespace Engine::UI
 
                 if (hit.get() == nullptr) return;
 
-                if (m_FocusWidget && m_FocusWidget != hit)
+                if (m_FocusWidget != nullptr && m_FocusWidget != hit)
                 {
                     m_FocusWidget->SetPressed(false);
                     m_FocusWidget->SetHovered(false);
@@ -117,7 +117,7 @@ namespace Engine::UI
 
     TRef<UIWidget> UISredaContext::HitTest(TRef<UIElement> root, const Vector2 &point)
     {
-        if (!root) return nullptr;
+        if (root == nullptr) return nullptr;
         if (!root->IsVisible()) return nullptr;
 
         for (auto it = root->GetChildren().rbegin(); it != root->GetChildren().rend(); ++it)

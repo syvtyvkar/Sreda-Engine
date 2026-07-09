@@ -21,7 +21,7 @@ namespace Engine
     public:
         IAssetTextFileLoader()
         {
-            m_typeLoader = {""};
+
         };
         virtual ~IAssetTextFileLoader() = default;
 

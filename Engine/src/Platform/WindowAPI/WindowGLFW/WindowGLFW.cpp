@@ -88,7 +88,7 @@ namespace Engine
         if (!isVulkan)
         {
             // Делаем контекст OpenGL текущим для этого окна
-            glfwMakeContextCurrent(GetHandle());
+            //glfwMakeContextCurrent(GetHandle());
 
             // Включение/выключение вертикальной синхронизации
             glfwSwapInterval(config.vsync ? 1 : 0); //VSync!!!
@@ -276,7 +276,7 @@ namespace Engine
     void WindowGLFW::FramebufferResizeCallback(GLFWwindow* window, int width, int height) 
     {
         auto* win = (class WindowGLFW *)glfwGetWindowUserPointer(window);
-        if (win) 
+        if (win != nullptr) 
         {
             if (win->GetWindowMode() == WindowMode::Window) 
             {
@@ -300,17 +300,21 @@ namespace Engine
     void WindowGLFW::FocusCallback(GLFWwindow *window, int focused)
     {
         auto* win = (class WindowGLFW *)glfwGetWindowUserPointer(window);
-        if (win) 
+        if (win != nullptr) 
         {
             win->m_WindowHasFocus = (focused == GLFW_TRUE);
             win->OnHasFocusChange().Broadcast(win->GetWindowContext(), win->m_WindowHasFocus);
+            if (window != glfwGetCurrentContext())
+            {
+                glfwMakeContextCurrent(window);
+            }
         }
     }
 
     void WindowGLFW::IconifyCallback(GLFWwindow *window, int iconified)
     {
         auto* win = (class WindowGLFW *)glfwGetWindowUserPointer(window);
-        if (win) 
+        if (win != nullptr)  
         {
             win->m_WindowIsMinimized = (iconified == GLFW_TRUE);
             win->OnMinimizedChange().Broadcast(win->GetWindowContext(),win->m_WindowIsMinimized);
