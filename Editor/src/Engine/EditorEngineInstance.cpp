@@ -213,9 +213,6 @@ void EditorAppInstance::Update(float DeltaTime)
 
 	Renderer::BeginScene(m_CameraController.GetCamera());
 
-	//Renderer2D::RenderDrawText(L"Привет, мир!", m_FontTexture, m_AtlasFont.glyphs, 0.0f, 0.0f, 16, glm::vec4(1.0f));
-	//Renderer2D::RenderDrawText(L"Scale 2x", m_FontTexture, m_AtlasFont.glyphs, 0.0f, 0.0f, 16, glm::vec4(1.0f));
-
 	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
 	m_FlatColorShader->Bind();
@@ -270,11 +267,6 @@ void EditorAppInstance::Update(float DeltaTime)
 	Renderer::EndScene();
 
 	Renderer2D::BeginScene(m_ui_camera);
-
-	//Renderer2D::RenderDrawText(L"Hello, world!", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 100.0f, 48, TColor::White);
-	//Renderer2D::RenderDrawText(L"Big text test", m_Font->GetAtlasTexture(), m_Font->GetGlyphs(), 100.0f, 200.0f, 94, TColor::Orange);
-
-	//Renderer2D::DrawQuad(Vector2(0,500), Vector2(1500,100), m_Font->GetAtlasTexture());
 
 	Renderer2D::EndScene();
 

@@ -310,7 +310,6 @@ namespace Engine::Render
 			s_Data.Stats.DrawCalls++;
 		}
 
-		//ENGINE_LOG_INFO("TextIndexCount = {}", s_Data.TextIndexCount);
 		if (s_Data.TextIndexCount) 
 		{
     		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.TextVertexBufferPtr - (uint8_t*)s_Data.TextVertexBufferBase);
@@ -517,7 +516,7 @@ namespace Engine::Render
 		DrawLine(lineVertices[3], lineVertices[0], color, entityID);
 	}
 
-    void Renderer2D::RenderDrawText(const std::wstring &text, const TRef<Texture2D> &fontAtlas, const std::unordered_map<uint32_t, GlyphMetrics> &glyphs, float x, float y, int FontSize, const TColor &color, int entityID)
+    void Renderer2D::RenderDrawText(const std::wstring &text, const TRef<Texture2D> &fontAtlas, const std::unordered_map<uint32_t, GlyphMetrics> &glyphs, float x, float y,float z, int FontSize, const TColor &color, int entityID)
     {
 		if (text.empty() || !fontAtlas) return;
 

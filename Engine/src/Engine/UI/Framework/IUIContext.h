@@ -12,8 +12,6 @@
 
 namespace Engine::UI 
 {
-
-    using namespace Engine;
     class UIContext : public std::enable_shared_from_this<UIContext>
     {
     public:
@@ -30,6 +28,12 @@ namespace Engine::UI
         // Root element management
         void SetRootWidget(TRef<UIElement> root);
         TRef<UIElement> GetRootWidget() const { return m_rootWidget; }
+        
+        void AddContextWidget(TRef<UIElement> Widget);
+
+        void AddOverlayWidget(TRef<UIElement> Widget);
+        void RemoveOverlayWidget(const TRef<UIElement>& Widget);
+        const std::vector<TRef<UIElement>>& GetOverlayWidgets() const { return m_overlayWidgets; }
 
         //Focus widget
 
@@ -54,6 +58,7 @@ namespace Engine::UI
 
         TRef<UIElement> m_rootWidget;
         std::vector<TRef<UIElement>> m_widgets;
+        std::vector<TRef<UIElement>> m_overlayWidgets;
     };
 
 

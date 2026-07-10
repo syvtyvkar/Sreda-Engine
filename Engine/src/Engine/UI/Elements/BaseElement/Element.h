@@ -10,6 +10,7 @@
 #include "Engine/UI/Elements/WidgetBaseElement/UIButton.h"
 #include "Engine/UI/Elements/WidgetBaseElement/UIImage.h"
 #include "Engine/UI/Elements/WidgetBaseElement/UIScrollBox.h"
+#include "Engine/UI/Elements/WidgetBaseElement/UIContextMenu.h"
 
 // Text
 #include "Engine/UI/Elements/WidgetBaseElement/UITextBlock.h"

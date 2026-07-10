@@ -26,7 +26,14 @@ namespace Engine::UI
     void UISredaContext::Render()
     {
         Renderer2D::BeginScene(m_ui_camera);
-        RenderUIElements(GetRootWidget());
+
+            for (auto& overlay : GetOverlayWidgets())
+            {
+                RenderUIElements(overlay);
+            }
+            
+            RenderUIElements(GetRootWidget());
+
         Renderer2D::EndScene();
     }
     void UISredaContext::Shutdown()
@@ -52,6 +59,19 @@ namespace Engine::UI
             {
                 if (button != InputKey::MouseLeft) return;
                 Vector2 mousePos = InputSystem::GetMousePosition();
+
+                for (auto it = GetOverlayWidgets().rbegin(); it != GetOverlayWidgets().rend(); ++it)
+                {
+                    auto hit = HitTest(*it, mousePos);
+                    if (hit)
+                    {
+                        hit->SetPressed(true);
+                        m_LastPressWidget = hit;
+                        hit->OnPressBegin().Broadcast();
+                        return;
+                    }
+                }
+
                 TRef<UIWidget> hit = HitTest(GetRootWidget(), mousePos);
 
                 if (hit.get() == nullptr) return;
@@ -93,9 +113,30 @@ namespace Engine::UI
                 {
                     m_LastPressWidget->SetPressed(false);
                     m_LastPressWidget->OnPressEnd().Broadcast();
-                    if (m_LastPressWidget == m_hoveredWidget)
+
+                    bool isOverlay = false;
+                    for (auto& overlay : GetOverlayWidgets())
                     {
-                        m_hoveredWidget->OnClick().Broadcast();
+                        if (m_LastPressWidget.get() == overlay.get())
+                        {
+                            isOverlay = true;
+                            break;
+                        }
+                        auto children = overlay->GetChildren();
+                        for (auto& child : children)
+                        {
+                            if (m_LastPressWidget.get() == child.get())
+                            {
+                                isOverlay = true;
+                                break;
+                            }
+                        }
+                        if (isOverlay) break;
+                    }
+
+                    if (isOverlay || m_LastPressWidget == m_hoveredWidget)
+                    {
+                        m_LastPressWidget->OnClick().Broadcast();
                     }
                     m_LastPressWidget.reset();
                 }
@@ -123,7 +164,13 @@ namespace Engine::UI
         for (auto it = root->GetChildren().rbegin(); it != root->GetChildren().rend(); ++it)
         {
             auto result = HitTest(*it, point);
-            if (result) return result;
+            if (result) 
+            {
+                if (result->IsVisible() && result->IsFocusable() && result->GetVisisbleMode() != UIVisibleMode::VisibleNoHit)
+                {
+                    return result;
+                }
+            }
         }
 
         if (root->ContainsPoint(point))
@@ -141,6 +188,26 @@ namespace Engine::UI
         if (mousePos.x == m_lastMousePos.x && mousePos.y == m_lastMousePos.y)
             return;
         m_lastMousePos = mousePos;
+
+        for (auto it = GetOverlayWidgets().rbegin(); it != GetOverlayWidgets().rend(); ++it)
+        {
+            auto result = HitTest(*it, mousePos);
+            if (result)
+            {
+                if (m_hoveredWidget != result)
+                {
+                    if (m_hoveredWidget)
+                    {
+                        m_hoveredWidget->SetHovered(false);
+                        m_hoveredWidget->OnHoverEnd().Broadcast();
+                    }
+                    m_hoveredWidget = result;
+                    m_hoveredWidget->SetHovered(true);
+                    m_hoveredWidget->OnHoverBegin().Broadcast();
+                }
+                return;
+            }
+        }
 
         TRef<UIWidget> newHovered = HitTest(GetRootWidget(), mousePos);
 

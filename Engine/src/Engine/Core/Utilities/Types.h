@@ -58,6 +58,7 @@ namespace Engine
         // Constructors
         Vector3() : x(0), y(0), z(0) {}
         Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
+        Vector3(float x, float y) : x(x), y(y), z(0.f) {}
         Vector3(float xyz) : x(xyz), y(xyz), z(xyz) {}
         Vector3(glm::vec3 glm) : x(glm.x), y(glm.y), z(glm.z) {}
         Vector3(const glm::vec4& v) : x(v.x), y(v.y), z(v.z) {}

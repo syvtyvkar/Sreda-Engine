@@ -43,8 +43,6 @@ namespace Engine::UI
         DOnUILineEditTextCommitted& OnTextCommitted() { return m_onTextCommitted; }
 
     private:
-        enum class ContextMenuAction { Cut, Copy, Paste, Delete, SelectAll, Count };
-
         void UpdateTextInternal();
         void HandleKeyInput();
         void HandleCharInput(uint32_t codepoint);
@@ -69,9 +67,6 @@ namespace Engine::UI
         void PasteText();
 
         void ShowContextMenu();
-        void HideContextMenu();
-        void DrawContextMenu();
-        void HandleContextMenuInput();
         void SelectWordAtCursor();
         void HandleMouseClick(const Vector2& mousePos);
 
@@ -100,12 +95,6 @@ namespace Engine::UI
         Engine::DelegateHandle m_charInputHandle;
         DOnUILineEditTextChanged m_onTextChanged;
         DOnUILineEditTextCommitted m_onTextCommitted;
-
-        bool m_contextMenuVisible = false;
-        Vector2 m_contextMenuPos;
-        int m_contextMenuHoverIndex = -1;
-        float m_contextMenuWidth = 170.0f;
-        float m_contextMenuItemHeight = 26.0f;
 
         bool m_draggingSelection = false;
         bool m_wasDrag = false;

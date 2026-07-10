@@ -17,6 +17,7 @@ namespace Engine::UI
         m_text = text;
         m_font = FontManager::GetFontManager().AddFont(InFontName);
         SetText(text);
+        SetFocusable(true);
     }
 
     Vector2 UIButton::GetComputedSize() const
@@ -44,14 +45,17 @@ namespace Engine::UI
             float textX = pos.x /*+ size.x * 0.5f*/ /*+ 4.0f*/;
             float textY = pos.y + size.y * 0.5f + 6.0f;
 
-            Renderer2D::DrawQuad({pos.x + (size.x*0.5f) - ((GetPadding().left + GetPadding().right)/2.f), pos.y + (size.y/2.f)}, size, IsPressed() ? PressButtonColor : (IsHovered() ? HoverButtonColor : NormalButtonColor));
-            Renderer2D::DrawRect({ pos.x + (size.x*0.5f) - ((GetPadding().left + GetPadding().right)/2.f), pos.y + (size.y/2.f), 0.0f }, size, TColor(120,120,120,255));
+            float quadX = pos.x + (size.x*0.5f) - ((GetPadding().left + GetPadding().right)/2.f);
+            float quadY = pos.y + (size.y/2.f);
+
+            Renderer2D::DrawQuad(Vector2(quadX, quadY), size, IsPressed() ? PressButtonColor : (IsHovered() ? HoverButtonColor : NormalButtonColor));
+            Renderer2D::DrawRect(Vector3(quadX, quadY, 0.0f), size, TColor(120,120,120,255));
 
             Renderer2D::RenderDrawText(
                 std::wstring(m_text.begin(), m_text.end()),
                 m_font.get()->GetAtlasTexture(),
                 m_font.get()->GetGlyphs(),
-                textX + 1.f, textY + 1.f, 
+                textX + 1.f, textY + 1.f, GetDepthZ(),
                 GetFontSize(),
                 TColor::Black
             );
@@ -60,7 +64,7 @@ namespace Engine::UI
                 std::wstring(m_text.begin(), m_text.end()),
                 m_font.get()->GetAtlasTexture(),
                 m_font.get()->GetGlyphs(),
-                textX, textY, 
+                textX, textY, GetDepthZ(),
                 GetFontSize(),
                 TextColor
             );

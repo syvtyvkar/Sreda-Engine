@@ -19,6 +19,15 @@ namespace Engine
 {
     ADD_DELEGATE_ONE_PARAM(DOnAppUpdFrameDelta, float)
     ADD_DELEGATE(DOnAppUpdFrame)
+
+    class EngineSystem
+    {
+        virtual ~EngineSystem() = default;
+
+        virtual void Init() = 0;
+        virtual void DeInit() = 0;
+
+    };
     
     struct EngineContext
     {  
@@ -27,7 +36,7 @@ namespace Engine
         Engine::Time::TimeSystem* GetTimeSystem() {return m_TimeSystem.get();}
         EngineConfig::ConfigSystem* GetConfigSystem() {return m_ConfigSystem.get();}
         IVirtualFileSystem* GetVFS() {return m_VFS.get();}
-        CommandLine* GetEngineCommandLine() {return m_CommandLine.get();}
+         CommandLine* GetEngineCommandLine() {return m_CommandLine.get();}
         WindowManager* GetWindowManager() {return m_WindowManager.get();}
         Engine::UI::UISystem* GetUISystem() {return m_UISystem.get();}
         Engine::InputSystem* GetInputSystem() {return m_InputSystem.get();}

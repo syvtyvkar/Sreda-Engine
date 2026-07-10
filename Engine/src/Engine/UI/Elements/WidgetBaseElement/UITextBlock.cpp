@@ -35,7 +35,7 @@ namespace Engine::UI
                 std::wstring(m_text.begin(), m_text.end()),
                 m_font.get()->GetAtlasTexture(),
                 m_font.get()->GetGlyphs(),
-                textX, textY, GetFontSize(), TextColor
+                textX, textY,GetDepthZ(), GetFontSize(), TextColor
             );
         }
     }

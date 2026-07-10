@@ -72,7 +72,7 @@ namespace Engine::UI
                 std::wstring(m_tabText.begin(), m_tabText.end()),
                 font->GetAtlasTexture(),
                 font->GetGlyphs(),
-                pos.x + 8.0f, pos.y + size.y * 0.5f + 6.0f,
+                pos.x + 8.0f, pos.y + size.y * 0.5f + 6.0f,GetDepthZ(),
                 9, 
                 TColor(220, 220, 220, 255));
         }
@@ -98,7 +98,7 @@ namespace Engine::UI
                 std::wstring(L"\u00D7"),
                 font->GetAtlasTexture(),
                 font->GetGlyphs(),
-                cx + 2.0f, cy + 2.0f,
+                cx + 2.0f, cy + 2.0f,GetDepthZ(),
                 9, closeColor);
         }
     }

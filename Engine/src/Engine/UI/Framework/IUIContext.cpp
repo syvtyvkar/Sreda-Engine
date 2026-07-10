@@ -39,6 +39,24 @@ namespace Engine::UI
         m_rootWidget = root;
         m_rootWidget.get()->m_ui_context=shared_from_this();
     }
+    void UIContext::AddContextWidget(TRef<UIElement> Widget)
+    {
+        Widget.get()->m_ui_context=shared_from_this();
+    }
+    void UIContext::AddOverlayWidget(TRef<UIElement> Widget)
+    {
+        if (Widget)
+        {
+            Widget.get()->m_ui_context = shared_from_this();
+            m_overlayWidgets.push_back(Widget);
+        }
+    }
+    void UIContext::RemoveOverlayWidget(const TRef<UIElement>& Widget)
+    {
+        auto it = std::find(m_overlayWidgets.begin(), m_overlayWidgets.end(), Widget);
+        if (it != m_overlayWidgets.end())
+            m_overlayWidgets.erase(it);
+    }
     void UIContext::RenderUIElements(TRef<UIElement> element)
     {
         if (element && element->IsVisible())

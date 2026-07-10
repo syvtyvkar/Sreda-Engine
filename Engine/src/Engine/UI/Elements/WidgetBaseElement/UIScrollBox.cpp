@@ -212,7 +212,7 @@ namespace Engine::UI
         float barY = pos.y;
         float barH = size.y;
 
-        Renderer2D::DrawQuad({ barX + sbWidth * 0.5f, barY + barH * 0.5f }, { sbWidth, barH }, m_scrollbarBgColor);
+        Renderer2D::DrawQuad(Vector2(barX + sbWidth * 0.5f, barY + barH * 0.5f), Vector2(sbWidth, barH), m_scrollbarBgColor);
 
         float contentH = m_contentSize.y;
         float viewH = size.y;
@@ -225,7 +225,7 @@ namespace Engine::UI
         }
 
         TColor thumbColor = m_hoveringVertical ? m_scrollbarThumbHoverColor : m_scrollbarThumbColor;
-        Renderer2D::DrawQuad({ barX + sbWidth * 0.5f, thumbY + thumbHeight * 0.5f }, { sbWidth, thumbHeight }, thumbColor);
+        Renderer2D::DrawQuad(Vector2(barX + sbWidth * 0.5f, thumbY + thumbHeight * 0.5f), Vector2(sbWidth, thumbHeight), thumbColor);
     }
 
     void UIScrollBox::DrawScrollbarHorizontal()
@@ -238,7 +238,7 @@ namespace Engine::UI
         float barY = pos.y + size.y - sbWidth;
         float barW = size.x;
 
-        Renderer2D::DrawQuad({ barX + barW * 0.5f, barY + sbWidth * 0.5f }, { barW, sbWidth }, m_scrollbarBgColor);
+        Renderer2D::DrawQuad(Vector2(barX + barW * 0.5f, barY + sbWidth * 0.5f), Vector2(barW, sbWidth), m_scrollbarBgColor);
 
         float contentW = m_contentSize.x;
         float viewW = size.x;
@@ -251,7 +251,7 @@ namespace Engine::UI
         }
 
         TColor thumbColor = m_hoveringHorizontal ? m_scrollbarThumbHoverColor : m_scrollbarThumbColor;
-        Renderer2D::DrawQuad({ thumbX + thumbWidth * 0.5f, barY + sbWidth * 0.5f }, { thumbWidth, sbWidth }, thumbColor);
+        Renderer2D::DrawQuad(Vector2(thumbX + thumbWidth * 0.5f, barY + sbWidth * 0.5f), Vector2(thumbWidth, sbWidth), thumbColor);
     }
 
     bool UIScrollBox::IsMouseOverScrollbarVertical(const Vector2& mousePos)

@@ -9,33 +9,28 @@ namespace Engine::UI
 {
     void UISystem::ToggleDebugger()
     {
-
     }
 
-    bool UISystem::AddButtonContext(std::string InNameButton, DOnUIWidgetClick& Handle)
+    void UISystem::ShowContextMenu(const Vector2& InPosition, std::function<void(ContextMenuItemBuilder&)> InBuildFunc)
     {
         if (m_contextMenu)
         {
-            //Handle = m_contextMenu.get()->AddButtonContext(InNameButton);
-            return true;
-        }
-        return false;
-    }
-
-    void UISystem::RemoveButtonContext(std::string InNameButton)
-    {
-        if (m_contextMenu)
-        {
-            return m_contextMenu.get()->RemoveButtonContext(InNameButton);
+            m_contextMenu->ShowAt(InPosition, InBuildFunc);
         }
     }
 
-    void UISystem::ClearAllButton()
+    void UISystem::HideContextMenu()
     {
         if (m_contextMenu)
         {
-            return m_contextMenu.get()->ClearAllButton();
+            m_contextMenu->Hide();
         }
+    }
+
+    bool UISystem::IsContextMenuOpen() const
+    {
+        //return false;
+        return m_contextMenu ? m_contextMenu->IsOpen() : false;
     }
 
     void UISystem::CallOnWinCreate(IWindow *InWin, WindowContext InWinContext)
@@ -48,14 +43,23 @@ namespace Engine::UI
         DestroyContextFromWindowContext(InWinContext);
     }
 
+    void UISystem::CheckContextMenu(WindowContext InWinContext)
+    {
+        if (m_contextMenu == nullptr)
+        {
+            m_contextMenu = CreateRef<UIContextMenu>();
+            m_contextMenu->OnInit();
+
+            UIContext* ctx = GetContextFromWindowContext(InWinContext);
+            if (ctx)
+            {
+                ctx->AddOverlayWidget(m_contextMenu);
+            }
+        }
+    }
+
     bool UISystem::Initialize()
     {
-        /*if (!CreateContext())
-        {
-            return false;
-        }*/
-        m_contextMenu = CreateUniquePtr<UIContextMenu>();
-
         m_DH_OnWinCreate = Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinCreate().Subscribe(this, &UISystem::CallOnWinCreate);
         m_DH_OnWinDestroy = Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinDestroy().Subscribe(this, &UISystem::CallOnWinDestroy);
 
@@ -66,13 +70,12 @@ namespace Engine::UI
     {
         if (m_contextMenu)
         {
-            m_contextMenu.get()->ClearAllButton();
+            m_contextMenu->Hide();
             m_contextMenu.reset();
         }
         Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinCreate().Unsubscribe(m_DH_OnWinCreate);
         Engine::EngineCore::GetEngineContext().GetWindowManager()->OnWinDestroy().Unsubscribe(m_DH_OnWinDestroy);
         m_ui_contexts.clear();
-        //DestroyContext();
     }
     
     void UISystem::Update(float DeltaTime)
@@ -82,9 +85,9 @@ namespace Engine::UI
             if (!LVal) continue;
             LVal.get()->Update(DeltaTime);
         }
-        if (m_contextMenu.get())
+        if (m_contextMenu)
         {
-            m_contextMenu.get()->OnUpdate(DeltaTime);
+            m_contextMenu->OnUpdate(DeltaTime);
         }
     }
 
@@ -95,10 +98,7 @@ namespace Engine::UI
             if (!LVal) continue;
             LVal.get()->Render();
         }
-        if (m_contextMenu.get())
-        {
-            m_contextMenu.get()->OnRender();
-        }
+        
     }
 
     void UISystem::BeginFrame()
@@ -126,6 +126,8 @@ namespace Engine::UI
         LUIContext.get()->InitContext(InContext);
 
         m_ui_contexts.insert({InContext, std::move(LUIContext)});
+
+        CheckContextMenu(InContext);
     }
 
     UIContext *UISystem::GetContextFromWindowContext(WindowContext InContext)
@@ -144,11 +146,13 @@ namespace Engine::UI
         m_ui_contexts.erase(InContext);
     }
 
-    void UISystem::RegisterWidget(WindowContext InWinContext,TRef<UIElement> widget)
+    void UISystem::RegisterWidget(WindowContext InWinContext, TRef<UIElement> widget)
     {
         if (widget.get() == nullptr) return;
 
         UIContext* LCntxt = GetContextFromWindowContext(InWinContext);
+
+        CheckContextMenu(InWinContext);
 
         if (LCntxt)
         {
@@ -156,7 +160,7 @@ namespace Engine::UI
         }
     }
 
-    void UISystem::RemoveWidget(WindowContext InWinContext,const TRef<UIElement> &widget)
+    void UISystem::RemoveWidget(WindowContext InWinContext, const TRef<UIElement> &widget)
     {
         if (widget.get() == nullptr) return;
 
@@ -167,6 +171,7 @@ namespace Engine::UI
             LCntxt->RemoveWidget(widget);
         }
     }
+
     UIWidget *UISystem::GetFocusWidget(WindowContext InWinContext)
     {
         UIContext* LCntxt = GetContextFromWindowContext(InWinContext);
@@ -177,7 +182,7 @@ namespace Engine::UI
         return nullptr;
     }
 
-    void UISystem::SetFocusWidget(WindowContext InWinContext,TRef<UIWidget> InNewFocus)
+    void UISystem::SetFocusWidget(WindowContext InWinContext, TRef<UIWidget> InNewFocus)
     {
         UIContext* LCntxt = GetContextFromWindowContext(InWinContext);
         if (LCntxt)
@@ -196,7 +201,7 @@ namespace Engine::UI
         return nullptr;
     }
 
-    void UISystem::SetHoverWidget(WindowContext InWinContext,TRef<UIWidget> InNewHover)
+    void UISystem::SetHoverWidget(WindowContext InWinContext, TRef<UIWidget> InNewHover)
     {
         UIContext* LCntxt = GetContextFromWindowContext(InWinContext);
         if (LCntxt)

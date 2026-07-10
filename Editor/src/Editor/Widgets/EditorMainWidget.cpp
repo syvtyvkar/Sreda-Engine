@@ -95,8 +95,6 @@ void EditorMainWidget::OnRender()
     Vector2 size = GetComputedSize();
     TColor color = TColor::Green;
 
-    //Renderer2D::DrawQuad(pos + size * 0.5f, size, color);
-
     UIWidget::OnRender();
 }
 

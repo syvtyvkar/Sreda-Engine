@@ -4,7 +4,6 @@
 
 #include <Engine.h>
 #include "Engine/UI/Framework/UIWidget.h"
-#include "Engine/UI/Elements/WidgetBaseElement/UIContextMenu.h"
 
 class EditorMainMenuBar : public HorizontalBox
 {
@@ -14,4 +13,10 @@ public:
 
     virtual void OnInit() override;
     virtual void OnRender() override;
+
+    void OnCLickFile();
+    void OnCLickEdit();
+    void OnCLickHelp();
+
+    void OnClickDocumentation();
 };

@@ -99,6 +99,11 @@ namespace Engine::UI
         float x = m_padding.left;
         for (auto& child : m_children)
         {
+            x = x + child->GetPadding().left;
+            break;
+        }
+        for (auto& child : m_children)
+        {
             child->SetPosition({ x, (float)m_padding.top });
 
             if (child->GetHorizontalAlignment() == UIHorizontalAlignment::Stretch)

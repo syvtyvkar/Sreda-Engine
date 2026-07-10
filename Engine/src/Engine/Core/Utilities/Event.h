@@ -114,7 +114,6 @@ namespace Engine
             return Subscribe([object, method](Args... args) { (object->*method)(args...); });
         }
 
-        // Подписка на константный метод-член с сигнатурой void(Args...) const
         template<typename T>
         DelegateHandle Subscribe(const T* object, void (T::*method)(Args...) const)
         {

@@ -2,23 +2,17 @@
 #include <windows.h>
 
 #include "UILineEdit.h"
+#include "Engine/UI/Elements/WidgetBaseElement/UIContextMenu.h"
 #include "Engine/Render/Renderer2D.h"
 #include "Engine/Render/RenderCommand.h"
 #include "Engine/Input/Input.h"
 #include "Engine/Core/App/Application.h"
+#include "Engine/Core/Base/EngineCore.h"
 #include <algorithm>
 
 namespace Engine::UI
 {
     using namespace Engine::Render;
-
-    static const char* ContextMenuLabels[] = {
-        "Cut",
-        "Copy",
-        "Paste",
-        "Delete",
-        "Select All"
-    };
 
     UILineEdit::UILineEdit(const std::string& InFontName)
     {
@@ -34,14 +28,8 @@ namespace Engine::UI
     {
         if (!IsVisible()) return;
 
-        if (m_contextMenuVisible)
-        {
-            DrawContextMenu();
-        }
-
         DrawTextContent();
         DrawControl();
-       // DrawTextContent();
 
         UIWidget::OnRender();
     }
@@ -53,14 +41,11 @@ namespace Engine::UI
         UpdateCursorBlink(deltaTime);
         m_timeSinceLastClick += deltaTime;
 
+        if (EngineCore::GetEngineContext().GetUISystem()->IsContextMenuOpen())
+            return;
+
         Vector2 mousePos = InputSystem::GetMousePosition();
         bool overWidget = ContainsPoint(mousePos);
-
-        if (m_contextMenuVisible)
-        {
-            HandleContextMenuInput();
-            return;
-        }
 
         if (InputSystem::IsMouseButtonJustPressed(InputKey::MouseRight) && overWidget)
         {
@@ -184,10 +169,6 @@ namespace Engine::UI
         m_cursorVisible = false;
         m_selectionStart = -1;
         m_selectionEnd = -1;
-        if (m_contextMenuVisible)
-        {
-            HideContextMenu();
-        }
         if (!m_text.empty())
         {
             m_onTextCommitted.Broadcast(m_text);
@@ -298,7 +279,7 @@ namespace Engine::UI
         float cursorY = pos.y + m_padding.top + 2.0f;
         float cursorH = size.y - m_padding.top - m_padding.bottom - 4.0f;
 
-        Renderer2D::DrawQuad({ cursorX, cursorY + cursorH * 0.5f }, { 1.5f, cursorH }, m_CursorColor);
+        Renderer2D::DrawQuad(Vector2( cursorX, cursorY + cursorH * 0.5f), Vector2( 1.5f, cursorH), m_CursorColor);
     }
 
     void UILineEdit::DrawSelection()
@@ -335,7 +316,7 @@ namespace Engine::UI
                 float selY = pos.y + m_padding.top + 2.0f;
                 float selH = size.y - m_padding.top - m_padding.bottom - 4.0f;
 
-                Renderer2D::DrawQuad({ selX + advance * 0.5f, selY + selH * 0.5f }, { advance, selH }, m_SelectionColor);
+                Renderer2D::DrawQuad(Vector2( selX + advance * 0.5f, selY + selH * 0.5f), Vector2( advance, selH), m_SelectionColor);
             }
 
             x += advance;
@@ -347,7 +328,7 @@ namespace Engine::UI
             float selY = pos.y + m_padding.top + 2.0f;
             float selH = size.y - m_padding.top - m_padding.bottom - 4.0f;
             float endAdvance = (m_FontSize / 48.0f) * 8.0f;
-            Renderer2D::DrawQuad({ selX + endAdvance * 0.5f, selY + selH * 0.5f }, { endAdvance, selH }, m_SelectionColor);
+            Renderer2D::DrawQuad(Vector2( selX + endAdvance * 0.5f, selY + selH * 0.5f), Vector2(endAdvance, selH), m_SelectionColor);
         }
     }
 
@@ -367,13 +348,13 @@ namespace Engine::UI
             std::wstring wplaceholder(m_placeholderText.begin(), m_placeholderText.end());
             float textX = pos.x + m_padding.left - m_scrollOffset;
             float textY = pos.y + m_padding.top + m_FontSize * 0.85f;
-            Renderer2D::RenderDrawText(wplaceholder, m_font->GetAtlasTexture(), m_font->GetGlyphs(), textX, textY, m_FontSize, m_PlaceholderColor);
+            Renderer2D::RenderDrawText(wplaceholder, m_font->GetAtlasTexture(), m_font->GetGlyphs(), textX, textY,GetDepthZ(), m_FontSize, m_PlaceholderColor);
         }
         else if (!m_wtext.empty())
         {
             float textX = pos.x + m_padding.left - m_scrollOffset;
             float textY = pos.y + m_padding.top + m_FontSize * 0.85f;
-            Renderer2D::RenderDrawText(m_wtext, m_font->GetAtlasTexture(), m_font->GetGlyphs(), textX, textY, m_FontSize, m_TextColor);
+            Renderer2D::RenderDrawText(m_wtext, m_font->GetAtlasTexture(), m_font->GetGlyphs(), textX, textY,GetDepthZ(), m_FontSize, m_TextColor);
         }
 
         RenderCommand::EnableScissor(false);
@@ -685,129 +666,20 @@ namespace Engine::UI
     void UILineEdit::ShowContextMenu()
     {
         Vector2 mousePos = InputSystem::GetMousePosition();
-        m_contextMenuPos = mousePos;
+        UILineEdit* self = this;
 
-        ENGINE_ASSERT(GetUIContext(), "No valid UIContext!");
-        IWindow* LWin = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(GetUIContext().get()->GetWindowContext());
-        ENGINE_ASSERT(LWin, "Error init EditorMainWidget. No valid window!");
-
-        int windowW = LWin->GetWidth();
-        int windowH = LWin->GetHeight();
-        float menuH = (int)ContextMenuAction::Count * m_contextMenuItemHeight + 4.0f;
-
-        if (m_contextMenuPos.x + m_contextMenuWidth > (float)windowW)
-            m_contextMenuPos.x = (float)windowW - m_contextMenuWidth - 4.0f;
-        if (m_contextMenuPos.x < 0.0f)
-            m_contextMenuPos.x = 4.0f;
-        if (m_contextMenuPos.y + menuH > (float)windowH)
-            m_contextMenuPos.y = (float)windowH - menuH - 4.0f;
-        if (m_contextMenuPos.y < 0.0f)
-            m_contextMenuPos.y = 4.0f;
-
-        m_contextMenuVisible = true;
-        m_contextMenuHoverIndex = -1;
-    }
-
-    void UILineEdit::HideContextMenu()
-    {
-        m_contextMenuVisible = false;
-        m_contextMenuHoverIndex = -1;
-    }
-
-    void UILineEdit::DrawContextMenu()
-    {
-        if (!m_contextMenuVisible) return;
-
-        float menuW = m_contextMenuWidth;
-        float itemH = m_contextMenuItemHeight;
-        int itemCount = (int)ContextMenuAction::Count;
-        float menuH = itemCount * itemH + 4.0f;
-
-        Vector2 bgPos = m_contextMenuPos + Vector2(menuW * 0.5f, menuH * 0.5f);
-        //Renderer2D::DrawQuad(bgPos, { menuW, menuH }, TColor(45, 45, 48, 240));
-       // Renderer2D::DrawRect({ bgPos.x, bgPos.y, 0.0f }, { menuW, menuH }, TColor(100, 100, 100, 255));
-
-        for (int i = 0; i < itemCount; i++)
-        {
-            float itemY = m_contextMenuPos.y + 2.0f + i * itemH;
-
-            if (i == m_contextMenuHoverIndex)
-            {
-                Renderer2D::DrawQuad(
-                    { m_contextMenuPos.x + menuW * 0.5f, itemY + itemH * 0.5f },
-                    { menuW - 2.0f, itemH },
-                    TColor(70, 70, 75, 255));
+        EngineCore::GetEngineContext().GetUISystem()->ShowContextMenu(
+            mousePos,
+            [self](ContextMenuItemBuilder& builder) {
+                builder.AddItem("Cut", [self]() { self->CutSelection(); }, self->HasSelection())
+                       .AddItem("Copy", [self]() { self->CopySelection(); }, self->HasSelection())
+                       .AddItem("Paste", [self]() { self->PasteText(); })
+                       //.AddSeparator()
+                       .AddItem("Delete", [self]() { self->DeleteSelection(); }, self->HasSelection())
+                       //.AddSeparator()
+                       .AddItem("Select All", [self]() { self->SelectAll(); });
             }
-
-            std::string label = ContextMenuLabels[i];
-            std::wstring wlabel(label.begin(), label.end());
-            float textX = m_contextMenuPos.x + 8.0f;
-            float textY = itemY + itemH * 0.5f + 4.0f;
-            Renderer2D::RenderDrawText(wlabel, m_font->GetAtlasTexture(), m_font->GetGlyphs(),
-                textX, textY, 14, TColor(220, 220, 220, 255));
-        }
-
-        Renderer2D::DrawQuad(bgPos, { menuW, menuH }, TColor(45, 45, 48, 240));
-        Renderer2D::DrawRect({ bgPos.x, bgPos.y, 0.0f }, { menuW, menuH }, TColor(100, 100, 100, 255));
-    }
-
-    void UILineEdit::HandleContextMenuInput()
-    {
-        Vector2 mousePos = InputSystem::GetMousePosition();
-
-        float menuW = m_contextMenuWidth;
-        float itemH = m_contextMenuItemHeight;
-        int itemCount = (int)ContextMenuAction::Count;
-        float menuH = itemCount * itemH + 4.0f;
-
-        bool overMenu = mousePos.x >= m_contextMenuPos.x &&
-                        mousePos.x <= m_contextMenuPos.x + menuW &&
-                        mousePos.y >= m_contextMenuPos.y &&
-                        mousePos.y <= m_contextMenuPos.y + menuH;
-
-        if (overMenu)
-        {
-            int hoverIndex = (int)((mousePos.y - m_contextMenuPos.y - 2.0f) / itemH);
-            if (hoverIndex >= 0 && hoverIndex < itemCount)
-            {
-                m_contextMenuHoverIndex = hoverIndex;
-            }
-            else
-            {
-                m_contextMenuHoverIndex = -1;
-            }
-        }
-        else
-        {
-            m_contextMenuHoverIndex = -1;
-        }
-
-        if (InputSystem::IsMouseButtonJustPressed(InputKey::MouseLeft))
-        {
-            if (overMenu && m_contextMenuHoverIndex >= 0)
-            {
-                ContextMenuAction action = (ContextMenuAction)m_contextMenuHoverIndex;
-                switch (action)
-                {
-                    case ContextMenuAction::Cut: CutSelection(); break;
-                    case ContextMenuAction::Copy: CopySelection(); break;
-                    case ContextMenuAction::Paste: PasteText(); break;
-                    case ContextMenuAction::Delete: DeleteSelection(); break;
-                    case ContextMenuAction::SelectAll: SelectAll(); break;
-                    default: break;
-                }
-            }
-            HideContextMenu();
-        }
-        else if (InputSystem::IsMouseButtonJustPressed(InputKey::MouseRight))
-        {
-        //    HideContextMenu();
-        }
-
-       // if (InputSystem::IsKeyJustPressed(InputKey::Escape))
-       // {
-       //     HideContextMenu();
-       // }
+        );
     }
 
     void UILineEdit::SelectWordAtCursor()

@@ -33,25 +33,22 @@ namespace Engine::UI
         UIContext* GetContextFromWindowContext(WindowContext InContext);
         void DestroyContextFromWindowContext(WindowContext InContext);
 
-        // UI Element Management
-        void RegisterWidget(WindowContext InWinContext,TRef<UIElement> widget);
-        void RemoveWidget(WindowContext InWinContext,const TRef<UIElement>& widget);
+        void RegisterWidget(WindowContext InWinContext, TRef<UIElement> widget);
+        void RemoveWidget(WindowContext InWinContext, const TRef<UIElement>& widget);
 
-        //Focus system
         UIWidget* GetFocusWidget(WindowContext InWinContext);
-        void SetFocusWidget(WindowContext InWinContext,TRef<UIWidget> InNewFocus);
+        void SetFocusWidget(WindowContext InWinContext, TRef<UIWidget> InNewFocus);
         UIWidget* GetHoverWidget(WindowContext InWinContext);
         void SetHoverWidget(WindowContext InWinContext, TRef<UIWidget> InNewHover);
         
-        // Debug
         void ToggleDebugger();
 
-        // ContextMenu
-        bool AddButtonContext(std::string InNameButton, DOnUIWidgetClick& Handle);
-        void RemoveButtonContext(std::string InNameButton);
-        void ClearAllButton();
+        void ShowContextMenu(const Vector2& InPosition, std::function<void(ContextMenuItemBuilder&)> InBuildFunc);
+        void HideContextMenu();
+        bool IsContextMenuOpen() const;
+
     private:
-        TUniquePtr<UIContextMenu> m_contextMenu;
+        TRef<UIContextMenu> m_contextMenu;
 
         //Delegate
         Engine::DelegateHandle m_DH_OnWinCreate;
@@ -59,7 +56,7 @@ namespace Engine::UI
 
         unordered_map<WindowContext,TRef<UIContext>, WindowContextHash> m_ui_contexts; 
 
-
+        void CheckContextMenu(WindowContext InWinContext);
         void CallOnWinCreate(IWindow* InWin, WindowContext InWinContext);
         void CallOnWinDestroy(IWindow* InWin, WindowContext InWinContext);
     };

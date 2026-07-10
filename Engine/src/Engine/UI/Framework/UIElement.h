@@ -55,7 +55,11 @@ namespace Engine::UI
         std::vector<TRef<UIElement>>& GetChildren() { return m_children; }
 
         virtual bool IsVisible() const { return m_visible == UIVisibleMode::Visible || m_visible == UIVisibleMode::VisibleNoHit; }
+        virtual bool GetVisisbleMode() const { return m_visible; }
         void SetVisible(UIVisibleMode visible) { m_visible = visible; }
+
+        virtual bool IsFocusable() const { return bIsFocusable; }
+        void SetFocusable(bool InFocusable) { bIsFocusable = InFocusable; }
 
         bool ContainsPoint(const Vector2& point) const;
         Vector2 GetAbsolutePosition() const { return GetComputedPosition(); }
@@ -63,6 +67,8 @@ namespace Engine::UI
         TRef<UIElement> GetParent() const { return m_parent.lock(); }
 
         TRef<class UIContext> GetUIContext() {return m_ui_context.lock();}
+
+        float GetDepthZ() {return DepthZ;}
 
     protected:
         std::vector<TRef<UIElement>> m_children;
@@ -78,5 +84,7 @@ namespace Engine::UI
         UIPadding m_padding;
         UIHorizontalAlignment m_hAlignment = UIHorizontalAlignment::Left;
         UIVerticalAlignment m_vAlignment = UIVerticalAlignment::Top;
+        bool bIsFocusable = false;
+        float DepthZ=0.f;
     };
 }

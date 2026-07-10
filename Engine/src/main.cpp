@@ -1,25 +1,24 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#include "Engine/Core/App/Application.h"    // Заголовочный файл приложения
-#include "BaseEngine.h"                     // Базовые зависимости движка
-#include <string>                           // Для работы с строками
-/* 
-* Точка входа
-*/
+#include "Engine/Core/App/Application.h"
+//#include "BaseEngine.h"
+#include "Engine/Core/Utilities/Types.h"
+#include "Engine/Core/Base/EngineCore.h"
+#include <string>
 
 int main(int argc, char **argv)
 {
+    Engine::TRef<Engine::EngineCore> Engine = Engine::CreateRef<Engine::EngineCore>();
+    if (!Engine) return -1;
     try
     {
-        TRef<Engine::EngineCore> Engine = CreateRef<EngineCore>();
-        if (!Engine) return -1;
         Engine.get()->PreInit(argc, argv);
         Engine.get()->Init();
-        TRef<Engine::Application> App = Engine::Application::CreateNewApplication();    // Создаем приложение
-        App->RunApp(Engine);                                                            // Запуск приложения
-        App.reset();                                                                    // Закрытие приложения
+        Engine::TRef<Engine::Application> App = Engine::Application::CreateNewApplication();
+        App->RunApp(Engine);
+        App.reset();
         Engine.get()->Shotdown();
-        ENGINE_LOG_INFO("Process close.");                                               // Оповещаем, что приложение завершено
+        ENGINE_LOG_INFO("Process close.");
     }
     catch (const std::exception& e)
     {
