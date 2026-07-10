@@ -1,6 +1,12 @@
 # Build files
 build/*
 
+# Vulkan (WIP)
+Engine/src/Platform/RenderAPI/Vulkan/*
+
+# Other project
+Game/*
+
 # vcpkg installed
 vcpkg_installed/*
 

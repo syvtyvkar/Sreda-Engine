@@ -3,7 +3,7 @@
     {
         "version": "0.0.1",
         "WindowAPI": "GLFW",
-        "RenderAPI": "Vulkan"
+        "RenderAPI": "OpenGL"
     },
     "window":
     {

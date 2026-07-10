@@ -49,7 +49,7 @@ namespace Engine
 
         if (InConfigWindow.widget)
         {
-            EngineCore::GetEngineContext().GetUISystem()->GetContextFromWindowContext(LResultContext.cntx)->RegisterWidget(InConfigWindow.widget);
+            EngineCore::GetEngineContext().GetUISystem()->RegisterWidget(LResultContext.cntx, InConfigWindow.widget);
             EngineCore::GetEngineContext().GetUISystem()->GetContextFromWindowContext(LResultContext.cntx)->GetRootWidget()->OnInit();
         }
 

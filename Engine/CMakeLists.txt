@@ -7,6 +7,15 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 project(Engine VERSION 1.0.0 LANGUAGES CXX C)
 
+add_subdirectory(external/glfw)
+add_subdirectory(external/glad)
+add_subdirectory(external/stb_image)
+add_subdirectory(external/glm)
+add_subdirectory(external/spdlog)
+add_subdirectory(external/nlohmann_json)
+#add_subdirectory(external/freetype)
+add_subdirectory(external/msdf-atlas-gen)
+
 cmake_policy(SET CMP0072 NEW)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -21,60 +30,37 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR}/Engine/Bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Engine/Bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Engine/lib)
 
+set({VCPKG_ROOT} ${CMAKE_CURRENT_SOURCE_DIR}/Engine/external/vcpkg)
+
 # Поиск пакетов
-find_package(OpenGL REQUIRED)
-find_package(msdfgen CONFIG REQUIRED)
-find_package(Freetype REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(unofficial-shaderc CONFIG QUIET)
+find_package(Freetype REQUIRED)
 
 # Исполняемый файл
 file(GLOB_RECURSE MY_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-set(GLAD_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/glad.c")
 set(SHADER_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
 set(SHADER_BINARY_DIR "${CMAKE_BINARY_DIR}/../Resources")
 
-#add_executable(Engine 
-#    ${MY_SOURCE}
-#    ${GLAD_SOURCE}
-#)
+add_library(Engine STATIC ${MY_SOURCE})
 
-add_library(Engine STATIC
-            ${MY_SOURCE}
-            ${GLAD_SOURCE})
-
-if(MSVC)
-    set_source_files_properties(external/glad/src/glad.c PROPERTIES 
-        COMPILE_FLAGS "/TC"
-    )
-endif()
-
-#### msdfgen
-
-target_link_libraries(Engine PRIVATE msdfgen::msdfgen freetype)
-target_compile_definitions(Engine PRIVATE MSDFGEN_STATIC)
-
-######
 
 target_include_directories(Engine PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/stb_image
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/msdf-atlas-gen
 )
 
 target_link_libraries(Engine PRIVATE
-    OpenGL::GL
-    glfw
-    glm::glm
+    glm
+    #freetype
     Freetype::Freetype
     Vulkan::Vulkan
+    glad
+    spdlog
+    nlohmann_json
+    stb_image
+    msdf-atlas-gen
 )
 
 if(unofficial-shaderc_FOUND)
@@ -82,23 +68,11 @@ if(unofficial-shaderc_FOUND)
     target_compile_definitions(Engine PRIVATE ENGINE_HAS_SHADERC)
 endif()
 
-add_library(glad STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/glad.c
-)
-
-target_include_directories(glad PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include
-)
-if(MSVC)
-    set_source_files_properties(${GLAD_SOURCE} PROPERTIES COMPILE_FLAGS "/TC")
-endif()
-
 
 target_link_libraries(Engine PUBLIC
-    OpenGL::GL
     glfw
-    glm::glm
-    spdlog::spdlog_header_only
+    glm
+    spdlog
     nlohmann_json::nlohmann_json
     glad
 )

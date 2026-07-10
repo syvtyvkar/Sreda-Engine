@@ -148,6 +148,8 @@ namespace Engine
     {
        // m_GraphicsContext->MakeCurrent();
 
+        m_GraphicsContext->BeginFrame();
+
         if (m_dirt_width_height)    // В прошлом кадре параметры окна изменились!
         {
             m_dirt_width_height = false;
@@ -157,6 +159,7 @@ namespace Engine
     void WindowGLFW::EndRender()
     {
         glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
+		m_GraphicsContext->EndFrame();
 		m_GraphicsContext->SwapBuffers();   
     }
 

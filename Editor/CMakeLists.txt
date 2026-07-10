@@ -10,6 +10,8 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/Editor/Demo)
 
 file(GLOB_RECURSE MY_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
+#add_subdirectory(external/imgui-docking)
+
 add_executable(Editor
     ${MY_SOURCE}
     $<$<PLATFORM_ID:Windows>:appdata/app.rc>
@@ -26,4 +28,7 @@ add_custom_command(TARGET Editor POST_BUILD
     COMMENT "Copying Engine Resources to Editor output directory..."
 )
 
-target_link_libraries(Editor PRIVATE Engine)
+target_link_libraries(Editor PRIVATE 
+    Engine
+    #imgui
+    )
