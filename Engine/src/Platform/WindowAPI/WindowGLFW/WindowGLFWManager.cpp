@@ -203,6 +203,8 @@ namespace Engine
             if (Engine::Render::RenderAPIFactory::GetRenderAPI() != Engine::Render::RenderAPIFactory::RHI_API::Vulkan)  
                 glViewport(0, 0, width, height);
 
+            EngineCore::GetEngineContext().GetWindowManager()->OnWindowReSize().Broadcast(win->GetWindowContext(), width, height);
+            win->OnWindowReSize().Broadcast(width, height);
             if (win->GetWindowMode() == WindowMode::Window) 
             {
                 Vector2 LRes = win->GetLocationWindow();
@@ -210,7 +212,6 @@ namespace Engine
                 int LY = (int)LRes.y;
                 glfwGetWindowPos(window, &LX, &LY);
             }
-            EngineCore::GetEngineContext().GetWindowManager()->OnWindowReSize().Broadcast(win->GetWindowContext(), width, height);
         }
     }
 

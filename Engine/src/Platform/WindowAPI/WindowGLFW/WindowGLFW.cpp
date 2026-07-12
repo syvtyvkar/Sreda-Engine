@@ -178,7 +178,6 @@ namespace Engine
         OnHasFocusChange().Clear();
         OnMinimizedChange().Clear();
         OnWindowReSize().Clear();
-        OnWindowClose().Clear();
 
         if (GetHandle() == s_SharedWindow)
             s_SharedWindow = nullptr;

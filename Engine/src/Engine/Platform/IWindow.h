@@ -13,10 +13,9 @@
 namespace Engine
 {
 
-    ADD_DELEGATE_THREE_PARAMS(DOnWindowReSize,WindowContext, int,int)         // On window resize
-    ADD_DELEGATE_TWO_PARAMS(DOnWindowFocusChange,WindowContext, bool)        // On focus/minimize change
+    ADD_DELEGATE_TWO_PARAMS(DOnWindowReSize, int,int)         // On window resize
+    ADD_DELEGATE_ONE_PARAM(DOnWindowFocusChange, bool)        // On focus/minimize change
     ADD_DELEGATE_TWO_PARAMS(DOnWindowModeChange,WindowContext, WindowMode)   
-    ADD_DELEGATE_ONE_PARAM(DOnWindowClose,WindowContext)      
 
     using namespace Engine::Render;
 
@@ -96,7 +95,7 @@ namespace Engine
         DOnWindowFocusChange& OnHasFocusChange() {return s_OnHasFocusChange;}
         DOnWindowFocusChange& OnMinimizedChange() {return s_OnMinimizedChange;}
         DOnWindowModeChange& OnWindowModeChange() {return s_OnWindowModeChange;}
-        DOnWindowClose& OnWindowClose() {return s_OnWindowClose;}
+
         virtual bool LoadIconFromFile() = 0;
 
         virtual void* GetWindowAPIHandle() = 0;
@@ -116,7 +115,5 @@ namespace Engine
         DOnWindowFocusChange s_OnHasFocusChange;
         DOnWindowFocusChange s_OnMinimizedChange;
         DOnWindowModeChange s_OnWindowModeChange;
-        DOnWindowClose s_OnWindowClose;
-
     };
 }

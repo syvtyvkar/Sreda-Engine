@@ -236,7 +236,7 @@ namespace Engine::UI
             GetRootWidget().get()->OnUpdate(DeltaTime);
         }
     }
-    void UISredaContext::CallOnWindowReSize(WindowContext cntxt, int x, int y)
+    void UISredaContext::CallOnWindowReSize(int x, int y)
     {
         m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);
     }

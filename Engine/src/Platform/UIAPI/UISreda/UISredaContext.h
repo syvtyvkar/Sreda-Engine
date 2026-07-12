@@ -33,7 +33,7 @@ namespace Engine::UI
 
         virtual Engine::WindowContext GetWindowContext() override {return m_WindowContext;};
 
-        void CallOnWindowReSize(WindowContext cntxt, int x, int y); 
+        void CallOnWindowReSize(int x, int y); 
 
     protected:
 
