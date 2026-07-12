@@ -20,6 +20,8 @@ namespace Engine
         WindowContext(const WindowContext& InContext) : WindowID(InContext.WindowID) {}
         int WindowID = 0;
 
+        virtual void* GetWindowHande() {return nullptr; }
+
         /*size_t operator()(const Engine::WindowContext& ctx) const noexcept
         {
             return hash<int>{}(ctx.WindowID);

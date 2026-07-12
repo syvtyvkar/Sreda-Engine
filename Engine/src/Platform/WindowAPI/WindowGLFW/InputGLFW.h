@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>                      // Математическая библиотека (векторы)
 #include <unordered_map>                    // Для мапы инпутов
 #include <GLFW/glfw3.h>
+#include "Platform/WindowAPI/WindowGLFW/WindowGLFW.h"
 
 // Предварительное объявление структуры GLFWwindow (используется для платформозависимых колбэков)
 struct GLFWwindow;
@@ -164,7 +165,7 @@ namespace Engine
         virtual ~InputListenGLFWSystem() override;
 
         // Переопределение виртуальных методов базового класса
-        virtual void Init(class IWindow* InWindow) override;
+        virtual void Init(TWeak<class IWindow> InWindow) override;
         virtual void DeInit() override;
 
         // Управление курсором
@@ -174,15 +175,13 @@ namespace Engine
         virtual void SetCursorMode(int Mode) override; // 0=Normal, 1=Hidden, 2=Disable
 
         // Утилиты
-        void* GetWindowHandle();                    // Получить нативный дескриптор окна
+        GLFWwindow* GetWindowHandle();                    // Получить нативный дескриптор окна
         InputKey InputKeyFromInt(int IntKey);       // Преобразовать целочисленный код в InputKey
 
         static InputListenGLFWSystem* GetInputListen(GLFWwindow* window);
 
     protected:
-
-        void* m_windowHandle = nullptr;                     // Указатель на нативный дескриптор окна (GLFWwindow*)
-        void* m_window = nullptr;
+        TWeak<IWindow> m_window;
         DelegateHandle DelegateChangeWindowHandle;
 
         // Преобразования между InputKey и GLFW-кодами

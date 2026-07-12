@@ -25,12 +25,6 @@ namespace Engine
 
     WindowGLFW::~WindowGLFW()                   // Деструктор: автоматически закрывает окно при уничтожении объекта
     {
-        //Close(false);
-        //glfwSetFramebufferSizeCallback(GetHandle(), nullptr);
-        //glfwSetWindowFocusCallback(GetHandle(), nullptr);
-        //glfwSetWindowIconifyCallback(GetHandle(), nullptr);
-        //OnUpdateWindowHandle().Clear();
-        //OnUpdateWindowSize().Clear();
     }
 
     /**
@@ -95,21 +89,16 @@ namespace Engine
         if (!isVulkan)
         {
             // Делаем контекст OpenGL текущим для этого окна
-            //glfwMakeContextCurrent(GetHandle());
+            glfwMakeContextCurrent(GetHandle());
 
             // Включение/выключение вертикальной синхронизации
             glfwSwapInterval(config.vsync ? 1 : 0); //VSync!!!
         }
 
-        // Устанавливаем колбэк изменения
-        glfwSetFramebufferSizeCallback(GetHandle(), FramebufferResizeCallback);
-        glfwSetWindowFocusCallback(GetHandle(), FocusCallback);
-        glfwSetWindowIconifyCallback(GetHandle(), IconifyCallback);
-
         ENGINE_LOG_INFO("Window ( {} ) has been created successfully", config.title);
         ///////////////////////////////////////////
 
-        m_GraphicsContext = RenderAPIFactory::CreateGraphicsContext(GetHandle());
+        m_GraphicsContext = RenderAPIFactory::CreateGraphicsContext(shared_from_this());
 		m_GraphicsContext->Init();                                                 // Инициализация
 
         if (!s_SharedWindow)
@@ -147,7 +136,7 @@ namespace Engine
     void WindowGLFW::BeginRender()
     {
        // m_GraphicsContext->MakeCurrent();
-
+        if (!m_GraphicsContext) return;
         m_GraphicsContext->BeginFrame();
 
         if (m_dirt_width_height)    // В прошлом кадре параметры окна изменились!
@@ -159,8 +148,10 @@ namespace Engine
     void WindowGLFW::EndRender()
     {
         glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
+        if (!m_GraphicsContext) return;
 		m_GraphicsContext->EndFrame();
-		m_GraphicsContext->SwapBuffers();   
+		m_GraphicsContext->SwapBuffers();
+        //glfwSwapBuffers(GetHandle());   
     }
 
     /**
@@ -187,21 +178,18 @@ namespace Engine
         OnHasFocusChange().Clear();
         OnMinimizedChange().Clear();
         OnWindowReSize().Clear();
+        OnWindowClose().Clear();
 
         if (GetHandle() == s_SharedWindow)
             s_SharedWindow = nullptr;
 
-        ENGINE_LOG_INFO("The Window close");
-        glfwSetWindowShouldClose(GetHandle(), true);
-        glfwDestroyWindow(GetHandle());            // Уничтожаем окно GLFW
+        ENGINE_LOG_INFO("The Window {0} close", GetWindowContext().WindowID);
+        //glfwSetWindowShouldClose(GetHandle(), true);
+        //glfwDestroyWindow(GetHandle());            // Уничтожаем окно GLFW
         
-        glfwSetFramebufferSizeCallback(GetHandle(), nullptr);
-        glfwSetWindowFocusCallback(GetHandle(), nullptr);
-        glfwSetWindowIconifyCallback(GetHandle(), nullptr);
-        OnUpdateWindowHandle().Clear();
-        OnUpdateWindowSize().Clear();
-
-        m_window = nullptr;
+        m_GraphicsContext.reset();
+        glfwDestroyWindow(GetHandle()); 
+        glfwSetWindowShouldClose(GetHandle(), true);
     }
 
     void WindowGLFW::WindowTerminate()
@@ -268,8 +256,6 @@ namespace Engine
         glfwGetFramebufferSize(GetHandle(), &fbW, &fbH);
         if (Engine::Render::RenderAPIFactory::GetRenderAPI() != Engine::Render::RenderAPIFactory::RHI_API::Vulkan)
             glViewport(0, 0, fbW, fbH);
-
-        FramebufferResizeCallback(GetHandle(), fbW, fbH);
     
         // Возвращаем фокус окну
         glfwFocusWindow(GetHandle());
@@ -282,64 +268,6 @@ namespace Engine
         }
 
         OnWindowModeChange().Broadcast(GetWindowContext(), m_windowMode);
-    }
-
-    /**
-     * @brief Статический колбэк, вызываемый GLFW при изменении размера фреймбуфера.
-     * @param window Указатель на окно GLFW.
-     * @param width Новая ширина.
-     * @param height Новая высота.
-     *
-     * Обновляет внутренние размеры, устанавливает viewport OpenGL и вызывает
-     * пользовательский колбэк, если он задан.
-     */
-    void WindowGLFW::FramebufferResizeCallback(GLFWwindow* window, int width, int height) 
-    {
-        auto* win = (class WindowGLFW *)glfwGetWindowUserPointer(window);
-        if (win != nullptr) 
-        {
-            if (win->GetWindowMode() == WindowMode::Window) 
-            {
-                win->m_width = width;
-                win->m_height = height;
-                win->m_dirt_width_height = true;
-            }
-            
-            // Устанавливаем область вывода на весь новый размер окна
-            if (Engine::Render::RenderAPIFactory::GetRenderAPI() != Engine::Render::RenderAPIFactory::RHI_API::Vulkan)
-                glViewport(0, 0, width, height);
-            win->OnUpdateWindowSize().Broadcast(window, width, height);
-            win->OnWindowReSize().Broadcast(win->GetWindowContext(),width,height);
-            if (win->GetWindowMode() == WindowMode::Window) 
-            {
-                glfwGetWindowPos(window, &win->m_windowedX, &win->m_windowedY);
-            }
-        }
-    }
-
-    void WindowGLFW::FocusCallback(GLFWwindow *window, int focused)
-    {
-        auto* win = (class WindowGLFW *)glfwGetWindowUserPointer(window);
-        if (win != nullptr) 
-        {
-            if (win->m_window == nullptr) return;
-            win->m_WindowHasFocus = (focused == GLFW_TRUE);
-            win->OnHasFocusChange().Broadcast(win->GetWindowContext(), win->m_WindowHasFocus);
-            if (window != glfwGetCurrentContext())
-            {
-                glfwMakeContextCurrent(window);
-            }
-        }
-    }
-
-    void WindowGLFW::IconifyCallback(GLFWwindow *window, int iconified)
-    {
-        auto* win = (class WindowGLFW *)glfwGetWindowUserPointer(window);
-        if (win != nullptr)  
-        {
-            win->m_WindowIsMinimized = (iconified == GLFW_TRUE);
-            win->OnMinimizedChange().Broadcast(win->GetWindowContext(),win->m_WindowIsMinimized);
-        }
     }
 
     bool WindowGLFW::LoadIconFromFile()
@@ -360,6 +288,14 @@ namespace Engine
         glfwSetWindowIcon(GetHandle(), 1, images);
 
         return true;
+    }
+
+    void WindowGLFW::FocusThisWindow()
+    {
+        if (GetHandle() == glfwGetCurrentContext()) return;
+        if (!m_GraphicsContext) return;
+        
+        m_GraphicsContext->MakeCurrent();
     }
 }
 //#endif

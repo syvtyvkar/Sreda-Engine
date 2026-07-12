@@ -57,8 +57,8 @@ namespace Engine::UI
         unordered_map<WindowContext,TRef<UIContext>, WindowContextHash> m_ui_contexts; 
 
         void CheckContextMenu(WindowContext InWinContext);
-        void CallOnWinCreate(IWindow* InWin, WindowContext InWinContext);
-        void CallOnWinDestroy(IWindow* InWin, WindowContext InWinContext);
+        void CallOnWinCreate(TWeak<IWindow> InWin, WindowContext InWinContext);
+        void CallOnWinDestroy(TWeak<IWindow> InWin, WindowContext InWinContext);
     };
 
 }

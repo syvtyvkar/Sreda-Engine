@@ -8,7 +8,7 @@
 
 #include <GLFW/glfw3.h>                                             // Заголовок GLFW (колбэки, константы)
 #include "Engine/Platform/IWindow.h"        
-#include "Platform/WindowAPI/WindowGLFW/WindowGLFW.h"        // Класс окна GLFW (для получения native handle)
+//#include "Platform/WindowAPI/WindowGLFW/WindowGLFW.h"        // Класс окна GLFW (для получения native handle)
 
 #include <unordered_map>                                            // TODO: проверить и убрать, возможно, ныне не требуется
 
@@ -17,15 +17,16 @@ namespace Engine
     /**
      * @brief Инициализация слушателя ввода для GLFW.
      */
-    void InputListenGLFWSystem::Init(class IWindow* InWindow)
+    void InputListenGLFWSystem::Init(TWeak<class IWindow> InWindow)
     {
-        if (!InWindow) 
+        if (!InWindow.lock()) 
         {
             ENGINE_LOG_ERROR("ERROR! Window NULL!");
             return;
         }
+        m_window = InWindow;
         // Приведение к конкретному типу окна GLFW.
-        Engine::WindowGLFW* WindowGL = reinterpret_cast<WindowGLFW*>(InWindow);
+        Engine::WindowGLFW* WindowGL = reinterpret_cast<WindowGLFW*>(InWindow.lock().get());
         auto* glfwWindow = static_cast<GLFWwindow*>(WindowGL->GetHandle());
 
         // Установка колбэков GLFW на это окно.
@@ -35,34 +36,6 @@ namespace Engine
         glfwSetScrollCallback(glfwWindow, OnGLFWScrollCallback);
         glfwSetCharCallback(glfwWindow, OnGLFWCharCallback);
 
-        m_windowHandle = glfwWindow;                                    // Сохраняем native handle для дальнейшего использования
-        DelegateChangeWindowHandle = WindowGL->OnUpdateWindowHandle().Subscribe([&,this](GLFWwindow* OutWindow)
-        {
-            if (m_windowHandle)
-            {
-                auto* glfwWindow = static_cast<GLFWwindow*>(m_windowHandle);
-                if (glfwWindow)
-                {
-                    // Убираем колбэки, чтобы они не вызывались после удаления объекта.
-                    glfwSetKeyCallback(glfwWindow, nullptr);
-                    glfwSetMouseButtonCallback(glfwWindow, nullptr);
-                    glfwSetCursorPosCallback(glfwWindow, nullptr);
-                    glfwSetScrollCallback(glfwWindow, nullptr);
-                }
-                m_windowHandle = nullptr;
-            } 
-            if (OutWindow)
-            {
-                glfwSetKeyCallback(OutWindow, OnGLFWKeyCallback);
-                glfwSetMouseButtonCallback(OutWindow, OnGLFWMouseButtonCallback);
-                glfwSetCursorPosCallback(OutWindow, OnGLFWCursorPosCallback);
-                glfwSetScrollCallback(OutWindow, OnGLFWScrollCallback);
-                glfwSetCharCallback(OutWindow, OnGLFWCharCallback);
-
-                m_windowHandle = OutWindow;
-            }
-        });
-        m_window=WindowGL;
         ENGINE_LOG_TRACE("Input listen start!");
     }
 
@@ -77,16 +50,12 @@ namespace Engine
         OnMouseScrolled().Clear();
         OnCharInput().Clear();
 
-        if (m_window)
+        if (m_window.lock().get())
         {
-            auto* EngineWindow = static_cast<WindowGLFW*>(m_window);
-            EngineWindow->OnUpdateWindowHandle().Unsubscribe(DelegateChangeWindowHandle);
+            Engine::WindowGLFW* WindowGL = reinterpret_cast<WindowGLFW*>(m_window.lock().get());
+            ENGINE_LOG_INFO("Input listen {0} shutdown", WindowGL->GetWindowContext().WindowID);
 
-        }
-        m_window = nullptr;
-        if (m_windowHandle)
-        {
-            auto* glfwWindow = static_cast<GLFWwindow*>(m_windowHandle);
+            auto* glfwWindow = WindowGL->GetHandle();
             if (glfwWindow)
             {
                 // Убираем колбэки, чтобы они не вызывались после удаления объекта.
@@ -97,9 +66,7 @@ namespace Engine
                 glfwSetCharCallback(glfwWindow, nullptr);
             }
         }
-        m_windowHandle = nullptr;
-
-        ENGINE_LOG_INFO("Input listen shutdown");
+        m_window.reset();
     }
 
     /**
@@ -192,12 +159,12 @@ namespace Engine
 
     bool InputListenGLFWSystem::GetCursorVisible()
     {
-        if (m_windowHandle)
+        if (m_window.lock().get())
         {
-            if (glfwGetInputMode(static_cast<GLFWwindow*>(m_windowHandle),GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
+            if (glfwGetInputMode(GetWindowHandle(),GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
             {
                 return true;
-            }else if (glfwGetInputMode(static_cast<GLFWwindow*>(m_windowHandle),GLFW_CURSOR) == GLFW_CURSOR_HIDDEN)
+            }else if (glfwGetInputMode(GetWindowHandle(),GLFW_CURSOR) == GLFW_CURSOR_HIDDEN)
             {
                 return false;
             }
@@ -208,27 +175,25 @@ namespace Engine
 
     int InputListenGLFWSystem::GetCursorMode()
     {
-        if (m_windowHandle)
+        if (m_window.lock().get())
         {
-            return glfwGetInputMode(static_cast<GLFWwindow*>(m_windowHandle),GLFW_CURSOR);
+            return glfwGetInputMode(GetWindowHandle(),GLFW_CURSOR);
         }
         return 0;
     }
 
     void InputListenGLFWSystem::SetCursorVisible(bool InVisible)
     {
-        if (m_windowHandle)
+        if (m_window.lock())
         {
-            auto* glfwWindow = static_cast<GLFWwindow*>(m_windowHandle);
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, InVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
+            glfwSetInputMode(GetWindowHandle(), GLFW_CURSOR, InVisible ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
         }
     }
 
     void InputListenGLFWSystem::SetCursorMode(int mode)
     {
-        if (m_windowHandle)
+        if (m_window.lock())
         {
-            auto* glfwWindow = static_cast<GLFWwindow*>(m_windowHandle);
             int glfwMode;
             switch (mode)
             {
@@ -242,13 +207,13 @@ namespace Engine
                 glfwMode = GLFW_CURSOR_NORMAL;                          // Обычный режим
                 break;
             }
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, glfwMode);
+            glfwSetInputMode(GetWindowHandle(), GLFW_CURSOR, glfwMode);
         }
     }
 
-    void* InputListenGLFWSystem::GetWindowHandle()
+    GLFWwindow* InputListenGLFWSystem::GetWindowHandle()
     {
-        return m_windowHandle;
+        return static_cast<GLFWwindow*>(m_window.lock().get()->GetWindowAPIHandle());
     }
 
     InputKey InputListenGLFWSystem::InputKeyFromInt(int IntKey)
@@ -268,10 +233,7 @@ namespace Engine
         GetInputListen(window)->OnCharInput().Broadcast(codepoint);
     }
 
-    InputListenGLFWSystem::~InputListenGLFWSystem() // Деструктор: автоматически вызывает DeInit для очистки.
-    {
-        DeInit();
-    }
+    InputListenGLFWSystem::~InputListenGLFWSystem(){}
 }
 
 #endif

@@ -69,7 +69,7 @@ namespace Engine
 
     void Application::ExitApp()                                                                             // Request application exit (close window)
     {
-        EngineCore::GetEngineContext().GetWindowManager()->CloseEngineWindow(EngineCore::GetEngineContext().GetWindowManager()->GetActivIWin());
+        EngineCore::GetEngineContext().GetWindowManager()->CloseEngineWindow(EngineCore::GetEngineContext().GetWindowManager()->GetFocusWindow());
     }
 
     void Application::AddInstance(TUniquePtr<ApplicationInstance> InInstance)

@@ -14,9 +14,6 @@
 namespace Engine
 {
     using namespace Engine::Render;
-    ADD_DELEGATE_ONE_PARAM(DOnUpdateWindowHandle, GLFWwindow*)                  // При смене окна
-    ADD_DELEGATE_THREE_PARAMS(DOnUpdateWindowSize,GLFWwindow*, int,int)         // При смене размера окна
-
     using namespace Engine::UI;
     /**
      * @class WindowGLFW
@@ -30,7 +27,7 @@ namespace Engine
     {
     public:
         WindowGLFW();
-        ~WindowGLFW() override;
+        virtual ~WindowGLFW() override;
 
         virtual bool Init(const Engine::WindowConfig& config) override;                 // Инициализация окна
         virtual void UpdateWindowName(std::string NewName) override;                    // Поменять имя окна 
@@ -41,6 +38,7 @@ namespace Engine
         virtual int GetWidth() const override {return m_width;}                         // Получить длину и ширину
         virtual int GetHeight() const override {return m_height;}
         GLFWwindow* GetHandle() {return m_window;}                                // Получить окно
+        virtual void* GetWindowAPIHandle() override {return GetHandle();};
         virtual void Close() override;                                            // Закрываем окно
         virtual void WindowTerminate() override;
         virtual void SetTittle(const std::string NewTittle) override {NameWindow = NewTittle;};
@@ -48,16 +46,25 @@ namespace Engine
         virtual GraphicsContext* GetGraphicsContext() override {return m_GraphicsContext.get();}
         virtual WindowMode GetWindowMode() override {return m_windowMode;};
         virtual void SetWindowMode(WindowMode NewMode) override;
-        DOnUpdateWindowHandle& OnUpdateWindowHandle() {return s_OnUpdateWindowHandle;}
-        DOnUpdateWindowSize& OnUpdateWindowSize() {return s_OnUpdateWindowSize;}
 
-        virtual bool IsWindowHasFocus() override {return m_WindowHasFocus;};
-        virtual bool IsWindowMinimized() override {return m_WindowIsMinimized;};
+        virtual bool IsWindowHasFocus() override {return m_WindowHasFocus;}
+        virtual bool IsWindowMinimized() override {return m_WindowIsMinimized;}
+
+        virtual void SetWindowHasFocus(bool InNewVal) override {m_WindowHasFocus = InNewVal;}
+        virtual void SetWindowMinimized(bool InNewVal) override {m_WindowIsMinimized = InNewVal;}
 
         static void FocusCallback(GLFWwindow* window, int focused);
         static void IconifyCallback(GLFWwindow* window, int iconified);
+        static void CloseWindowCallback(GLFWwindow* window);
         virtual bool LoadIconFromFile() override;
         virtual Engine::WindowContext GetWindowContext() override {return m_WindowContext;}
+
+        virtual void FocusThisWindow() override;
+
+        virtual Vector2 GetSizeWindow() const override {return Vector2(m_width,m_height);}
+        virtual Vector2 GetLocationWindow() const override {return Vector2(m_windowedX,m_windowedY);}
+        virtual void SetSizeWindow(Vector2 InNewVal) override {m_windowedX = InNewVal.x; m_windowedY = InNewVal.y; m_dirt_width_height = true;}
+        virtual void SetLocationWindow(Vector2 InNewVal) override {m_width = InNewVal.x; m_height = InNewVal.y;}
 
     private:
         GLFWwindow* m_window = nullptr;                                                     // Указатель на объект окна GLFW
@@ -69,14 +76,12 @@ namespace Engine
         int m_windowedX = 0;                                                                // Координаты расположения окна по X
         int m_windowedY = 0;                                                                // Координаты расположения окна по Y
         WindowMode m_windowMode = WindowMode::Window;
-        DOnUpdateWindowHandle s_OnUpdateWindowHandle;
-        DOnUpdateWindowSize s_OnUpdateWindowSize;
 
         bool m_WindowHasFocus = true;
         bool m_WindowIsMinimized = false;
     protected:
         //TUniquePtr<Scene> m_currentScene;               // Текущая сцена
-        TUniquePtr<GraphicsContext> m_GraphicsContext;    // Графический контекст (OpenGL, Vulkan и т.д.)
+        TRef<GraphicsContext> m_GraphicsContext;    // Графический контекст (OpenGL, Vulkan и т.д.)
         Engine::WindowContext m_WindowContext = Engine::WindowContext(0);
     };
 }

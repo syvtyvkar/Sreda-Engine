@@ -6,6 +6,8 @@
 
 #include <map>
 
+#include "Engine/Platform/IWindow.h"
+
 namespace Engine::Render
 {
 	class RenderAPIFactory
@@ -42,7 +44,7 @@ namespace Engine::Render
         static TRef<class Texture2D> CreateTexture2DFromPath(const std::string& InPath) { return s_Texture2DCreatorPath(InPath); }
 		static TRef<class Shader> CreateShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) { return s_ShaderCreator(name,vertexSrc,fragmentSrc); }
         static TRef<class Shader> CreateShaderFromPath(const std::string& InPath) { return s_ShaderCreatorPath(InPath); }
-        static TUniquePtr<class GraphicsContext> CreateGraphicsContext(void* window);
+        static TRef<class GraphicsContext> CreateGraphicsContext(TRef<Engine::IWindow> window);
         static TRef<class Framebuffer> CreateFramebuffer(const struct FramebufferSpecification& spec) { return s_FramebufferCreator(spec); }
 		static TRef<class VertexBuffer> CreateVertexBuffer(uint32_t size) { return s_VertexBufferCreator(size); }
         static TRef<class VertexBuffer> CreateVertexBufferFromVertex(float* vertices, uint32_t size) { return s_VertexBufferCreatorVertx(vertices, size); }

@@ -35,7 +35,7 @@ void EditorMainMenuBar::OnRender()
 
     __super::OnRender();
 
-    Renderer2D::DrawQuad(pos+(size*0.5f),Vector2(size.x,size.y),TColor::DarkGray);
+    Renderer2D::DrawQuad(pos+Vector2(size.x*0.5f,0.f),Vector2(size.x,size.y+7.f),TColor::DarkGray);
 }
 
 void EditorMainMenuBar::OnCLickFile()

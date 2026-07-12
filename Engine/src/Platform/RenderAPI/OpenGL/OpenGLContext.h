@@ -12,13 +12,13 @@ namespace Engine::Render
     class OpenGLContext : public GraphicsContext
 	{
 	public:
-		OpenGLContext(GLFWwindow* windowHandle);
+		OpenGLContext(TWeak<IWindow> InWindowOwner);
 
 		virtual void Init() override;
 		virtual void SwapBuffers() override;
 		virtual void MakeCurrent() override;
 
 	private:
-		GLFWwindow* m_WindowHandle;
+		TWeak<IWindow> m_windowOwner;
 	};
 }

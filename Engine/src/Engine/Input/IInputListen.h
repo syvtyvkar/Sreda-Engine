@@ -33,7 +33,7 @@ namespace Engine
         //virtual IInputListen() = default;
         virtual ~IInputListen() = default;                                                               // Virtual destructor for correct deletion of derived classes
 
-        virtual void Init(class IWindow* InWindow) = 0;                                              // Initialize listener.
+        virtual void Init(TWeak<class IWindow> InWindow) = 0;                                              // Initialize listener.
         virtual void DeInit() = 0;                                                                      // Deinitialize listener, free resources.
 
         // Delegate access methods for subscription.
@@ -72,6 +72,6 @@ namespace Engine
          * @brief Creates a unique pointer to an InputListen object.
          * @return TUniquePtr<InputListen> Pointer to the created instance.
          */
-        static TUniquePtr<IInputListen> create();
+        static TRef<IInputListen> create();
     };
 }

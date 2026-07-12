@@ -33,12 +33,12 @@ namespace Engine::UI
         return m_contextMenu ? m_contextMenu->IsOpen() : false;
     }
 
-    void UISystem::CallOnWinCreate(IWindow *InWin, WindowContext InWinContext)
+    void UISystem::CallOnWinCreate(TWeak<IWindow> InWin, WindowContext InWinContext)
     {
         CreateContextFromWindowContext(InWinContext);
     }
 
-    void UISystem::CallOnWinDestroy(IWindow *InWin, WindowContext InWinContext)
+    void UISystem::CallOnWinDestroy(TWeak<IWindow> InWin, WindowContext InWinContext)
     {
         DestroyContextFromWindowContext(InWinContext);
     }

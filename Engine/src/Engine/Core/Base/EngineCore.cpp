@@ -5,6 +5,7 @@
 #include "Engine/Render/RenderCommand.h"
 #include "Engine/Render/Renderer.h"
 #include "Engine/Render/RenderAPIFactory.h"
+#include "Engine/Platform/WindowManagerAPIFactory.h"
 
 namespace Engine
 {
@@ -38,7 +39,7 @@ namespace Engine
 
         m_engineContext.m_CommandLine.get()->Parse(argc, argv);
 
-        m_engineContext.m_WindowManager = CreateUniquePtr<WindowManager>();
+        m_engineContext.m_WindowManager = WindowManagerAPIFactory::createWindowManager();
 
         RenderAPIFactory::Init();
 
@@ -119,13 +120,15 @@ namespace Engine
     void EngineCore::FrameLoopUpdate()
     {
         m_engineContext.GetTimeSystem()->Update();
-        m_engineContext.GetWindowManager()->Update();
+        /*m_engineContext.GetWindowManager()->Update();
         m_engineContext.GetWindowManager()->BeginRender();
         m_engineDelegates.OnAppUpdFrameDelta().Broadcast(Time::TimeSystem::GetDeltaTime()); 
         m_engineDelegates.OnAppBeginRender().Broadcast();
         m_engineDelegates.OnAppRender().Broadcast();   
         m_engineDelegates.OnAppRenderUI().Broadcast();  
         m_engineDelegates.OnAppEndRender().Broadcast();
-        m_engineContext.GetWindowManager()->EndRender();
+        m_engineContext.GetWindowManager()->EndRender();*/
+
+        m_engineContext.GetWindowManager()->FrameUpdate(Time::TimeSystem::GetDeltaTime());
     }
 }

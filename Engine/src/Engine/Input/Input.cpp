@@ -47,9 +47,9 @@ namespace Engine
         LInputSystem->m_scrollDelta=0.0;
     }
 
-    void InputSystem::InitNewWindow(Engine::IWindow *InWinHandle, Engine::WindowContext InWinContext)
+    void InputSystem::InitNewWindow(TWeak<Engine::IWindow> InWinHandle, Engine::WindowContext InWinContext)
     {
-        TUniquePtr<IInputListen> LIL = InputListenAPIFactory::create();
+        TRef<IInputListen> LIL = InputListenAPIFactory::create();
   
         if (!LIL.get())
         {
@@ -68,7 +68,7 @@ namespace Engine
         ENGINE_LOG_TRACE("Input init for window: {0}", InWinContext.WindowID);
     }
 
-    void InputSystem::DeInitWindow(Engine::IWindow *InWinHandle, Engine::WindowContext InWinContext)
+    void InputSystem::DeInitWindow(TWeak<Engine::IWindow> InWinHandle, Engine::WindowContext InWinContext)
     {
         auto it = m_InputListenList.find(InWinContext);
         if (it == m_InputListenList.end()) 
@@ -82,8 +82,8 @@ namespace Engine
         it->second.get()->OnMouseMoved().Clear();
         it->second.get()->OnMouseScrolled().Clear();
         it->second.get()->OnCharInput().Clear();
+        it->second.get()->DeInit();
         m_InputListenList.erase(InWinContext);
-        ENGINE_LOG_TRACE("DeInit input window [{0}].",InWinContext.WindowID);
     }
 
     /*************** INPUTS (key state polling) */
@@ -230,7 +230,7 @@ namespace Engine
     IInputListen *InputSystem::GetInputListenFromActivWin()
     {
         if (!Engine::EngineCore::GetEngineContext().GetWindowManager()) return nullptr;
-        auto it = m_InputListenList.find(Engine::EngineCore::GetEngineContext().GetWindowManager()->GetActivIWin());
+        auto it = m_InputListenList.find(Engine::EngineCore::GetEngineContext().GetWindowManager()->GetFocusWindow());
         return (it != m_InputListenList.end()) ? it->second.get() : nullptr;
     }
 
@@ -329,12 +329,12 @@ namespace Engine
         
     }
 
-    void InputSystem::CallOnWinCreate(IWindow *InWin, WindowContext InWinContext)
+    void InputSystem::CallOnWinCreate(TWeak<Engine::IWindow> InWin, WindowContext InWinContext)
     {
         InitNewWindow(InWin, InWinContext);
     }
 
-    void InputSystem::CallOnWinDestroy(IWindow *InWin, WindowContext InWinContext)
+    void InputSystem::CallOnWinDestroy(TWeak<Engine::IWindow> InWin, WindowContext InWinContext)
     {
         DeInitWindow(InWin, InWinContext);
     }

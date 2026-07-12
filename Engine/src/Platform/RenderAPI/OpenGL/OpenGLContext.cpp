@@ -11,15 +11,15 @@
 
 namespace Engine::Render
 {
-    OpenGLContext::OpenGLContext(GLFWwindow* windowHandle)
-		: m_WindowHandle(windowHandle)
+    OpenGLContext::OpenGLContext(TWeak<IWindow> InWindowOwner)
+		: m_windowOwner(InWindowOwner)
 	{
-		ENGINE_ASSERT(windowHandle, "Window handle is null!");
+		ENGINE_ASSERT(m_windowOwner.lock(), "Window handle is null!");
 	}
 
 	void OpenGLContext::Init()
 	{
-		glfwMakeContextCurrent(m_WindowHandle);
+		glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_windowOwner.lock().get()->GetWindowAPIHandle()));
 		
 		static bool InitGLLoader = false;
 		if (!InitGLLoader)
@@ -39,11 +39,11 @@ namespace Engine::Render
 
     void OpenGLContext::SwapBuffers()
 	{
-		glfwSwapBuffers(m_WindowHandle);
+		glfwSwapBuffers(static_cast<GLFWwindow*>(m_windowOwner.lock().get()->GetWindowAPIHandle()));
 	}
 
 	void OpenGLContext::MakeCurrent()
 	{
-		glfwMakeContextCurrent(m_WindowHandle);
+		glfwMakeContextCurrent(static_cast<GLFWwindow*>(m_windowOwner.lock().get()->GetWindowAPIHandle()));
 	}
 }

@@ -15,7 +15,8 @@ namespace Engine
 
     ADD_DELEGATE_THREE_PARAMS(DOnWindowReSize,WindowContext, int,int)         // On window resize
     ADD_DELEGATE_TWO_PARAMS(DOnWindowFocusChange,WindowContext, bool)        // On focus/minimize change
-    ADD_DELEGATE_TWO_PARAMS(DOnWindowModeChange,WindowContext, WindowMode)         
+    ADD_DELEGATE_TWO_PARAMS(DOnWindowModeChange,WindowContext, WindowMode)   
+    ADD_DELEGATE_ONE_PARAM(DOnWindowClose,WindowContext)      
 
     using namespace Engine::Render;
 
@@ -27,7 +28,7 @@ namespace Engine
      * event handling, title changes, getting dimensions, etc.
      * Concrete implementations (e.g., for GLFW, SDL, WinAPI) should inherit this class.
      */
-    class IWindow
+    class IWindow : public std::enable_shared_from_this<IWindow>
     {
     public:
         virtual ~IWindow()  = default;                                               // Virtual destructor for correct deletion of derived classes
@@ -95,35 +96,27 @@ namespace Engine
         DOnWindowFocusChange& OnHasFocusChange() {return s_OnHasFocusChange;}
         DOnWindowFocusChange& OnMinimizedChange() {return s_OnMinimizedChange;}
         DOnWindowModeChange& OnWindowModeChange() {return s_OnWindowModeChange;}
+        DOnWindowClose& OnWindowClose() {return s_OnWindowClose;}
         virtual bool LoadIconFromFile() = 0;
+
+        virtual void* GetWindowAPIHandle() = 0;
 
         virtual bool IsWindowHasFocus() = 0;
         virtual bool IsWindowMinimized() = 0;
+        virtual void SetWindowHasFocus(bool InNewVal) = 0;
+        virtual void SetWindowMinimized(bool InNewVal) = 0;
         virtual Engine::WindowContext GetWindowContext() = 0;
+        virtual void FocusThisWindow() = 0;
+        virtual Vector2 GetSizeWindow() const = 0;
+        virtual Vector2 GetLocationWindow() const = 0;
+        virtual void SetSizeWindow(Vector2 InNewVal) = 0;
+        virtual void SetLocationWindow(Vector2 InNewVal) = 0;
     private:
         DOnWindowReSize s_OnWindowReSize;
         DOnWindowFocusChange s_OnHasFocusChange;
         DOnWindowFocusChange s_OnMinimizedChange;
         DOnWindowModeChange s_OnWindowModeChange;
-    };
+        DOnWindowClose s_OnWindowClose;
 
-    /**
-     * @class WindowAPIFactory
-     * @brief Factory for creating a window instance depending on platform/API.
-     *
-     * Hides the details of the specific window implementation behind a unified Window interface.
-     */
-    class WindowAPIFactory 
-    {
-    public:
-    /**
-         * @brief Creates a unique pointer to a window object.
-         * @return TUniquePtr<Window> Pointer to the created window.
-         *
-         * Depending on macros (e.g., ENGINE_WINDOW_GLFW) returns the corresponding
-         * Window descendant (e.g., WindowGLF3). If no platform is defined,
-         * may return nullptr.
-         */
-        static TUniquePtr<IWindow> create();
     };
 }

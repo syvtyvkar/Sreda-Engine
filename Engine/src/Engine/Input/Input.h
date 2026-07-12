@@ -42,8 +42,8 @@ namespace Engine
         void Shutdown();                 // Shutdown input system, free resources.
         static void Update();                                               // Update input state (should be called every frame).
 
-        void InitNewWindow(Engine::IWindow* InWinHandle, Engine::WindowContext InWinContext);
-        void DeInitWindow(Engine::IWindow* InWinHandle, Engine::WindowContext InWinContext);
+        void InitNewWindow(TWeak<Engine::IWindow> InWinHandle, Engine::WindowContext InWinContext);
+        void DeInitWindow(TWeak<Engine::IWindow> InWinHandle, Engine::WindowContext InWinContext);
 
         // Keyboard
         static bool IsKeyPressed(InputKey Key);                             // Checks if a key is held in the current frame.
@@ -85,7 +85,7 @@ namespace Engine
 
     protected:
         //TUniquePtr<IInputListen> m_InputListen=nullptr;                 // Input listener
-        unordered_map<Engine::WindowContext, TUniquePtr<IInputListen>,Engine::WindowContextHash> m_InputListenList;
+        unordered_map<Engine::WindowContext, TRef<IInputListen>,Engine::WindowContextHash> m_InputListenList;
     private:
 
         void SetKeyState(InputKey Key, InputState State);                   // Sets the state of the specified key.
@@ -128,7 +128,7 @@ namespace Engine
         void CallOnMouseButtonPressed(InputKey button, int mods, InputState State);
     public:
         void CallOnHasFocusChange(WindowContext InWinContext);
-        void CallOnWinCreate(IWindow* InWin, WindowContext InWinContext);
-        void CallOnWinDestroy(IWindow* InWin, WindowContext InWinContext);
+        void CallOnWinCreate(TWeak<Engine::IWindow> InWin, WindowContext InWinContext);
+        void CallOnWinDestroy(TWeak<Engine::IWindow> InWin, WindowContext InWinContext);
     };
 }
