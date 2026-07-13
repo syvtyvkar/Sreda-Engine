@@ -98,7 +98,7 @@ void EditorMainWidget::OnRender()
     UIWidget::OnRender();
 }
 
-void EditorMainWidget::CallOnWindowReSize(WindowContext cntxt, int x, int y)
+void EditorMainWidget::CallOnWindowReSize(int x, int y)
 {
     ENGINE_ASSERT(GetUIContext(), "No valid UIContext!");
     IWindow* LWinD = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(GetUIContext().get()->GetWindowContext());

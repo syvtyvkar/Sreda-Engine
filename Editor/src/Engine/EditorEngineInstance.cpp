@@ -279,7 +279,7 @@ void EditorAppInstance::OnRender()
 	__super::OnRender();
 }
 
-void EditorAppInstance::CallOnWindowReSize(WindowContext cntxt, int x, int y)
+void EditorAppInstance::CallOnWindowReSize(int x, int y)
 {
 	m_CameraController.OnResize(x,y);
 	m_ui_camera.SetProjection(0.0f, (float)x, (float)y, 0.0f);

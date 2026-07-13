@@ -1,6 +1,6 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-#pragma once                            // Multiple inclusion guard for header file
+#pragma once
 
 #include <string>
 

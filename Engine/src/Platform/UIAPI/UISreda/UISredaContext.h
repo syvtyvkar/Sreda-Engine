@@ -4,6 +4,7 @@
 
 #include "Engine/UI/Framework/IUIContext.h"
 #include "Engine/UI/Framework/UIWidget.h"
+//#include "Engine/UI/Framework/UIRenderCommandList.h"
 #include "Engine/Render/OrthographicCamera.h"
 #include "Engine/Core/Utilities/Event.h"
 
@@ -35,6 +36,8 @@ namespace Engine::UI
 
         void CallOnWindowReSize(int x, int y); 
 
+        //virtual UICommandList& GetCommandList() override { return m_uiCommandList; }
+
     protected:
 
     //Focus widget
@@ -46,6 +49,9 @@ namespace Engine::UI
     private:
         TRef<UIWidget> HitTest(TRef<UIElement> root, const Vector2& point);
         void HandleInput();
+
+        void CollectCommands(TRef<UIElement> InElement);
+        void SortCommand();
 
         OrthographicCamera m_ui_camera;
         bool m_bIsVisible = true;
@@ -60,5 +66,7 @@ namespace Engine::UI
         Engine::DelegateHandle m_mouseReleasedHandle;
 
         WindowContext m_WindowContext = WindowContext(0);
+
+        //UICommandList m_uiCommandList;
     };
 }
