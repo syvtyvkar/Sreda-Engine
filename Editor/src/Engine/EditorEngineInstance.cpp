@@ -266,10 +266,6 @@ void EditorAppInstance::Update(float DeltaTime)
 	}
 	Renderer::EndScene();
 
-	Renderer2D::BeginScene(m_ui_camera);
-
-	Renderer2D::EndScene();
-
 	//ENGINE_LOG_INFO("Atlas size: {}x{}, pixels size: {}", m_AtlasFont.width, m_AtlasFont.height, m_AtlasFont.pixels.size());
 	//ENGINE_LOG_INFO("Font texture created, ID: {}", m_FontTexture->GetRendererID());
 }

@@ -24,21 +24,6 @@ namespace Engine::UI
         if (!IsVisible()) return;
 
         UIWidget::OnRender();
-
-        Vector2 pos = GetComputedPosition();
-        Vector2 size = GetComputedSize();
-        if (m_font)
-        {
-            float textX = pos.x + m_padding.left;
-            float textY = pos.y + m_padding.top + GetFontSize() * 0.85f;
-
-            /*Renderer2D::RenderDrawText(
-                std::wstring(m_text.begin(), m_text.end()),
-                m_font.get()->GetAtlasTexture(),
-                m_font.get()->GetGlyphs(),
-                textX, textY,GetLayout(), GetFontSize(), TextColor
-            );*/
-        }
     }
 
     void UITextBlock::OnUpdate(float deltaTime)
