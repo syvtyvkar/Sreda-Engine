@@ -66,10 +66,6 @@ namespace Engine::UI
         DOnUIWidgetPressEnd& OnPressEnd() { return m_onPressEnd; }
 
     protected:
-        virtual void DrawBackground();
-        virtual void DrawBorder();
-        virtual void DrawContent();
-
         TColor GetCurrentBackgroundColor() const;
         TColor GetCurrentBorderColor() const;
 

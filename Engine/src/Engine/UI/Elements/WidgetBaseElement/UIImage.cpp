@@ -6,6 +6,7 @@
 #include "Engine/Render/Renderer.h"
 
 #include "Engine/Render/RenderCommand.h"
+#include "Engine/UI/Framework/UIRenderCommandList.h"
 
 namespace Engine::UI 
 {
@@ -26,10 +27,17 @@ namespace Engine::UI
         const Vector2 size = GetComputedSize();
 
         //const TRef<Texture2D> LTexture = m_Texture;
-        Renderer2D::DrawQuad(pos,size, m_Texture,1.f,TColor::White);
     }
     
     void UIImage::OnUpdate(float deltaTime)
     {
+    }
+
+    void UIImage::OnSelfUICollectCommand(UICommandList &InCmd)
+    {
+        if (!m_Texture) return;
+        const Vector2 pos = GetComputedPosition();
+        const Vector2 size = GetComputedSize();
+        InCmd.PushQuad({pos,size, m_Texture,1.f,TColor::White, GetLayout()});
     }
 }

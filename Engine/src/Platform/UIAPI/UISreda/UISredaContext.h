@@ -4,7 +4,7 @@
 
 #include "Engine/UI/Framework/IUIContext.h"
 #include "Engine/UI/Framework/UIWidget.h"
-//#include "Engine/UI/Framework/UIRenderCommandList.h"
+#include "Engine/UI/Framework/UIRenderCommandList.h"
 #include "Engine/Render/OrthographicCamera.h"
 #include "Engine/Core/Utilities/Event.h"
 
@@ -36,7 +36,7 @@ namespace Engine::UI
 
         void CallOnWindowReSize(int x, int y); 
 
-        //virtual UICommandList& GetCommandList() override { return m_uiCommandList; }
+        virtual UICommandList& GetCommandList() override { return m_uiCommandList; }
 
     protected:
 
@@ -67,6 +67,6 @@ namespace Engine::UI
 
         WindowContext m_WindowContext = WindowContext(0);
 
-        //UICommandList m_uiCommandList;
+        UICommandList m_uiCommandList;
     };
 }

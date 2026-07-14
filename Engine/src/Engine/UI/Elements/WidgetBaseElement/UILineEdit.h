@@ -19,6 +19,8 @@ namespace Engine::UI
         void OnCallCharInput(uint32_t codepoint);
         void OnCallClick();
 
+        virtual void OnSelfUICollectCommand(UICommandList& InCmd) override;
+
         void SetText(const std::string& text);
         std::string GetText() const { return m_text; }
 
@@ -47,10 +49,10 @@ namespace Engine::UI
         void HandleKeyInput();
         void HandleCharInput(uint32_t codepoint);
         void UpdateCursorBlink(float dt);
-        void DrawControl();
-        void DrawCursor();
-        void DrawSelection();
-        void DrawTextContent();
+        void DrawControl(UICommandList &InCmd);
+        void DrawCursor(UICommandList &InCmd);
+        void DrawSelection(UICommandList &InCmd);
+        void DrawTextContent(UICommandList &InCmd);
         int GetGlyphIndexAtX(float x);
         float GetCursorXPosition() const;
         void EnsureCursorVisible();

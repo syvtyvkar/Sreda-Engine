@@ -8,6 +8,7 @@
 #include "Engine/Input/Input.h"
 #include "Engine/Core/App/Application.h"
 #include "Engine/Core/Base/EngineCore.h"
+#include "Engine/UI/Framework/UIRenderCommandList.h"
 #include <algorithm>
 
 namespace Engine::UI
@@ -28,8 +29,8 @@ namespace Engine::UI
     {
         if (!IsVisible()) return;
 
-        DrawTextContent();
-        DrawControl();
+       // DrawTextContent();
+       // DrawControl();
 
         UIWidget::OnRender();
     }
@@ -138,6 +139,12 @@ namespace Engine::UI
         {
             Focus();
         }
+    }
+
+    void UILineEdit::OnSelfUICollectCommand(UICommandList &InCmd)
+    {
+        DrawControl(InCmd);
+        DrawTextContent(InCmd);
     }
 
     void UILineEdit::SetText(const std::string& text)
@@ -254,7 +261,7 @@ namespace Engine::UI
         }
     }
 
-    void UILineEdit::DrawControl()
+    void UILineEdit::DrawControl(UICommandList &InCmd)
     {
         Vector2 pos = GetComputedPosition();
         Vector2 size = GetComputedSize();
@@ -262,13 +269,13 @@ namespace Engine::UI
         TColor bgColor = m_BackgroundColor;
         if (m_focused) bgColor = TColor(35, 35, 40, 255);
 
-        Renderer2D::DrawQuad(pos + size * 0.5f, size, bgColor);
+        InCmd.PushQuad({pos + size * 0.5f, size, bgColor, GetLayout()+0.1f});
 
         TColor borderColor = m_focused ? m_FocusBorderColor : m_BorderColor;
-        Renderer2D::DrawRect({ pos.x + size.x * 0.5f, pos.y + size.y * 0.5f, 0.0f }, size, borderColor);
+        InCmd.PushRect({{ pos.x + size.x * 0.5f, pos.y + size.y * 0.5f}, size, borderColor, GetLayout()+0.1f});
     }
 
-    void UILineEdit::DrawCursor()
+    void UILineEdit::DrawCursor(UICommandList &InCmd)
     {
         if (!m_cursorVisible || !m_focused) return;
 
@@ -279,10 +286,10 @@ namespace Engine::UI
         float cursorY = pos.y + m_padding.top + 2.0f;
         float cursorH = size.y - m_padding.top - m_padding.bottom - 4.0f;
 
-        Renderer2D::DrawQuad(Vector2( cursorX, cursorY + cursorH * 0.5f), Vector2( 1.5f, cursorH), m_CursorColor);
+        InCmd.PushQuad({Vector2( cursorX, cursorY + cursorH * 0.5f), Vector2( 1.5f, cursorH), m_CursorColor, GetLayout()});
     }
 
-    void UILineEdit::DrawSelection()
+    void UILineEdit::DrawSelection(UICommandList &InCmd)
     {
         if (!HasSelection()) return;
 
@@ -316,7 +323,7 @@ namespace Engine::UI
                 float selY = pos.y + m_padding.top + 2.0f;
                 float selH = size.y - m_padding.top - m_padding.bottom - 4.0f;
 
-                Renderer2D::DrawQuad(Vector2( selX + advance * 0.5f, selY + selH * 0.5f), Vector2( advance, selH), m_SelectionColor);
+                InCmd.PushQuad({Vector2( selX + advance * 0.5f, selY + selH * 0.5f), Vector2( advance, selH), m_SelectionColor, GetLayout(),pos,size});
             }
 
             x += advance;
@@ -328,36 +335,36 @@ namespace Engine::UI
             float selY = pos.y + m_padding.top + 2.0f;
             float selH = size.y - m_padding.top - m_padding.bottom - 4.0f;
             float endAdvance = (m_FontSize / 48.0f) * 8.0f;
-            Renderer2D::DrawQuad(Vector2( selX + endAdvance * 0.5f, selY + selH * 0.5f), Vector2(endAdvance, selH), m_SelectionColor);
+            InCmd.PushQuad({Vector2( selX + endAdvance * 0.5f, selY + selH * 0.5f), Vector2(endAdvance, selH), m_SelectionColor, GetLayout(),pos,size});
         }
     }
 
-    void UILineEdit::DrawTextContent()
+    void UILineEdit::DrawTextContent(UICommandList &InCmd)
     {
         Vector2 pos = GetComputedPosition();
         Vector2 size = GetComputedSize();
 
-        RenderCommand::EnableScissor(true);
-        RenderCommand::SetScissor((int)pos.x, (int)pos.y, (int)size.x, (int)size.y);
+        //RenderCommand::EnableScissor(true);
+        //RenderCommand::SetScissor((int)pos.x, (int)pos.y, (int)size.x, (int)size.y);
 
-        DrawSelection();
-        DrawCursor();
+        DrawSelection(InCmd);
+        DrawCursor(InCmd);
 
         if (m_wtext.empty() && !m_focused && !m_placeholderText.empty())
         {
             std::wstring wplaceholder(m_placeholderText.begin(), m_placeholderText.end());
             float textX = pos.x + m_padding.left - m_scrollOffset;
             float textY = pos.y + m_padding.top + m_FontSize * 0.85f;
-            Renderer2D::RenderDrawText(wplaceholder, m_font->GetAtlasTexture(), m_font->GetGlyphs(), textX, textY,GetDepthZ(), m_FontSize, m_PlaceholderColor);
+            InCmd.PushText({wplaceholder,m_font,Vector2(textX, textY),GetFontSize(),m_PlaceholderColor,-1,GetLayout(),size,pos});
         }
         else if (!m_wtext.empty())
         {
             float textX = pos.x + m_padding.left - m_scrollOffset;
             float textY = pos.y + m_padding.top + m_FontSize * 0.85f;
-            Renderer2D::RenderDrawText(m_wtext, m_font->GetAtlasTexture(), m_font->GetGlyphs(), textX, textY,GetDepthZ(), m_FontSize, m_TextColor);
+            InCmd.PushText({m_wtext,m_font,Vector2(textX, textY),GetFontSize(),m_TextColor,-1,GetLayout(),size,pos});
         }
 
-        RenderCommand::EnableScissor(false);
+        //RenderCommand::EnableScissor(false);
     }
 
     int UILineEdit::GetGlyphIndexAtX(float x)

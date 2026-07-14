@@ -3,6 +3,7 @@
 #include "Engine/Render/RenderCommand.h"
 #include "Engine/Input/Input.h"
 #include <algorithm>
+#include "Engine/UI/Framework/UIRenderCommandList.h"
 
 namespace Engine::UI
 {
@@ -16,27 +17,6 @@ namespace Engine::UI
     void UIScrollBox::OnRender()
     {
         if (!IsVisible()) return;
-
-        Vector2 pos = GetComputedPosition();
-        Vector2 size = GetComputedSize();
-
-        Renderer2D::DrawQuad(pos + size * 0.5f, size, GetCurrentBackgroundColor());
-
-        if (m_content)
-        {
-            RenderCommand::EnableScissor(true);
-            RenderCommand::SetScissor((int)pos.x, (int)pos.y, (int)size.x, (int)size.y);
-
-            Vector2 origPos = m_content->GetPosition();
-            m_content->SetPosition({ -m_scrollX, -m_scrollY });
-            m_content->OnRender();
-            m_content->SetPosition(origPos);
-
-            RenderCommand::EnableScissor(false);
-        }
-
-        if (m_showVertical) DrawScrollbarVertical();
-        if (m_showHorizontal) DrawScrollbarHorizontal();
 
         UIWidget::OnRender();
     }
@@ -152,6 +132,30 @@ namespace Engine::UI
         return UIWidget::GetComputedSize();
     }
 
+    void UIScrollBox::OnSelfUICollectCommand(UICommandList &InCmd)
+    {
+        Vector2 pos = GetComputedPosition();
+        Vector2 size = GetComputedSize();
+
+        InCmd.PushQuad({pos + size * 0.5f, size, GetCurrentBackgroundColor(), GetLayout()});
+
+        /*if (m_content)
+        {
+            RenderCommand::EnableScissor(true);
+            RenderCommand::SetScissor((int)pos.x, (int)pos.y, (int)size.x, (int)size.y);
+
+            Vector2 origPos = m_content->GetPosition();
+            m_content->SetPosition({ -m_scrollX, -m_scrollY });
+            m_content->OnRender();
+            m_content->SetPosition(origPos);
+
+            RenderCommand::EnableScissor(false);
+        }*/
+
+        if (m_showVertical) DrawScrollbarVertical(InCmd);
+        if (m_showHorizontal) DrawScrollbarHorizontal(InCmd);
+    }
+
     void UIScrollBox::SetContent(TRef<UIElement> content)
     {
         if (m_content)
@@ -202,7 +206,7 @@ namespace Engine::UI
         m_showHorizontal = m_contentSize.x > size.x;
     }
 
-    void UIScrollBox::DrawScrollbarVertical()
+    void UIScrollBox::DrawScrollbarVertical(UICommandList& InCmd)
     {
         Vector2 pos = GetComputedPosition();
         Vector2 size = GetComputedSize();
@@ -212,7 +216,7 @@ namespace Engine::UI
         float barY = pos.y;
         float barH = size.y;
 
-        Renderer2D::DrawQuad(Vector2(barX + sbWidth * 0.5f, barY + barH * 0.5f), Vector2(sbWidth, barH), m_scrollbarBgColor);
+        InCmd.PushQuad({Vector2(barX + sbWidth * 0.5f, barY + barH * 0.5f), Vector2(sbWidth, barH), m_scrollbarBgColor, GetLayout()});
 
         float contentH = m_contentSize.y;
         float viewH = size.y;
@@ -225,10 +229,10 @@ namespace Engine::UI
         }
 
         TColor thumbColor = m_hoveringVertical ? m_scrollbarThumbHoverColor : m_scrollbarThumbColor;
-        Renderer2D::DrawQuad(Vector2(barX + sbWidth * 0.5f, thumbY + thumbHeight * 0.5f), Vector2(sbWidth, thumbHeight), thumbColor);
+        InCmd.PushQuad({Vector2(barX + sbWidth * 0.5f, thumbY + thumbHeight * 0.5f), Vector2(sbWidth, thumbHeight), thumbColor, GetLayout()});
     }
 
-    void UIScrollBox::DrawScrollbarHorizontal()
+    void UIScrollBox::DrawScrollbarHorizontal(UICommandList& InCmd)
     {
         Vector2 pos = GetComputedPosition();
         Vector2 size = GetComputedSize();
@@ -238,7 +242,7 @@ namespace Engine::UI
         float barY = pos.y + size.y - sbWidth;
         float barW = size.x;
 
-        Renderer2D::DrawQuad(Vector2(barX + barW * 0.5f, barY + sbWidth * 0.5f), Vector2(barW, sbWidth), m_scrollbarBgColor);
+        InCmd.PushQuad({Vector2(barX + barW * 0.5f, barY + sbWidth * 0.5f), Vector2(barW, sbWidth), m_scrollbarBgColor, GetLayout()});
 
         float contentW = m_contentSize.x;
         float viewW = size.x;
@@ -251,7 +255,7 @@ namespace Engine::UI
         }
 
         TColor thumbColor = m_hoveringHorizontal ? m_scrollbarThumbHoverColor : m_scrollbarThumbColor;
-        Renderer2D::DrawQuad(Vector2(thumbX + thumbWidth * 0.5f, barY + sbWidth * 0.5f), Vector2(thumbWidth, sbWidth), thumbColor);
+        InCmd.PushQuad({Vector2(thumbX + thumbWidth * 0.5f, barY + sbWidth * 0.5f), Vector2(thumbWidth, sbWidth), thumbColor, GetLayout()});
     }
 
     bool UIScrollBox::IsMouseOverScrollbarVertical(const Vector2& mousePos)

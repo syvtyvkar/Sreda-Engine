@@ -15,6 +15,7 @@
 #include "Engine/Render/RenderAPIFactory.h"
 
 #include "Platform/RenderAPI/OpenGL/OpenGLContext.h"   
+#include "Engine/Render/RenderCommand.h"
 
 
 namespace Engine
@@ -254,7 +255,7 @@ namespace Engine
         int fbW, fbH;
         glfwGetFramebufferSize(GetHandle(), &fbW, &fbH);
         if (Engine::Render::RenderAPIFactory::GetRenderAPI() != Engine::Render::RenderAPIFactory::RHI_API::Vulkan)
-            glViewport(0, 0, fbW, fbH);
+            RenderCommand::SetViewport(0, 0, fbW, fbH);
     
         // Возвращаем фокус окну
         glfwFocusWindow(GetHandle());

@@ -41,7 +41,7 @@ namespace Engine::Render
 
 		static void DrawCircle(const glm::mat4& transform, const TColor& color, float thickness = 1.0f, float fade = 0.005f, int entityID = -1);
 		
-		static void DrawLine(const Vector3& p0, Vector3& p1, const TColor& color, int entityID = -1);
+		static void DrawLine(const Vector3& p0, const Vector3& p1, const TColor& color, int entityID = -1);
 
 		static void DrawRect(const Vector3& position, const Vector2& size, const TColor& color, int entityID = -1);
 		static void DrawRect(const glm::mat4& transform, const TColor& color, int entityID = -1);

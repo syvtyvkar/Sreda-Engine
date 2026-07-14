@@ -14,10 +14,6 @@ namespace Engine::UI
     {
         if (!IsVisible()) return;
 
-        //DrawBackground();
-        //DrawBorder();
-        DrawContent();
-
         UIElement::OnRender();
     }
 
@@ -39,31 +35,6 @@ namespace Engine::UI
                 m_pressed = false;
             }
         }
-    }
-
-    void UIWidget::DrawBackground()
-    {
-        Vector2 pos = GetComputedPosition();
-        Vector2 size = GetComputedSize();
-        TColor color = GetCurrentBackgroundColor();
-
-        Renderer2D::DrawQuad(pos + size * 0.5f, size, color);
-    }
-
-    void UIWidget::DrawBorder()
-    {
-        float bw = m_style.borderWidth;
-        if (bw <= 0.0f) return;
-
-        Vector2 pos = GetComputedPosition();
-        Vector2 size = GetComputedSize();
-        TColor color = GetCurrentBorderColor();
-
-        Renderer2D::DrawRect({ pos.x, pos.y, 0.0f }, size, color);
-    }
-
-    void UIWidget::DrawContent()
-    {
     }
 
     TColor UIWidget::GetCurrentBackgroundColor() const

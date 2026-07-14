@@ -6,6 +6,7 @@
 #include "Engine/Render/Renderer.h"
 
 #include "Engine/Render/RenderCommand.h"
+#include "Engine/UI/Framework/UIRenderCommandList.h"
 
 namespace Engine::UI 
 {
@@ -31,12 +32,12 @@ namespace Engine::UI
             float textX = pos.x + m_padding.left;
             float textY = pos.y + m_padding.top + GetFontSize() * 0.85f;
 
-            Renderer2D::RenderDrawText(
+            /*Renderer2D::RenderDrawText(
                 std::wstring(m_text.begin(), m_text.end()),
                 m_font.get()->GetAtlasTexture(),
                 m_font.get()->GetGlyphs(),
-                textX, textY,GetDepthZ(), GetFontSize(), TextColor
-            );
+                textX, textY,GetLayout(), GetFontSize(), TextColor
+            );*/
         }
     }
 
@@ -44,6 +45,16 @@ namespace Engine::UI
     {
         if (!IsVisible()) return;
         UIWidget::OnUpdate(deltaTime);
+    }
+
+    void UITextBlock::OnSelfUICollectCommand(UICommandList& InCmd)
+    {
+        Vector2 pos = GetComputedPosition();
+        Vector2 size = GetComputedSize();
+        float textX = pos.x + m_padding.left;
+        float textY = pos.y + m_padding.top + GetFontSize() * 0.85f;
+
+        InCmd.PushText({std::wstring(m_text.begin(), m_text.end()),m_font,Vector2(textX, textY),GetFontSize(),TextColor,-1,GetLayout()});
     }
 
     void UITextBlock::SetFontSize(int size)

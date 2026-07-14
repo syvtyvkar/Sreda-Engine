@@ -20,6 +20,7 @@ namespace Engine::UI
         virtual Vector2 GetComputedSize() const override;
         void OnRender() override;
         void OnUpdate(float deltaTime) override;
+        virtual void OnSelfUICollectCommand(UICommandList& InCmd) override;
         std::string GetText() const { return m_text; }
         void SetText(const std::string& InText) { m_text = InText; }
         void SetFontSize(int size);

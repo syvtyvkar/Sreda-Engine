@@ -22,6 +22,10 @@ namespace Engine::UI
         virtual void OnRender();
         virtual void OnUpdate(float deltaTime);
 
+
+        void OnUICollectCommand(class UICommandList& InCmd);
+        virtual void OnSelfUICollectCommand(class UICommandList& InCmd);
+
         virtual void SetPosition(const Vector2& position) { m_position = position; }
         virtual Vector2 GetPosition() const { return m_position; }
 
@@ -68,7 +72,7 @@ namespace Engine::UI
 
         TRef<class UIContext> GetUIContext() {return m_ui_context.lock();}
 
-        float GetDepthZ() {return DepthZ;}
+        float GetLayout() {return (m_Layout + (float)m_children.size()) * 0.001f;}
 
     protected:
         std::vector<TRef<UIElement>> m_children;
@@ -85,6 +89,6 @@ namespace Engine::UI
         UIHorizontalAlignment m_hAlignment = UIHorizontalAlignment::Left;
         UIVerticalAlignment m_vAlignment = UIVerticalAlignment::Top;
         bool bIsFocusable = false;
-        float DepthZ=0.f;
+        float m_Layout=0.f;
     };
 }

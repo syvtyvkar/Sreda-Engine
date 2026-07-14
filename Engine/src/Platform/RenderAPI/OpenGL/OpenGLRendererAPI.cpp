@@ -95,6 +95,7 @@ namespace Engine::Render
 
 	void OpenGLRendererAPI::SetScissor(int x, int y, int width, int height)
 	{
-		glScissor(x, m_viewportHeight - y - height, width, height);
+		//glScissor(x, m_viewportHeight - y - height, width, height);
+		glScissor(x, y, width, height);
 	}
 }

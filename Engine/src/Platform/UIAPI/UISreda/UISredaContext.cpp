@@ -25,6 +25,16 @@ namespace Engine::UI
     }
     void UISredaContext::Render()
     {
+        m_uiCommandList.Clear();
+
+        CollectCommands(GetRootWidget());
+        for (auto& overlay : GetOverlayWidgets())
+        {
+            CollectCommands(overlay);
+        }
+
+        SortCommand();
+
         Renderer2D::BeginScene(m_ui_camera);
 
             for (auto& overlay : GetOverlayWidgets())
@@ -33,6 +43,7 @@ namespace Engine::UI
             }
             
             RenderUIElements(GetRootWidget());
+            GetCommandList().ExecuteCommands(m_ui_camera);
 
         Renderer2D::EndScene();
     }
@@ -225,6 +236,17 @@ namespace Engine::UI
                 m_hoveredWidget->OnHoverBegin().Broadcast();
             }
         }
+    }
+
+    void UISredaContext::CollectCommands(TRef<UIElement> InElement)
+    {
+        if (!InElement || !InElement->IsVisible()) return;
+
+        InElement->OnUICollectCommand(GetCommandList());
+    }
+
+    void UISredaContext::SortCommand()
+    {
     }
 
     void UISredaContext::Update(float DeltaTime)

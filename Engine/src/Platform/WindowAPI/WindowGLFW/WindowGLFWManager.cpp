@@ -17,6 +17,7 @@
 #include "Engine/Platform/WindowManagerAPIFactory.h"
 #include "Engine/Platform/IWindow.h"
 #include "Engine/Render/RenderAPIFactory.h"
+#include "Engine/Render/RenderCommand.h"
 
 namespace Engine
 {
@@ -201,7 +202,7 @@ namespace Engine
             
             // Устанавливаем область вывода на весь новый размер окна
             if (Engine::Render::RenderAPIFactory::GetRenderAPI() != Engine::Render::RenderAPIFactory::RHI_API::Vulkan)  
-                glViewport(0, 0, width, height);
+                RenderCommand::SetViewport(0, 0, width, height);
 
             EngineCore::GetEngineContext().GetWindowManager()->OnWindowReSize().Broadcast(win->GetWindowContext(), width, height);
             win->OnWindowReSize().Broadcast(width, height);

@@ -14,6 +14,8 @@ namespace Engine::UI
         void OnUpdate(float deltaTime) override;
         Vector2 GetComputedSize() const override;
 
+        virtual void OnSelfUICollectCommand(UICommandList& InCmd) override;
+
         void SetContent(TRef<UIElement> content);
         TRef<UIElement> GetContent() const { return m_content; }
 
@@ -37,8 +39,8 @@ namespace Engine::UI
     private:
         void UpdateScrollableSize();
         void ClampScroll();
-        void DrawScrollbarVertical();
-        void DrawScrollbarHorizontal();
+        void DrawScrollbarVertical(UICommandList& InCmd);
+        void DrawScrollbarHorizontal(UICommandList& InCmd);
         bool IsMouseOverScrollbarVertical(const Vector2& mousePos);
         bool IsMouseOverScrollbarHorizontal(const Vector2& mousePos);
 

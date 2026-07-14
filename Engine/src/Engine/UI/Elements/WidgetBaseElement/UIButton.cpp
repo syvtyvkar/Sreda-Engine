@@ -6,6 +6,7 @@
 #include "Engine/Render/Renderer.h"
 
 #include "Engine/Render/RenderCommand.h"
+#include "Engine/UI/Framework/UIRenderCommandList.h"
 
 namespace Engine::UI 
 {
@@ -36,45 +37,29 @@ namespace Engine::UI
         if (!IsVisible()) return;
 
         UIWidget::OnRender();
-
-        Vector2 pos = GetComputedPosition();
-        Vector2 size = GetComputedSize();
-
-        if (m_font)
-        {
-            float textX = pos.x /*+ size.x * 0.5f*/ /*+ 4.0f*/;
-            float textY = pos.y + size.y * 0.5f + 6.0f;
-
-            float quadX = pos.x + (size.x*0.5f) - ((GetPadding().left + GetPadding().right)/2.f);
-            float quadY = pos.y + (size.y/2.f);
-
-            Renderer2D::DrawQuad(Vector2(quadX, quadY), size, IsPressed() ? PressButtonColor : (IsHovered() ? HoverButtonColor : NormalButtonColor));
-            Renderer2D::DrawRect(Vector3(quadX, quadY, 0.0f), size, TColor(120,120,120,255));
-
-            Renderer2D::RenderDrawText(
-                std::wstring(m_text.begin(), m_text.end()),
-                m_font.get()->GetAtlasTexture(),
-                m_font.get()->GetGlyphs(),
-                textX + 1.f, textY + 1.f, GetDepthZ(),
-                GetFontSize(),
-                TColor::Black
-            );
-
-            Renderer2D::RenderDrawText(
-                std::wstring(m_text.begin(), m_text.end()),
-                m_font.get()->GetAtlasTexture(),
-                m_font.get()->GetGlyphs(),
-                textX, textY, GetDepthZ(),
-                GetFontSize(),
-                TextColor
-            );
-        }
     }
 
     void UIButton::OnUpdate(float deltaTime)
     {
         if (!IsVisible()) return;
         UIWidget::OnUpdate(deltaTime);
+    }
+
+    void UIButton::OnSelfUICollectCommand(UICommandList &InCmd)
+    {
+        Vector2 pos = GetComputedPosition();
+        Vector2 size = GetComputedSize();
+
+        float textX = pos.x /*+ size.x * 0.5f*/ /*+ 4.0f*/;
+        float textY = pos.y + size.y * 0.5f + 6.0f;
+
+        float quadX = pos.x + (size.x*0.5f) - ((GetPadding().left + GetPadding().right)/2.f);
+        float quadY = pos.y + (size.y/2.f);
+
+        InCmd.PushRect({Vector2(quadX, quadY), size, TColor(120,120,120,255), GetLayout()});
+        InCmd.PushText({std::wstring(m_text.begin(), m_text.end()),m_font,Vector2(textX + 1.f, textY + 1.f),GetFontSize(),TColor::Black,-1,GetLayout()});
+        InCmd.PushText({std::wstring(m_text.begin(), m_text.end()),m_font,Vector2(textX, textY),GetFontSize(),TextColor,-1,GetLayout()});
+        InCmd.PushQuad({Vector2(quadX, quadY), size, IsPressed() ? PressButtonColor : (IsHovered() ? HoverButtonColor : NormalButtonColor), GetLayout()});
     }
 
     void UIButton::SetFontSize(int size)

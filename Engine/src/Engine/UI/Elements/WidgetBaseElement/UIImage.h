@@ -19,7 +19,8 @@ namespace Engine::UI
         UIImage(const std::string& InImageAsset);
         void OnRender() override;
         void OnUpdate(float deltaTime) override;
-
+        
+        virtual void OnSelfUICollectCommand(UICommandList& InCmd) override;
     private:
         TRef<Texture2D> m_Texture;
     };

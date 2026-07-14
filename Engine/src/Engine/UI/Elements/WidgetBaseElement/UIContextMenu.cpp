@@ -8,6 +8,7 @@
 #include "Engine/Platform/IWindow.h"
 #include "Engine/UI/Framework/UIBuilder.h"
 #include "Engine/UI/Framework/IUIContext.h"
+#include "Engine/UI/Framework/UIRenderCommandList.h"
 
 namespace Engine::UI
 {
@@ -17,7 +18,6 @@ namespace Engine::UI
     UIContextMenu::UIContextMenu()
     {
         SetVisible(UIVisibleMode::Collapse);
-        DepthZ = 99999.f;
     }
 
     UIContextMenu::~UIContextMenu()
@@ -28,6 +28,7 @@ namespace Engine::UI
     void UIContextMenu::OnInit()
     {
         m_Font = FontManager::GetFontManager().GetFontDefault();
+        m_Layout = 0.f;
     }
 
     void UIContextMenu::ShowAt(const Vector2& InPosition, std::function<void(ContextMenuItemBuilder&)> InBuildFunc)
@@ -71,74 +72,17 @@ namespace Engine::UI
     {
         if (!m_IsOpen) return;
 
-        RenderMenu(m_MenuPosition, m_MenuWidth, m_Items, m_HoveredIndex);
+        /*RenderMenu(m_MenuPosition, m_MenuWidth, m_Items, m_HoveredIndex);
 
         if (m_ActiveSubmenu)
         {
             m_ActiveSubmenu->OnRender();
-        }
+        }*/
     }
 
     void UIContextMenu::RenderMenu(const Vector2& InPos, float InWidth, const std::vector<ContextMenuItem>& InItems, int InHoverIndex)
     {
         if (InItems.empty()) return;
-
-        float menuH = CalculateMenuHeight(InItems);
-        Vector2 bgCenter = InPos + Vector2(InWidth * 0.5f, menuH * 0.5f);
-
-        float y = InPos.y + MENU_PADDING;
-        int itemIndex = 0;
-
-        for (size_t i = 0; i < InItems.size(); i++)
-        {
-            const ContextMenuItem& item = InItems[i];
-
-            if (item.Type == ContextMenuItemType::Separator)
-            {
-                float LSeparatorY = y + 1.0f;
-                Vector3 p0 = Vector3( InPos.x + ITEM_PADDING_LEFT, LSeparatorY );
-                Vector3 p1 = Vector3( InPos.x + InWidth - ITEM_PADDING_LEFT, LSeparatorY );
-                Renderer2D::DrawLine(p0,p1,m_SeparatorColor);
-                y += 2.0f;
-                continue;
-            }
-
-            float itemY = y;
-            bool isHovered = (itemIndex == InHoverIndex) && item.Enabled;
-
-            TColor textColor = item.Enabled ? m_TextColor : m_DisabledTextColor;
-            std::wstring wlabel(item.Label.begin(), item.Label.end());
-            float textX = InPos.x + ITEM_PADDING_LEFT;
-            float textY = itemY + DEFAULT_ITEM_HEIGHT * 0.5f + 4.0f;
-
-            if (m_Font)
-            {
-                Renderer2D::RenderDrawText(wlabel, m_Font->GetAtlasTexture(), m_Font->GetGlyphs(),
-                    textX, textY,GetDepthZ(), m_FontSize, textColor);
-            }
-
-            if (isHovered)
-            {
-                Vector2 hoverCenter(InPos.x + InWidth * 0.5f, itemY + DEFAULT_ITEM_HEIGHT * 0.5f);
-                Renderer2D::DrawQuad(hoverCenter, Vector2(InWidth - 2.0f, DEFAULT_ITEM_HEIGHT), m_HoverColor);
-            }
-
-            if (item.Type == ContextMenuItemType::Submenu && item.Enabled)
-            {
-                float arrowX = InPos.x + InWidth - ITEM_PADDING_LEFT - SUBMENU_ARROW_SIZE;
-                float arrowY = itemY + DEFAULT_ITEM_HEIGHT * 0.5f;
-
-                Renderer2D::DrawQuad(Vector2(arrowX + SUBMENU_ARROW_SIZE * 0.33f, arrowY),Vector2(0.0f, 0.0f), m_SubmenuArrowColor);
-                Renderer2D::DrawLine(Vector3(arrowX, arrowY - SUBMENU_ARROW_SIZE * 0.5f),Vector3(arrowX + SUBMENU_ARROW_SIZE, arrowY),m_SubmenuArrowColor);
-                Renderer2D::DrawLine(Vector3(arrowX + SUBMENU_ARROW_SIZE, arrowY),Vector3( arrowX, arrowY + SUBMENU_ARROW_SIZE * 0.5f),m_SubmenuArrowColor);
-            }
-
-            y += DEFAULT_ITEM_HEIGHT;
-            itemIndex++;
-        }
-
-        Renderer2D::DrawQuad(bgCenter, Vector2(InWidth, menuH), m_BackgroundColor);
-        Renderer2D::DrawRect(Vector3(bgCenter.x, bgCenter.y, 0.0f), Vector2(InWidth, menuH), m_BorderColor,9999);
     }
 
     void UIContextMenu::OnUpdate(float deltaTime)
@@ -150,6 +94,65 @@ namespace Engine::UI
         if (m_ActiveSubmenu)
         {
             m_ActiveSubmenu->OnUpdate(deltaTime);
+        }
+    }
+
+    void UIContextMenu::OnSelfUICollectCommand(UICommandList &InCmd)
+    {
+        if (!m_IsOpen) return;
+        if (m_Items.empty()) return;
+;
+        float menuH = CalculateMenuHeight(m_Items);
+        Vector2 bgCenter = m_MenuPosition + Vector2(m_MenuWidth * 0.5f, menuH * 0.5f);
+
+        float y = m_MenuPosition.y + MENU_PADDING;
+        int itemIndex = 0;
+
+        for (size_t i = 0; i < m_Items.size(); i++)
+        {
+            const ContextMenuItem& item = m_Items[i];
+            if (item.Type == ContextMenuItemType::Separator)
+            {
+                float LSeparatorY = y + 1.0f;
+                Vector2 p0 = Vector2( m_MenuPosition.x + ITEM_PADDING_LEFT, LSeparatorY );
+                Vector2 p1 = Vector2( m_MenuPosition.x + m_MenuWidth - ITEM_PADDING_LEFT, LSeparatorY );
+                InCmd.PushLine({p0,p1,m_SeparatorColor, GetLayout()});
+                y += 2.0f;
+                continue;
+            }
+            float itemY = y;
+            bool isHovered = (itemIndex == m_HoveredIndex) && item.Enabled;
+            TColor textColor = item.Enabled ? m_TextColor : m_DisabledTextColor;
+            std::wstring wlabel(item.Label.begin(), item.Label.end());
+            float textX = m_MenuPosition.x + ITEM_PADDING_LEFT;
+            float textY = itemY + DEFAULT_ITEM_HEIGHT * 0.5f + 4.0f;
+
+            InCmd.PushText({wlabel,m_Font,Vector2(textX, textY),m_FontSize,textColor,-1,GetLayout()});
+
+            if (isHovered)
+            {
+                Vector2 hoverCenter(m_MenuPosition.x + m_MenuWidth * 0.5f, itemY + DEFAULT_ITEM_HEIGHT * 0.5f);
+                InCmd.PushQuad({hoverCenter, Vector2(m_MenuWidth - 2.0f, DEFAULT_ITEM_HEIGHT), m_HoverColor, GetLayout()});
+            }
+
+            if (item.Type == ContextMenuItemType::Submenu && item.Enabled)
+            {
+                float arrowX = m_MenuPosition.x + m_MenuWidth - ITEM_PADDING_LEFT - SUBMENU_ARROW_SIZE;
+                float arrowY = itemY + DEFAULT_ITEM_HEIGHT * 0.5f;
+
+                InCmd.PushQuad({Vector2(arrowX + SUBMENU_ARROW_SIZE * 0.33f, arrowY),Vector2(0.0f, 0.0f), m_SubmenuArrowColor, GetLayout()});
+                InCmd.PushLine({Vector2(arrowX, arrowY - SUBMENU_ARROW_SIZE * 0.5f),Vector2(arrowX + SUBMENU_ARROW_SIZE, arrowY),m_SubmenuArrowColor, GetLayout()});
+                InCmd.PushLine({Vector2(arrowX + SUBMENU_ARROW_SIZE, arrowY),Vector2( arrowX, arrowY + SUBMENU_ARROW_SIZE * 0.5f),m_SubmenuArrowColor, GetLayout()});
+            }
+
+            y += DEFAULT_ITEM_HEIGHT;
+            itemIndex++;
+        }
+        InCmd.PushQuad({bgCenter, Vector2(m_MenuWidth, menuH), m_BackgroundColor, GetLayout()});
+        InCmd.PushRect({Vector2(bgCenter.x, bgCenter.y), Vector2(m_MenuWidth, menuH), m_BorderColor, GetLayout()});
+        if (m_ActiveSubmenu)
+        {
+            m_ActiveSubmenu->OnUICollectCommand(InCmd);
         }
     }
 

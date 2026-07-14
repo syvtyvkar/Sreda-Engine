@@ -5,6 +5,8 @@
 #include "Engine/Render/Renderer2D.h"
 #include "Engine/Render/RenderCommand.h"
 #include "Engine/Core/Base/EngineCore.h"
+#include "Engine/UI/Framework/UIRenderCommandList.h"
+#include "Engine/Core/App/Application.h"
 
 EditorMainMenuBar::EditorMainMenuBar()
 {
@@ -28,20 +30,18 @@ void EditorMainMenuBar::OnInit()
     AddChild(LNewButtonHelp);
 }
 
-void EditorMainMenuBar::OnRender()
+void EditorMainMenuBar::OnSelfUICollectCommand(UICommandList &InCmd)
 {
     Vector2 pos = GetComputedPosition();
     Vector2 size = GetComputedSize();
 
-    __super::OnRender();
-
-    Renderer2D::DrawQuad(pos+Vector2(size.x*0.5f,0.f),Vector2(size.x,size.y+7.f),TColor::DarkGray);
+    InCmd.PushQuad({pos+Vector2(size.x*0.5f,0.f),Vector2(size.x,size.y+7.f),TColor::DarkGray, GetLayout()});
 }
 
 void EditorMainMenuBar::OnCLickFile()
 {
     EngineCore::GetEngineContext().GetUISystem()->ShowContextMenu(
-        InputSystem::GetMousePosition(),
+        Vector2(InputSystem::GetMousePosition().x, GetComputedSize().y-7.f),
         [&](ContextMenuItemBuilder& builder) {
             builder.AddItem("New", []() { /* TODO: New file */ })
                    .AddItem("Open", []() { /* TODO: Open file */ })
@@ -61,7 +61,7 @@ void EditorMainMenuBar::OnCLickFile()
 void EditorMainMenuBar::OnCLickEdit()
 {
     EngineCore::GetEngineContext().GetUISystem()->ShowContextMenu(
-        InputSystem::GetMousePosition(),
+        Vector2(InputSystem::GetMousePosition().x, GetComputedSize().y-7.f),
         [](ContextMenuItemBuilder& builder) {
             builder.AddItem("Undo", []() { /* TODO */ }, false)
                    .AddItem("Redo", []() { /* TODO */ }, false)
@@ -78,7 +78,7 @@ void EditorMainMenuBar::OnCLickEdit()
 void EditorMainMenuBar::OnCLickHelp()
 {
     EngineCore::GetEngineContext().GetUISystem()->ShowContextMenu(
-        InputSystem::GetMousePosition(),
+        Vector2(InputSystem::GetMousePosition().x, GetComputedSize().y-7.f),
         [&,this](ContextMenuItemBuilder& builder) {
             builder.AddItem("Documentation", []() { /* TODO */ })
                    .AddItem("About",[&,this]() 
@@ -95,6 +95,11 @@ void EditorMainMenuBar::OnCLickHelp()
                     });
         }
     );
+}
+
+void EditorMainMenuBar::OnCLickExit()
+{
+    Application::Get().ExitApp();
 }
 
 void EditorMainMenuBar::OnClickDocumentation()

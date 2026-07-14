@@ -20,6 +20,8 @@ namespace Engine::UI
         void OnRender() override;
         void OnUpdate(float deltaTime) override;
 
+        virtual void OnSelfUICollectCommand(UICommandList& InCmd) override;
+
         void SetText(const std::string& text) { m_text = text; }
         std::string GetText() const { return m_text; }
 

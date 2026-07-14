@@ -1,6 +1,7 @@
 #include "UIElement.h"
 #include <algorithm>
 #include <cfloat>
+#include "UIRenderCommandList.h"
 
 namespace Engine::UI 
 {
@@ -22,6 +23,21 @@ namespace Engine::UI
         {
             child->OnUpdate(deltaTime);
         }
+    }
+
+    void UIElement::OnUICollectCommand(UICommandList& InCmd)
+    {
+        if (!IsVisible()) return;
+
+        OnSelfUICollectCommand(InCmd);
+        for (auto& child : m_children)
+        {
+            child->OnUICollectCommand(InCmd);
+        }
+    }
+
+    void UIElement::OnSelfUICollectCommand(UICommandList& InCmd)
+    {
     }
 
     Vector2 UIElement::GetComputedPosition() const
@@ -117,7 +133,8 @@ namespace Engine::UI
             m_children.push_back(child);
             child->m_parent = shared_from_this();
             child->m_ui_context = m_ui_context;
-            child->DepthZ = DepthZ + 0.01f;
+            float LL = /*0.01f */ m_children.size() + 0.01f;
+            child->m_Layout = m_Layout + LL;
         }
     }
 

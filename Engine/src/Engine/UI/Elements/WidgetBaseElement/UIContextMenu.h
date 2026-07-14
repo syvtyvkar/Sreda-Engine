@@ -28,6 +28,8 @@ namespace Engine::UI
         void OnRender() override;
         void OnUpdate(float deltaTime) override;
 
+        virtual void OnSelfUICollectCommand(UICommandList& InCmd) override;
+
         static constexpr float DEFAULT_WIDTH = 140.0f;
         static constexpr float DEFAULT_ITEM_HEIGHT = 16.0f;
         static constexpr float MENU_PADDING = 2.0f;

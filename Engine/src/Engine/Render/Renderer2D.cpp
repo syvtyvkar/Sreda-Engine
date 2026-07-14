@@ -476,7 +476,7 @@ namespace Engine::Render
 		s_Data.Stats.QuadCount++;
 	}
 
-	void Renderer2D::DrawLine(const Vector3& p0, Vector3& p1, const TColor& color, int entityID)
+	void Renderer2D::DrawLine(const Vector3& p0, const Vector3& p1, const TColor& color, int entityID)
 	{
 		s_Data.LineVertexBufferPtr->Position = p0;
 		s_Data.LineVertexBufferPtr->Color = color.GetGlmVec4();

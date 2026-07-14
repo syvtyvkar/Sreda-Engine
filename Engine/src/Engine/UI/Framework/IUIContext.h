@@ -53,6 +53,7 @@ namespace Engine::UI
 	    virtual void EndFrame()= 0;
 
         virtual Engine::WindowContext GetWindowContext() = 0;
+        virtual class UICommandList& GetCommandList() = 0;
     protected:
         void RenderUIElements(TRef<UIElement> element);
 

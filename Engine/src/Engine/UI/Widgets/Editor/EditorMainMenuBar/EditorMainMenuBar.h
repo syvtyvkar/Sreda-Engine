@@ -12,11 +12,12 @@ public:
     virtual ~EditorMainMenuBar() = default;
 
     virtual void OnInit() override;
-    virtual void OnRender() override;
+    virtual void OnSelfUICollectCommand(UICommandList& InCmd) override;
 
     void OnCLickFile();
     void OnCLickEdit();
     void OnCLickHelp();
+    void OnCLickExit();
 
     void OnClickDocumentation();
 };
