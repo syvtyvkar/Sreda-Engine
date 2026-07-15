@@ -19,6 +19,10 @@ namespace Engine::UI
         m_font = FontManager::GetFontManager().AddFont(InFontName);
     }
 
+    void UITextBlock::OnInit()
+    {
+    }
+
     void UITextBlock::OnRender()
     {
         if (!IsVisible()) return;

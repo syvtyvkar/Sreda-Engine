@@ -1,7 +1,5 @@
 #include "EngineCore.h"
 
-#include "Engine/UI/Widgets/Base/UIInitWindow.h"
-
 #include "Engine/Render/RenderCommand.h"
 #include "Engine/Render/Renderer.h"
 #include "Engine/Render/RenderAPIFactory.h"

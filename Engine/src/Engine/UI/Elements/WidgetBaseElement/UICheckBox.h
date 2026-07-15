@@ -1,3 +1,4 @@
+
 // (c) Nikita Rogalev. All rights reserved.
 
 #pragma once
@@ -13,16 +14,21 @@ using namespace Engine::Render;
 
 namespace Engine::UI 
 {
-    class UIImage : public UIWidget
+    class UICheckBox : public UIWidget
     {
     public:
-        UIImage(const std::string& InImageAsset);
+        UICheckBox();
         void OnInit() override;
-        void OnRender() override;
         void OnUpdate(float deltaTime) override;
         
         virtual void OnSelfUICollectCommand(UICommandList& InCmd) override;
+
+        bool GetCheckOut() const {return m_CheckOut;}
+        void SetCheckOut(bool InVal) {m_CheckOut = InVal;}
+        
+        void CallOnClick();
+
     private:
-        TRef<Texture2D> m_Texture;
+        bool m_CheckOut = false;
     };
 }

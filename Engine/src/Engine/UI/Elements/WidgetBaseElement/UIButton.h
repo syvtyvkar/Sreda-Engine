@@ -17,6 +17,7 @@ namespace Engine::UI
     {
     public:
         UIButton(const std::string& text, const std::string& InFontName);
+        void OnInit() override;
         virtual Vector2 GetComputedSize() const override;
         void OnRender() override;
         void OnUpdate(float deltaTime) override;

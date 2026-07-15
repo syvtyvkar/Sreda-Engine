@@ -20,6 +20,7 @@ namespace Engine::UI
         m_FontName = InFontName;
         m_font = FontManager::GetFontManager().AddFont(InFontName);
         SetFocusable(true);
+        SetSize(Vector2(100.f,15.f));
 
         m_charInputHandle = InputSystem::GetInstance()->OnCharInput().Subscribe(this, &UILineEdit::OnCallCharInput);
         m_clickHandle = OnClick().Subscribe(this, &UILineEdit::OnCallClick);
@@ -269,7 +270,7 @@ namespace Engine::UI
         TColor bgColor = m_BackgroundColor;
         if (m_focused) bgColor = TColor(35, 35, 40, 255);
 
-        InCmd.PushQuad({pos + size * 0.5f, size, bgColor, GetLayout()+0.1f});
+        //InCmd.PushQuad({pos + size * 0.5f, size, bgColor, GetLayout()+0.01f});
 
         TColor borderColor = m_focused ? m_FocusBorderColor : m_BorderColor;
         InCmd.PushRect({{ pos.x + size.x * 0.5f, pos.y + size.y * 0.5f}, size, borderColor, GetLayout()+0.1f});

@@ -317,9 +317,9 @@ namespace Engine::Render
 			s_Data.TextShader->Bind();
 			if (s_Data.FontAtlasTexture)
 				s_Data.FontAtlasTexture->Bind(0);
-			RenderCommand::SetDepthTest(false);
+			//RenderCommand::SetDepthTest(false);
 			RenderCommand::DrawIndexed(s_Data.TextVertexArray, s_Data.TextIndexCount);
-			RenderCommand::SetDepthTest(true);
+			//RenderCommand::SetDepthTest(true);
 			s_Data.Stats.DrawCalls++;
 		}
 	}

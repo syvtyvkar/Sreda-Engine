@@ -11,6 +11,7 @@ namespace Engine::UI
         UIScrollBox();
 
         void OnRender() override;
+        void OnInit() override;
         void OnUpdate(float deltaTime) override;
         Vector2 GetComputedSize() const override;
 

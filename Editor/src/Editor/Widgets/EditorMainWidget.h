@@ -13,9 +13,6 @@ public:
     virtual void OnInit() override;
     virtual void OnRender() override;
 
-    void CallOnWindowReSize(int x, int y); 
-
 private:
-    TRef<UIButton> m_mainButton;
-    TRef<EditorMainMenuBar> m_EditorMainMenuBar;
+    TRef<VerticalBox> m_VerticalBox;
 };

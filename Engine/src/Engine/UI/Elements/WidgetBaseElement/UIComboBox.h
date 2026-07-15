@@ -1,3 +1,4 @@
+
 // (c) Nikita Rogalev. All rights reserved.
 
 #pragma once
@@ -13,16 +14,24 @@ using namespace Engine::Render;
 
 namespace Engine::UI 
 {
-    class UIImage : public UIWidget
+    class UIComboBox : public UIWidget
     {
     public:
-        UIImage(const std::string& InImageAsset);
+        UIComboBox();
         void OnInit() override;
-        void OnRender() override;
         void OnUpdate(float deltaTime) override;
         
         virtual void OnSelfUICollectCommand(UICommandList& InCmd) override;
+
+        std::vector<std::string> GetOptions() const {return Options;}
+        void SetOptions(std::vector<std::string> InVal) {Options = InVal;}
+
+        void AddOption(std::string InVal);
+        void RemoveOption(std::string InVal);
+
+        void CallOnClick();
+
     private:
-        TRef<Texture2D> m_Texture;
+        std::vector<std::string> Options;
     };
 }

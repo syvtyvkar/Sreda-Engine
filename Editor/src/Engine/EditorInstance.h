@@ -16,16 +16,16 @@
 
 using namespace Engine::Render;
 
-class EditorAppInstance : public Engine::ApplicationInstance
+class EditorInstance : public Engine::ApplicationInstance
 {
 public:
 
-    EditorAppInstance();
+    EditorInstance();
     /*{
         
     };*/
 
-    virtual ~EditorAppInstance()
+    virtual ~EditorInstance()
     {
         
     };
@@ -35,7 +35,7 @@ public:
 
     void OnStart() override;
     void OnEnd() override;
-    virtual std::string GetNameApp() override {return "Editor Render";}
+    virtual std::string GetNameApp() override {return "Editor";}
 
     virtual void Update(float DeltaTime) override;
     virtual void OnRender() override;
@@ -43,28 +43,4 @@ public:
 
     void CallOnWindowReSize(int x, int y);
 private:
-
-    TUniquePtr<EditorInputComponent> m_EditorInputHotKey;
-
-    ShaderLibrary m_ShaderLibrary;
-	TRef<Shader> m_Shader;
-	TRef<VertexArray> m_VertexArray;
-
-	TRef<Shader> m_FlatColorShader;
-	TRef<VertexArray> m_SquareVA;
-
-	TRef<Texture2D> m_Texture, m_CheckerboardTexture;
-
-	OrthographicCameraController m_CameraController;
-	TColor m_SquareColor = { 0.2f, 0.3f, 0.8f };
-
-    OrthographicCamera m_ui_camera;
-
-    TRef<Font> m_Font;
-
-    float m_Anim_x=0.f;
-    float m_Anim_y=0.f;
-    float m_Anim_z = 0.f;
-    bool m_AnimIs_x,m_AnimIs_y,m_AnimIs_z = false;
-    uint32_t m_BoxesCount = 0;
 };

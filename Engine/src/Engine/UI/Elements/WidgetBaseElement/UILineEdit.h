@@ -76,7 +76,7 @@ namespace Engine::UI
         std::wstring m_wtext;
         std::string m_FontName;
         std::string m_placeholderText;
-        int m_FontSize = 16;
+        int m_FontSize = 12;
         TRef<Engine::Render::Font> m_font;
 
         TColor m_TextColor = TColor(220, 220, 220, 255);

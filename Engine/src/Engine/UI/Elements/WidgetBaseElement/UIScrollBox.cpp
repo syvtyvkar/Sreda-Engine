@@ -21,6 +21,10 @@ namespace Engine::UI
         UIWidget::OnRender();
     }
 
+    void UIScrollBox::OnInit()
+    {
+    }
+
     void UIScrollBox::OnUpdate(float deltaTime)
     {
         if (!IsVisible()) return;

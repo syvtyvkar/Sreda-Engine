@@ -16,14 +16,14 @@ namespace Engine
     {
     public:
         Application();                                          // Constructor
-        ~Application();                                         // Destructor
-        static TRef<Application> CreateNewApplication();             // Static method to create a single application instance
-        void RunApp(TRef<Engine::EngineCore> InEngine);         // Run the main application loop, InNameApp - window title
+        virtual ~Application();                                 // Destructor
+        static TRef<Application> CreateNewApplication();        // Static method to create a single application instance
+        virtual void RunApp(TRef<Engine::EngineCore> InEngine); // Run the main application loop, InNameApp - window title
         static Application& Get();                              // Get reference to the single instance (singleton)
         void ExitApp();                                         // Request application exit (close window)
         void AddInstance(TUniquePtr<ApplicationInstance> InInstance);
 
-    private:
+    protected:
         void CloseApp();                                        // Internal method to free resources on close
 
         static Application* s_Instance;                         // Pointer to the single instance (singleton)

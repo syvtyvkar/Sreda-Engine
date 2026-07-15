@@ -1,3 +1,4 @@
+
 // (c) Nikita Rogalev. All rights reserved.
 
 #pragma once
@@ -13,16 +14,23 @@ using namespace Engine::Render;
 
 namespace Engine::UI 
 {
-    class UIImage : public UIWidget
+    class UIProgressBar : public UIWidget
     {
     public:
-        UIImage(const std::string& InImageAsset);
+        UIProgressBar();
         void OnInit() override;
-        void OnRender() override;
         void OnUpdate(float deltaTime) override;
         
         virtual void OnSelfUICollectCommand(UICommandList& InCmd) override;
+
+        float GetPercent() const {return m_Percent;}
+        void SetPercent(float InVal) {m_Percent = InVal;}
+
+        float GetPercentMax() const {return m_PercentMax;}
+        void SetPercentMax(float InVal) {m_PercentMax = InVal;}
+
     private:
-        TRef<Texture2D> m_Texture;
+        float m_Percent = 0.5f;
+        float m_PercentMax = 1.f;
     };
 }

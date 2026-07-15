@@ -275,6 +275,11 @@ void EditorAppInstance::OnRender()
 	__super::OnRender();
 }
 
+void EditorAppInstance::OnRenderUI()
+{
+	ApplicationInstance::OnRenderUI();
+}
+
 void EditorAppInstance::CallOnWindowReSize(int x, int y)
 {
 	m_CameraController.OnResize(x,y);

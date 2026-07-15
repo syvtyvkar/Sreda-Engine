@@ -135,6 +135,7 @@ namespace Engine::UI
             child->m_ui_context = m_ui_context;
             float LL = /*0.01f */ m_children.size() + 0.01f;
             child->m_Layout = m_Layout + LL;
+            child->OnInit();
         }
     }
 

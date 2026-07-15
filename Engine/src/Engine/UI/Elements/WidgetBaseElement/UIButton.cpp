@@ -21,6 +21,10 @@ namespace Engine::UI
         SetFocusable(true);
     }
 
+    void UIButton::OnInit()
+    {
+    }
+
     Vector2 UIButton::GetComputedSize() const
     {
         if (m_AutoSize && m_font)
@@ -57,7 +61,7 @@ namespace Engine::UI
         float quadY = pos.y + (size.y/2.f);
 
         InCmd.PushRect({Vector2(quadX, quadY), size, TColor(120,120,120,255), GetLayout()});
-        InCmd.PushText({std::wstring(m_text.begin(), m_text.end()),m_font,Vector2(textX + 1.f, textY + 1.f),GetFontSize(),TColor::Black,-1,GetLayout()});
+        //InCmd.PushText({std::wstring(m_text.begin(), m_text.end()),m_font,Vector2(textX + 1.f, textY + 1.f),GetFontSize(),TColor::Black,-1,GetLayout()});
         InCmd.PushText({std::wstring(m_text.begin(), m_text.end()),m_font,Vector2(textX, textY),GetFontSize(),TextColor,-1,GetLayout()});
         InCmd.PushQuad({Vector2(quadX, quadY), size, IsPressed() ? PressButtonColor : (IsHovered() ? HoverButtonColor : NormalButtonColor), GetLayout()});
     }

@@ -17,6 +17,7 @@ namespace Engine::UI
     {
     public:
         UITextBlock(const std::string& InText, const std::string& InFontName);
+        void OnInit() override;
         void OnRender() override;
         void OnUpdate(float deltaTime) override;
 

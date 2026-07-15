@@ -2,9 +2,11 @@
 #include "Engine/UI/Framework/UIBuilder.h"
 #include "Engine/UI/Elements/BaseElement/Element.h"
 #include "Engine/Core/App/Application.h"
+#include "Engine/UI/Widgets/Editor/UIDockSystem/UIDockExample.h"
 
 #include "Engine/Render/Renderer2D.h"
 
+#include "EditorDemoWidget.h"
 
 EditorMainWidget::EditorMainWidget()
 {
@@ -18,74 +20,35 @@ void EditorMainWidget::OnInit()
 {
     __super::OnInit();
 
-    ENGINE_ASSERT(GetUIContext(), "No valid UIContext!");
-    IWindow* LWin = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(GetUIContext().get()->GetWindowContext());
-    ENGINE_ASSERT(LWin, "Error init EditorMainWidget. No valid window!");
-
-    LWin->OnWindowReSize().Subscribe(this, &EditorMainWidget::CallOnWindowReSize);
-    Vector2 FullSize = Vector2(LWin->GetWidth(), LWin->GetHeight());
-    SetSize(FullSize);
-
     SetVerticalAlignment(UIVerticalAlignment::Stretch);
     SetHorizontalAlignment(UIHorizontalAlignment::Stretch);
 
-    m_mainButton = UIBuilder::CreateButton("Test button");
-    m_mainButton->OnInit();
-    m_mainButton->SetText("Test button 435354");
-    //m_mainButton->SetFontSize(48);
-    m_mainButton->SetSize({80,30});
-    m_mainButton->SetHorizontalAlignment(UIHorizontalAlignment::Center);
-    m_mainButton->SetVerticalAlignment(UIVerticalAlignment::Center);
-
-    m_mainButton->OnClick().Subscribe([&]()
+    m_VerticalBox = UIBuilder::WithProperties<VerticalBox>(UIBuilder::CreateVerticalBox(),[](VerticalBox* widget)
     {
-        ENGINE_LOG_WARN("CLICK BUTTON! YES!");
+
+        widget->SetHorizontalAlignment(UIHorizontalAlignment::Stretch);
+        widget->SetVerticalAlignment(UIVerticalAlignment::Stretch);
     });
-    AddChild(m_mainButton);
 
-    TRef<UIImage> LImage = UIBuilder::CreateImage("t_test_texture.png");
-    LImage->OnInit();
-    LImage->SetHorizontalAlignment(UIHorizontalAlignment::Center);
-    LImage->SetVerticalAlignment(UIVerticalAlignment::Center);
+    AddChild(m_VerticalBox);
 
-
-    AddChild(LImage);
-
-
-    m_EditorMainMenuBar = CreateRef<EditorMainMenuBar>();
-    m_EditorMainMenuBar->OnInit();
-    m_EditorMainMenuBar->SetHorizontalAlignment(UIHorizontalAlignment::Stretch);
-    m_EditorMainMenuBar->SetVerticalAlignment(UIVerticalAlignment::Top);
-    m_EditorMainMenuBar->SetSize(Vector2(FullSize.x,m_EditorMainMenuBar->GetSize().y));
-
-    AddChild(m_EditorMainMenuBar);
-
-    //TRef<VerticalBox> LVecrticalBox = UIBuilder::CreateVerticalBox();
-
-    TRef<UITextBlock> LText = UIBuilder::CreateTextBlock("Debug mode");
-    LText->OnInit();
-    LText->SetText("Text block");
-    LText->SetSize(45);
-    LText->SetHorizontalAlignment(UIHorizontalAlignment::Left);
-    LText->SetVerticalAlignment(UIVerticalAlignment::Bottom);
-    AddChild(LText);
-
-    TRef<UITextBlock> LTextEditLine = UIBuilder::CreateTextBlock("EditLine Text block:");
-    LTextEditLine->OnInit();
-    LTextEditLine->SetSize(16);
-    LTextEditLine->SetHorizontalAlignment(UIHorizontalAlignment::Left);
-    LTextEditLine->SetVerticalAlignment(UIVerticalAlignment::Center);
-    LTextEditLine->SetPosition(Vector2(50,-20));
-    AddChild(LTextEditLine);
-
-    AddChild(
-    UIBuilder::WithProperties<UILineEdit>(UIBuilder::CreateLineEdit(),[](UILineEdit* widget)
+    m_VerticalBox->AddChild(UIBuilder::WithProperties<EditorMainMenuBar>(CreateRef<EditorMainMenuBar>(),[](EditorMainMenuBar* widget)
     {
-        widget->OnInit();
-        widget->SetHorizontalAlignment(UIHorizontalAlignment::Left);
-        widget->SetVerticalAlignment(UIVerticalAlignment::Center);
-        widget->SetSize(Vector2(300.f,20.f));
-        widget->SetPosition(Vector2(50,0));  
+        widget->SetHorizontalAlignment(UIHorizontalAlignment::Stretch);
+        widget->SetVerticalAlignment(UIVerticalAlignment::Top);
+        widget->SetSize(Vector2(widget->GetSize().x,widget->GetSize().y));
+    }));
+
+    m_VerticalBox->AddChild(
+    UIBuilder::WithProperties<UIDockExample>(CreateRef<UIDockExample>(),[](UIDockExample* widget)
+    {
+        widget->SetHorizontalAlignment(UIHorizontalAlignment::Stretch);
+        widget->SetVerticalAlignment(UIVerticalAlignment::Stretch);
+        widget->AddChild(UIBuilder::WithProperties<EditorDemoWidget>(CreateRef<EditorDemoWidget>(),[](EditorDemoWidget* widget)
+        {
+            widget->SetHorizontalAlignment(UIHorizontalAlignment::Stretch);
+            widget->SetVerticalAlignment(UIVerticalAlignment::Stretch);
+        }));
     }));
 }
 
@@ -96,15 +59,4 @@ void EditorMainWidget::OnRender()
     TColor color = TColor::Green;
 
     UIWidget::OnRender();
-}
-
-void EditorMainWidget::CallOnWindowReSize(int x, int y)
-{
-    ENGINE_ASSERT(GetUIContext(), "No valid UIContext!");
-    IWindow* LWinD = EngineCore::GetEngineContext().GetWindowManager()->GetEngineWindow(GetUIContext().get()->GetWindowContext());
-    ENGINE_ASSERT(LWinD, "Error init EditorMainWidget. No valid window!");
-
-    Vector2 FullSize = Vector2(LWinD->GetWidth(), LWinD->GetHeight());
-    SetSize(FullSize);
-    m_EditorMainMenuBar->SetSize(Vector2(FullSize.x,m_EditorMainMenuBar->GetSize().y));
 }

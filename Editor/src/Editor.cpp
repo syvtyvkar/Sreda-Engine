@@ -1,13 +1,15 @@
 #include "Engine/EditorEngineInstance.h"
+#include "Engine/EditorInstance.h"
+#include "Engine/EditorApp.h"
 #include <memory>
 #include <functional>
 
 TUniquePtr<ApplicationInstance> GenerateApplicationInstance()
 {
-    return CreateUniquePtr<EditorAppInstance>();
+    return CreateUniquePtr<EditorInstance>();
 }
 
-/*TUniquePtr<Application> GenerateApplication()
+TUniquePtr<Application> GenerateApplication()
 {
-    return CreateUniquePtr<Application>();
-}*/
+    return CreateUniquePtr<EditorApp>();
+}

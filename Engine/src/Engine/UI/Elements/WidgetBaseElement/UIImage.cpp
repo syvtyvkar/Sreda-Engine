@@ -17,6 +17,10 @@ namespace Engine::UI
         m_Texture = RenderAPIFactory::CreateTexture2DFromPath("/Resources/Textures/" + InImageAsset);
     }
 
+    void UIImage::OnInit()
+    {
+    }
+
     void UIImage::OnRender()
     {
          if (!IsVisible() || !m_Texture) return;
@@ -38,6 +42,9 @@ namespace Engine::UI
         if (!m_Texture) return;
         const Vector2 pos = GetComputedPosition();
         const Vector2 size = GetComputedSize();
-        InCmd.PushQuad({pos,size, m_Texture,1.f,TColor::White, GetLayout()});
+
+        Vector2 quad = Vector2(pos.x + (size.x*0.5f) - ((GetPadding().left + GetPadding().right)/2.f),pos.y + (size.y/2.f));
+
+        InCmd.PushQuad({quad,size, m_Texture,1.f,TColor::White, GetLayout()});
     }
 }

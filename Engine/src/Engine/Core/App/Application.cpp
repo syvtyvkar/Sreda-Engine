@@ -36,7 +36,7 @@ namespace Engine
             ENGINE_LOG_CRITICAL("CRITICAL ERROR! Dublicate application!");              // Error: duplicate
             return nullptr;
         }
-        TRef<Application> LInstance = CreateRef<Application>();
+        TRef<Application> LInstance = GenerateApplication();
         s_Instance = LInstance.get();                                    // Create a new object
         return LInstance;                                                              // Return pointer to the created instance
     }

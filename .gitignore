@@ -12,6 +12,7 @@ vcpkg_installed/*
 
 # external
 Engine/external/*
+Editor/external/*
 
 #Test game
 IDUGame/*

@@ -10,7 +10,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/Editor/Demo)
 
 file(GLOB_RECURSE MY_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-#add_subdirectory(external/imgui-docking)
+add_subdirectory(external/imgui-docking)
 
 add_executable(Editor
     ${MY_SOURCE}
@@ -30,5 +30,5 @@ add_custom_command(TARGET Editor POST_BUILD
 
 target_link_libraries(Editor PRIVATE 
     Engine
-    #imgui
+    imgui
     )

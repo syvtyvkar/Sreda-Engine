@@ -6,7 +6,7 @@
 * Base UI elements
 */
 
-// Base other
+// Base 
 #include "Engine/UI/Elements/WidgetBaseElement/UIButton.h"
 #include "Engine/UI/Elements/WidgetBaseElement/UIImage.h"
 #include "Engine/UI/Elements/WidgetBaseElement/UIScrollBox.h"
@@ -15,4 +15,10 @@
 // Text
 #include "Engine/UI/Elements/WidgetBaseElement/UITextBlock.h"
 #include "Engine/UI/Elements/WidgetBaseElement/UILineEdit.h"
-#include "Engine/UI/Elements/WidgetBaseElement/UITextEdit.h"
+
+// Other
+#include "Engine/UI/Elements/WidgetBaseElement/UICheckBox.h"
+#include "Engine/UI/Elements/WidgetBaseElement/UIComboBox.h"
+#include "Engine/UI/Elements/WidgetBaseElement/UIProgressBar.h"
+#include "Engine/UI/Elements/WidgetBaseElement/UISliderBox.h"
+#include "Engine/UI/Elements/WidgetBaseElement/UISpinBox.h"
