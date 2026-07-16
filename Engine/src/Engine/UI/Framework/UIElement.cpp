@@ -9,9 +9,15 @@ namespace Engine::UI
     {
         if (!IsVisible()) return;
 
+        std::vector<TRef<UIElement>> LCash;
         for (auto& child : m_children)
         {
-            child->OnRender();
+            LCash.push_back(child);
+        }
+        for (auto& LC : LCash)
+        {
+            if (!LC.get()) return;
+            LC->OnRender();
         }
     }
 
@@ -19,9 +25,15 @@ namespace Engine::UI
     {
         if (!IsVisible()) return;
 
+        std::vector<TRef<UIElement>> LCash;
         for (auto& child : m_children)
         {
-            child->OnUpdate(deltaTime);
+            LCash.push_back(child);
+        }
+        for (auto& LC : LCash)
+        {
+            if (!LC.get()) return;
+            LC->OnUpdate(deltaTime);
         }
     }
 
@@ -30,9 +42,15 @@ namespace Engine::UI
         if (!IsVisible()) return;
 
         OnSelfUICollectCommand(InCmd);
+        std::vector<TRef<UIElement>> LCash;
         for (auto& child : m_children)
         {
-            child->OnUICollectCommand(InCmd);
+            LCash.push_back(child);
+        }
+        for (auto& LC : LCash)
+        {
+            if (!LC.get()) return;
+            LC->OnUICollectCommand(InCmd);
         }
     }
 
@@ -148,6 +166,13 @@ namespace Engine::UI
         {
             (*it)->m_parent.reset();
             m_children.erase(it);
+        }
+    }
+    void UIElement::RemoveThisWidget()
+    {
+        if (GetParent())
+        {
+            GetParent()->RemoveChild(shared_from_this());
         }
     }
 }

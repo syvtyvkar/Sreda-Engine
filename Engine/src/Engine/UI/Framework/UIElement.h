@@ -57,6 +57,7 @@ namespace Engine::UI
         void RemoveChild(const TRef<UIElement>& child);
         const std::vector<TRef<UIElement>>& GetChildren() const { return m_children; }
         std::vector<TRef<UIElement>>& GetChildren() { return m_children; }
+        void RemoveThisWidget();
 
         virtual bool IsVisible() const { return m_visible == UIVisibleMode::Visible || m_visible == UIVisibleMode::VisibleNoHit; }
         virtual bool GetVisisbleMode() const { return m_visible; }

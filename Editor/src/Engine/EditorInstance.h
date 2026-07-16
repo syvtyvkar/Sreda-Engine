@@ -5,6 +5,7 @@
 #include "../Editor/Input/EditorInputComponent.h"
 #include "Engine/Core/Utilities/Types.h"
 #include "Engine/Render/Font/Font.h"
+#include "ImGuiLayer.h"
 
 #include <memory>
 #include <functional>
@@ -14,33 +15,28 @@
 #include "Engine/Render/Shader.h"
 #include "Engine/Render/Texture.h"
 
+#include "../Editor/UI/Framework/UIEditorBase.h"
+
 using namespace Engine::Render;
 
 class EditorInstance : public Engine::ApplicationInstance
 {
 public:
-
     EditorInstance();
-    /*{
-        
-    };*/
-
-    virtual ~EditorInstance()
-    {
-        
-    };
+    virtual ~EditorInstance() {};
 
     virtual void OnInit(class Application* InOwnerApp) override;
-    virtual void DeInit()override;
+    virtual void DeInit() override;
 
     void OnStart() override;
     void OnEnd() override;
-    virtual std::string GetNameApp() override {return "Editor";}
+    virtual std::string GetNameApp() override { return "Editor"; }
 
     virtual void Update(float DeltaTime) override;
     virtual void OnRender() override;
     void OnRenderUI() override;
 
-    void CallOnWindowReSize(int x, int y);
 private:
+    ImGuiLayer m_ImGuiLayer;
+    TRef<UIEditorBase> m_EditorRoot;
 };
