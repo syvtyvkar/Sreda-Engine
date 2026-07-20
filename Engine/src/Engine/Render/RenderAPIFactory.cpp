@@ -13,7 +13,7 @@
 #include "Platform/RenderAPI/OpenGL/OpenGLVertex.h"
 
 // Vulkan
-#include "Platform/RenderAPI/Vulkan/VulkanAPI.h"
+/*#include "Platform/RenderAPI/Vulkan/VulkanAPI.h"
 #include "Platform/RenderAPI/Vulkan/VulkanBuffer.h"
 #include "Platform/RenderAPI/Vulkan/VulkanContext.h"
 #include "Platform/RenderAPI/Vulkan/VulkanFramebuffer.h"
@@ -21,7 +21,7 @@
 #include "Platform/RenderAPI/Vulkan/VulkanShader.h"
 #include "Platform/RenderAPI/Vulkan/VulkanTexture.h"
 #include "Platform/RenderAPI/Vulkan/VulkanUniformBuffer.h"
-#include "Platform/RenderAPI/Vulkan/VulkanVertex.h"
+#include "Platform/RenderAPI/Vulkan/VulkanVertex.h"*/
 
 // Engine core
 #include "Engine/Core/Base/EngineCore.h"
@@ -71,7 +71,7 @@ namespace Engine::Render
                 return;
 			case RHI_API::Vulkan:  
                 // Init Vulkan Factory
-                s_VertexArrayCreator = []() -> TRef<VertexArray> { return CreateRef<VulkanVertexArray>(); };
+                /*s_VertexArrayCreator = []() -> TRef<VertexArray> { return CreateRef<VulkanVertexArray>(); };
                 s_UniformBufferCreator = [](uint32_t size, uint32_t binding) -> TRef<UniformBuffer> { return CreateRef<VulkanUniformBuffer>(size, binding); };
                 s_Texture2DCreator = [](const TextureSpecification& specification) -> TRef<Texture2D> { return CreateRef<VulkanTexture2D>(specification); };
                 s_Texture2DCreatorPath = [](const std::string& InPath) -> TRef<Texture2D> { return CreateRef<VulkanTexture2D>(InPath); };
@@ -80,7 +80,7 @@ namespace Engine::Render
                 s_FramebufferCreator = [](const struct FramebufferSpecification& spec) -> TRef<Framebuffer> { return CreateRef<VulkanFramebuffer>(spec); };
                 s_VertexBufferCreator = [](uint32_t size) -> TRef<VertexBuffer> { return CreateRef<VulkanVertexBuffer>(size); };
                 s_VertexBufferCreatorVertx = [](float* vertices, uint32_t size) -> TRef<VertexBuffer> { return CreateRef<VulkanVertexBuffer>(vertices, size); };
-                s_IndexBufferCreator = [](uint32_t* indices, uint32_t count) -> TRef<IndexBuffer> { return CreateRef<VulkanIndexBuffer>(indices,count); };
+                s_IndexBufferCreator = [](uint32_t* indices, uint32_t count) -> TRef<IndexBuffer> { return CreateRef<VulkanIndexBuffer>(indices,count); };*/
                 return;
 		}
     }
@@ -91,7 +91,7 @@ namespace Engine::Render
 		{
 			case RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RHI_API::OpenGL:  return CreateUniquePtr<OpenGLRendererAPI>();
-			case RHI_API::Vulkan:  return CreateUniquePtr<VulkanRendererAPI>();
+			case RHI_API::Vulkan:  return nullptr; //CreateUniquePtr<VulkanRendererAPI>();
 		}
         ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
         return nullptr;
@@ -103,7 +103,7 @@ namespace Engine::Render
 		{
 			case RHI_API::None:    ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 			case RHI_API::OpenGL:  return CreateRef<OpenGLContext>(window);
-			case RHI_API::Vulkan:  return CreateRef<VulkanContext>(window);
+			case RHI_API::Vulkan:  return nullptr; //CreateRef<VulkanContext>(window);
 		}
         ENGINE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
         return nullptr;

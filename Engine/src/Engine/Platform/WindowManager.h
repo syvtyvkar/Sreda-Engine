@@ -38,6 +38,11 @@ namespace Engine
         virtual void SetMainWindow(WindowContext InFocus) = 0;
 
         /**
+         * @brief Update all window events 
+         */
+        virtual void PollEvents() = 0;
+
+        /**
          * @brief Global frame update all windows
          */
         virtual void FrameUpdate(float InDeltaTime) = 0;

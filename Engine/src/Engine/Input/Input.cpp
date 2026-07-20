@@ -45,6 +45,7 @@ namespace Engine
         // Reset mouse delta and scroll, as they accumulate only for one frame.
         LInputSystem->m_mouseDelta={0,0};
         LInputSystem->m_scrollDelta=0.0;
+        ENGINE_LOG_TRACE("Mouse Move: clear");   
     }
 
     void InputSystem::InitNewWindow(TWeak<Engine::IWindow> InWinHandle, Engine::WindowContext InWinContext)
@@ -290,7 +291,8 @@ namespace Engine
         LNewY = IsInverMoveY() ? LNewY*-1.f : LNewY;
         //float LDeltaTime = Engine::Time::TimeSystem::GetDeltaTime();
         //float LSensivityMouse = GetMouseSensivity();
-        //ENGINE_LOG_TRACE("Mouse Move: x {} y {}",LNewX,LNewY);
+        ENGINE_LOG_TRACE("Mouse Move: x {} y {}",LNewX,LNewY);
+        LInputSystem->m_mouseDelta = {LNewX, LNewY};
         LInputSystem->OnMouseMoved().Broadcast(LNewX, LNewY);
         LInputSystem->m_mousePosition.x=x;
         LInputSystem->m_mousePosition.y=y;

@@ -1,10 +1,10 @@
 // (c) Nikita Rogalev. All rights reserved.
 
-/*#pragma once
+#pragma once
 
-#include "Engine/Render/Components/Object.h"
-#include "Engine/Render/Render.h"
-#include "Engine/Render/Camera.h"
+#include "GameObject.h"
+#include "Engine/Render/RendererAPI.h"
+#include "Engine/Render/Camera/Camera.h"
 #include <vector>
 #include <memory>
 #include <string>
@@ -23,11 +23,10 @@ namespace Engine
         void removeGameObject(const std::string& name);
         GameObject* findGameObject(const std::string& name);
 
-        void update(float deltaTime);
-        void render(RenderAPI* renderer);
-        void OnContextRecreated(RenderAPI* renderer);
+        void Update(float deltaTime);
+        void Render();
 
-        void clear();
+        void Clear();
 
         const std::vector<TUniquePtr<GameObject>>& getGameObjects() const 
         { 
@@ -37,14 +36,10 @@ namespace Engine
         const std::string& getName() const { return m_name; }
         Engine::Camera* GetCamera() { return r_camera.get();};
 
-        void SetParentRender(class RenderAPI* scene) { m_parentRender = scene; }
-        class RenderAPI* GetParentRender() const { return m_parentRender; }
-
     private:
         std::string m_name;
         TUniquePtr<Engine::Camera> r_camera;
         std::vector<TUniquePtr<GameObject>> m_gameObjects;
-        class RenderAPI* m_parentRender = nullptr;
     };
 
-}*/
+}

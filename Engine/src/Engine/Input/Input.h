@@ -100,8 +100,8 @@ namespace Engine
         // Mouse state
         Vector2 m_mousePosition = {0,0};                                  // Current cursor position.
         Vector2 m_mouseDelta = {0,0};                                     // Position change per frame.
-        double m_scrollDelta = 0.0;                                         // Accumulated scroll wheel delta.
-        float m_mouseSensivity = 0.2f;                                      // Mouse sensitivity
+        double m_scrollDelta = 0.0;                                       // Accumulated scroll wheel delta.
+        float m_mouseSensivity = 0.2f;                                    // Mouse sensitivity
         bool m_Invers_Y = true;
 
         // Friend class Window has access to private methods (e.g., for processing).

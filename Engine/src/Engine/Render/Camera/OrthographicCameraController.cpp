@@ -2,9 +2,8 @@
 
 #include "OrthographicCameraController.h"
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "../../Engine/Input/KeyCodes.h"
-#include "../../Engine/Input/Input.h"
+#include "BaseEngine.h"
+#include "Engine/Input/Input.h"
 
 using namespace Engine;
 

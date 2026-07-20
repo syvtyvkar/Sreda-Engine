@@ -2,24 +2,21 @@
 
 //#include <glad/glad.h>
 
-/*#include "Scene.h"
+#include "Scene.h"
 #include <algorithm>
 
-#include "Engine/Render/Components/Object.h"
+#include "GameObject.h"
 #include "Engine/Input/Input.h"
-#include "Engine/Render/Camera.h"     
+#include "Engine/Render/Camera/Camera.h"     
 #include "Engine/Core/FileSystem/ResourceManager.h"  
+#include "Engine/Render/Renderer.h"  
 
 namespace Engine 
 {
 
     Scene::Scene(const std::string& name) : m_name(name) 
     {
-        Engine::CameraConfig camConfig;                                                             // Camera setup
-        camConfig.position = Vector3(0.0f, 0.0f, 3.0f);                                           // Camera position
-        camConfig.screenWidth = 800;                                                 // Screen width for aspect ratio
-        camConfig.screenHeight = 600;                                               // Screen height
-        r_camera = CreateUniquePtr<Engine::Camera>(camConfig);
+        createGameObject("NewObj");
     }
 
     Scene::~Scene()
@@ -30,10 +27,7 @@ namespace Engine
 
     GameObject* Scene::createGameObject(const std::string& name) 
     {
-        auto object = CreateUniquePtr<GameObject>(name, this);
-
-        object.get()->SetParentScene(this);
-
+        auto object = CreateUniquePtr<GameObject>();
         GameObject* ptr = object.get();
         m_gameObjects.push_back(std::move(object));
         return ptr;
@@ -41,92 +35,46 @@ namespace Engine
 
     void Scene::removeGameObject(GameObject* object) 
     {
-        m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),[object](const TUniquePtr<GameObject>& obj) {return obj.get() == object;}),m_gameObjects.end());
+       // m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),[object](const TUniquePtr<GameObject>& obj) {return obj.get() == object;}),m_gameObjects.end());
     }
 
     void Scene::removeGameObject(const std::string& name) 
     {
-        m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),[&name](const TUniquePtr<GameObject>& obj) {return obj->getName() == name;}),m_gameObjects.end());
+       // m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),[&name](const TUniquePtr<GameObject>& obj) {return obj->getName() == name;}),m_gameObjects.end());
     }
 
     GameObject* Scene::findGameObject(const std::string& name) 
     {
-        for (auto& obj : m_gameObjects) 
+        /*for (auto& obj : m_gameObjects) 
         {
             if (obj->getName() == name) 
             {
                 return obj.get();
             }
-        }
+        }*/
         return nullptr;
     }
 
-    void Scene::update(float deltaTime) 
+    void Scene::Update(float deltaTime) 
     {
         for (auto& obj : m_gameObjects) 
         {
-            obj->update(deltaTime);
-        }
-
-        if (Engine::InputSystem::IsKeyPressed(InputKey::W))
-        {
-            r_camera.get()->processKeyboard(Engine::CameraMovement::Forward, deltaTime);
-        }
-        if (Engine::InputSystem::IsKeyPressed(InputKey::S))
-        {
-            r_camera.get()->processKeyboard(Engine::CameraMovement::Backward, deltaTime);
-        }
-        if (Engine::InputSystem::IsKeyPressed(InputKey::A))
-        {
-            r_camera.get()->processKeyboard(Engine::CameraMovement::Left, deltaTime);
-        }
-        if (Engine::InputSystem::IsKeyPressed(InputKey::D))
-        {
-            r_camera.get()->processKeyboard(Engine::CameraMovement::Right, deltaTime);
-        }
-        if (Engine::InputSystem::IsKeyPressed(InputKey::Q))
-        {
-            r_camera.get()->processKeyboard(Engine::CameraMovement::Down, deltaTime);
-        }
-        if (Engine::InputSystem::IsKeyPressed(InputKey::E))
-        {
-            r_camera.get()->processKeyboard(Engine::CameraMovement::Up, deltaTime);
+            obj->Update(deltaTime);
         }
     }
 
-    void Scene::render(RenderAPI* renderer) 
+    void Scene::Render() 
     {
         for (auto& obj : m_gameObjects) 
         {
-            obj->render(renderer);
+            obj->Render();
         }
     }
 
-    void Scene::OnContextRecreated(RenderAPI* renderer)
-    {
-        for (auto& obj : m_gameObjects) 
-        {
-            if (Mesh* LMesh = obj.get()->getComponent<Mesh>())
-            {
-                renderer->removeMesh(LMesh, LMesh->GetTransform());
-            }
-        }
-
-
-        for (auto& obj : m_gameObjects) 
-        {
-            if (Mesh* LMesh = obj.get()->getComponent<Mesh>())
-            {
-                renderer->setupMesh(LMesh, LMesh->GetTransform());
-                LMesh->m_materialMesh.get()->loadShader(Engine::ResourceManager::getResourcePath("Resources/Shaders/camera.vert"), Engine::ResourceManager::getResourcePath("Resources/Shaders/camera.frag"));
-            }
-        }
-    }
-
-    void Scene::clear() 
+    void Scene::Clear() 
     {
         m_gameObjects.clear();
         r_camera = {};
     }
 
-}*/
+}

@@ -148,7 +148,6 @@ namespace Engine
 
     void WindowGLFW::EndRender()
     {
-        glfwPollEvents();               // Обработка событий (клавиатура, мышь и т.д.)
         if (!m_GraphicsContext) return;
 		m_GraphicsContext->EndFrame();
 		m_GraphicsContext->SwapBuffers();

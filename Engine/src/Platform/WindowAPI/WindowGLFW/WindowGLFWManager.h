@@ -33,6 +33,8 @@ namespace Engine
 
         virtual bool ShouldClose() const override;
 
+        virtual void PollEvents() override;
+
         /**
          * @brief Global frame update all windows
          */

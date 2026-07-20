@@ -10,12 +10,18 @@
 #include <memory>
 #include <functional>
 
-#include "Engine/Render/OrthographicCameraController.h"
+#include "Engine/Render/Camera/EditorCamera.h"
 #include "Engine/Render/Vertex.h"
 #include "Engine/Render/Shader.h"
 #include "Engine/Render/Texture.h"
 
+//#include "Engine/Render/RenderGraph/RenderGraph.h"
+//#include "Engine/Render/RenderGraph/Passes/GBufferPass.h"
+//#include "Engine/Render/RenderGraph/Passes/LightingPass.h"
+//#include "Engine/Render/RenderGraph/Passes/CompositePass.h"
+
 #include "../Editor/UI/Framework/UIEditorBase.h"
+#include "Engine/Scene/Scene.h"
 
 using namespace Engine::Render;
 
@@ -36,7 +42,31 @@ public:
     virtual void OnRender() override;
     void OnRenderUI() override;
 
+    //uint32_t GetViewportColorAttachmentID() const;
+    //void ResizeViewport(uint32_t width, uint32_t height);
+
 private:
+    //void InitRenderGraph();
+    //void RenderScene();
+
+    TUniquePtr<EditorInputComponent> m_EditorInputHotKey;
+
     ImGuiLayer m_ImGuiLayer;
     TRef<UIEditorBase> m_EditorRoot;
+
+    EditorCamera m_EditorCamera;
+
+    //RenderGraph m_RenderGraph;
+    //TRef<GBufferPass> m_GBufferPass;
+    //TRef<LightingPass> m_LightingPass;
+    //TRef<CompositePass> m_CompositePass;
+
+    //TRef<Framebuffer> m_ViewportFramebuffer;
+    uint32_t m_ViewportWidth = 800;
+    uint32_t m_ViewportHeight = 600;
+    bool m_ViewportDirty = false;
+
+    TRef<Scene> m_Scene;
+
+    Engine::DelegateHandle m_ResizeHandle;
 };

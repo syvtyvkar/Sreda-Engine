@@ -4,13 +4,13 @@
 
 #include "BaseEngine.h"
 
-#include "OrthographicCamera.h"
+#include "Camera/OrthographicCamera.h"
 
 #include "Texture.h"
 
 #include "Font/Font.h"
 
-#include "Camera.h"
+#include "Camera/Camera.h"
 
 namespace Engine::Render
 {

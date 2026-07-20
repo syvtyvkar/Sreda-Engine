@@ -11,8 +11,8 @@
 
 #include "Engine/Core/Integration/CustomGenerationInstance.h"               // Custom generation instance support
 
-#include "Engine/Render/Camera.h"      
-#include "Engine/Render/Renderer.h"    
+//#include "Engine/Render/Camera.h"      
+//#include "Engine/Render/Renderer.h"    
 #include "Engine/Render/RendererAPI.h"
 
 #include <string>

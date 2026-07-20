@@ -4,7 +4,7 @@
 
 #include "Engine/Core/Utilities/Types.h"
 #include "Engine/UI/Framework/UIRenderType.h"
-#include "Engine/Render/OrthographicCamera.h"
+#include "Engine/Render/Camera/OrthographicCamera.h"
 #include <memory>
 #include <unordered_map>
 #include <variant>

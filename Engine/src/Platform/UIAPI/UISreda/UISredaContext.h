@@ -5,7 +5,7 @@
 #include "Engine/UI/Framework/IUIContext.h"
 #include "Engine/UI/Framework/UIWidget.h"
 #include "Engine/UI/Framework/UIRenderCommandList.h"
-#include "Engine/Render/OrthographicCamera.h"
+#include "Engine/Render/Camera/OrthographicCamera.h"
 #include "Engine/Core/Utilities/Event.h"
 
 

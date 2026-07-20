@@ -2,7 +2,7 @@
 build/*
 
 # Vulkan (WIP)
-Engine/src/Platform/RenderAPI/Vulkan/*
+#Engine/src/Platform/RenderAPI/Vulkan/*
 
 # Other project
 Game/*

@@ -145,6 +145,11 @@ namespace Engine
         return false;
     }
 
+    void WindowGLFWManager::PollEvents()
+    {
+        glfwPollEvents();
+    }
+
     void WindowGLFWManager::FrameUpdate(float InDeltaTime)
     {
         if (m_windowList.empty()) return;
@@ -175,7 +180,6 @@ namespace Engine
             }
             LVL.get()->EndRender();
         }
-        glfwPollEvents();
     }
 
     /**

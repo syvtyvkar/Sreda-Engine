@@ -128,5 +128,7 @@ namespace Engine
         m_engineContext.GetWindowManager()->EndRender();*/
 
         m_engineContext.GetWindowManager()->FrameUpdate(Time::TimeSystem::GetDeltaTime());
+        m_engineContext.GetInputSystem()->Update();
+        m_engineContext.GetWindowManager()->PollEvents();
     }
 }

@@ -7,9 +7,6 @@
 #include "RendererAPI.h"
 #include "RenderAPIFactory.h"
 
-#include "Platform/RenderAPI/OpenGL/OpenGLShader.h"
-#include "Platform/RenderAPI/Vulkan/VulkanShader.h"
-
 namespace Engine::Render
 {
 	void ShaderLibrary::Add(const std::string& name, const TRef<Shader>& shader)
